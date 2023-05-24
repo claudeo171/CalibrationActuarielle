@@ -1,0 +1,54 @@
+﻿@using LiveChartsCore.SkiaSharpView.Blazor;
+@using Newtonsoft.Json;
+@using OnlineCalibrator.Shared;
+@using System
+@using System.IO
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavManager
+@page "/CalibrateDistribution"
+
+<h3>CalibrateDistribution</h3>
+<div class="row">
+    @if (ChartCDF != null)
+    {
+        <div class="mx-auto col-xl-6 bg-white shadow chart-sample rounded mx-auto mt-5 divChart">
+            <h5 style="text-align:center">Fonction de répartition empirique</h5>
+            <CartesianChart  Series="ChartCDF.Series" DrawMarginFrame="ChartCDF.DrawMarginFrame">
+            </CartesianChart>
+
+            <div> Caracteristiques </div>
+            <div> Moyenne : @DonneesAAnalyser.Moyenne </div>
+            <div> Variance : @DonneesAAnalyser.Variance </div>
+        </div>
+    }
+    @if (ChartKDE != null)
+    {
+        <div class="mx-auto col-xl-6 bg-white shadow chart-sample rounded mx-auto mt-5 divChart">
+            <h5 style="text-align:center">Estimateur à noyau de la Densité</h5>
+            <CartesianChart  Series="ChartKDE.Series" DrawMarginFrame="ChartKDE.DrawMarginFrame">
+            </CartesianChart>
+        </div>
+    }
+</div>
+
+@code {
+    private ChartViewModelLine ChartCDF;
+    private ChartViewModelLine ChartKDE;
+    private DonneesImportes? DonneesImportes;
+    private DonneesAAnalyser? DonneesAAnalyser;
+    protected override async void OnInitialized()
+    {
+        var json = await sessionStorage.GetItemAsync<string>("donnees");
+        DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
+        var name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
+        DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
+        if (DonneesAAnalyser != null)
+        {
+            ChartKDE = new ChartViewModelLine(DonneesAAnalyser.PointsKDE);
+            ChartCDF = new ChartViewModelLine(DonneesAAnalyser.PointsCDF);
+        }
+        StateHasChanged();
+    }
+}
