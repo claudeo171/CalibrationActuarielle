@@ -18,6 +18,10 @@ namespace OnlineCalibrator.Shared
 
         public double Moyenne => Values?.Average()??0;
         public double Variance => Values == null ? 0: Values.Select(a=>a*a).Mean() - Moyenne* Moyenne;
+        
+        public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
+
+        public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
         public List<TestStatistiques> TestStatistiques { get; set; }
 
@@ -26,6 +30,20 @@ namespace OnlineCalibrator.Shared
         {
             PointsCDF= GenerationGraphique.GetCDF(Values);
             PointsKDE= GenerationGraphique.GetDensity(Values,100);
+        }
+
+        public TestStatistiques? GetTest(TypeTestStatistique type)
+        {
+            if(type== TypeTestStatistique.ShapiroWilk)
+            {
+                return TestStatistiques.FirstOrDefault(a=>a.GetType() == typeof(ShapiroTest));
+            }
+            return null;
+        }
+        public void CalculerTest()
+        {
+            TestStatistiques = new List<TestStatistiques>();
+            TestStatistiques.Add(new ShapiroTest(Values));
         }
 
 

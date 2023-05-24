@@ -21,6 +21,8 @@
             <div> Caracteristiques </div>
             <div> Moyenne : @DonneesAAnalyser.Moyenne </div>
             <div> Variance : @DonneesAAnalyser.Variance </div>
+            <div> Skewness : @DonneesAAnalyser.Skewness </div>
+            <div> Kurtosis : @DonneesAAnalyser.Kurtosis </div>
         </div>
     }
     @if (ChartKDE != null)
@@ -30,6 +32,7 @@
             <CartesianChart  Series="ChartKDE.Series" DrawMarginFrame="ChartKDE.DrawMarginFrame">
             </CartesianChart>
         </div>
+        <a class="btn btn-primary" href="/TestNormalite" ></a>
     }
 </div>
 
