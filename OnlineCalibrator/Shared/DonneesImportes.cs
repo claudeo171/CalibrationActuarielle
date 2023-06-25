@@ -10,5 +10,6 @@ namespace OnlineCalibrator.Shared
     {
         public List<DonneesAAnalyser> Donnees { get; set; }
 
+        public string Nom { get; set; }
     }
 }

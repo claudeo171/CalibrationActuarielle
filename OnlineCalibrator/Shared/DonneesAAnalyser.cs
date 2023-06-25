@@ -1,5 +1,7 @@
 ﻿using GenerationImageDistribution;
 using MathNet.Numerics.Statistics;
+using Stochastique;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,6 +48,19 @@ namespace OnlineCalibrator.Shared
             TestStatistiques.Add(new ShapiroTest(Values));
         }
 
+        public List<Point> GetQQPlot(LoiProbabilite loi, TypeCalibration calibration)
+        {
+            List<Point> rst = new List<Point>();
+            loi.Initialize(Values, calibration);
+            int i = 0;
+            foreach(var elts in Values.Order())
+            { 
+                rst.Add(new Point() { X = loi.InverseCDF((0.5+i)/(Values.Length+1)), Y = elts });
+                i++;
+            }
+            return rst;
+        }
+        
 
     }
 }

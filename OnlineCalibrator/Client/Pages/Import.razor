@@ -1,5 +1,4 @@
-﻿
-@using LiveChartsCore.SkiaSharpView.Blazor;
+﻿@using LiveChartsCore.SkiaSharpView.Blazor;
 @using Newtonsoft.Json;
 @using OnlineCalibrator.Shared;
 @using System
@@ -8,99 +7,218 @@
 @using Microsoft.Extensions.Logging
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
+@inject IJSRuntime js
 @page "/Import"
 <PageTitle>Selectionnez vos données</PageTitle>
 
-<InputFile OnChange="@LoadFiles">Selectionner votre jeu de données</InputFile>
-@if (DonneesImportes != null)
-{
-    <select @bind="nameData">
-        @foreach (var forecast in DonneesImportes.Donnees)
+<nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Import des données</li>
+    </ol>
+</nav>
+
+<div class="card">
+    <div class="card-header main-card-header">
+        Importez vos données
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <label class="btn btn-primary">
+                    Selectionner votre jeu de données
+                    <InputFile class="visually-hidden" OnChange="@LoadFiles"></InputFile>
+
+                </label>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">
+                    Format de l'import
+                </button>
+                <!-- Modal -->
+                <div class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;":"display: none;")" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Format du fichier d'import</h5>
+                                <button type="button" class="btn btn-close" data-dismiss="modal" @onclick="@ShowModal" aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Le format du fichier d'import doit être le suivant soit un fichier que vous avez précédement télécharger dans l'outil ou bien un csv au format suivant (nom de la variable sur la première ligne) : <br />
+                                <img src="Content/Image/FormatImport.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+        @if (DonneesImportes != null)
         {
-            <option value="@forecast.Name">@forecast.Name</option>
+            <div class="row">
+                <div class="col-12">
+                    <select @bind="nameData">
+                        @foreach (var forecast in DonneesImportes.Donnees)
+                        {
+                            <option value="@forecast.Name">@forecast.Name</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary" @onclick="@CalibrerDonne">Calibrer la donnée</button>
+                    <button class="btn btn-danger" @onclick="@SupprimerDonnee">Supprimer Données</button>
+                    <button class="btn btn-outline-primary" @onclick="@SauvegarderDonnee">Sauvegarder Données</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="accordion" id="accordionExample">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button @onclick="@ShowAcordion" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Données importées
+                                </button>
+                            </h2>
+                            <div class="accordion-body">
+
+                                <div id="collapseOne" class="accordion-collapse collapse @(showAcordion?"show":"")" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                @foreach (var forecast in DonneesImportes.Donnees)
+                                                {
+                                                    <th>@forecast.Name</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @for (int i = 0; i < (DonneesImportes.Donnees.FirstOrDefault()?.Values.Length ?? 0); i++)
+                                            {
+                                                <tr>
+                                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                                    {
+                                                        <td>@forecast.Values[i]</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </select>
-    <button class="btn btn-primary"  @onclick="@CalibrerDonne">Calibrer la donnée</button>
-    <table class="table">
-        <thead>
-            <tr>
-                @foreach (var forecast in DonneesImportes.Donnees)
-                {
-                <th>@forecast.Name</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i=0;i<(DonneesImportes.Donnees.FirstOrDefault()?.Values.Length??0);i++)
-            {
-                <tr>
-                    @foreach (var forecast in DonneesImportes.Donnees)
-                    {
-                        <td>@forecast.Values[i]</td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-<h1>Counter</h1>
-<p role="status">Current count: @currentCount</p>
-
+    </div>
+</div>
+<div class="toast-container position-absolute p-3 bottom-0 end-0">
+    @foreach(var error in Errors)
+    {
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <iconify-icon icon="oi:warning" class="text-warning"></iconify-icon>
+                <strong class="me-auto">Erreur</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" @onclick="@(()=>SuppressionErreur(error))" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @error
+            </div>
+        </div>
+    }
+</div>
 
 @code {
-    private int currentCount = 0;
     private string nameData;
     private DonneesImportes DonneesImportes;
+    private bool showAcordion = true;
+    private bool showModal = false;
+    private List<string> Errors = new List<string>();
     public async Task LoadFiles(InputFileChangeEventArgs e)
     {
+        SupprimerDonnee();
         var singleFile = e.File;
 
         Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
         if (!regex.IsMatch(singleFile.Name))
         {
-            //show error invalidad format file
+            regex = new Regex(".+\\.data", RegexOptions.Compiled);
+            if (regex.IsMatch(singleFile.Name))
+            {
+                var stream = singleFile.OpenReadStream(20000000);
+                MemoryStream ms = new MemoryStream();
+                await stream.CopyToAsync(ms);
+                stream.Close();
+                var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
+                DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(outputFileString);
+                nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+            }
+            else
+            {
+                Errors.Add("Le fichier n'est pas au bon format");
+                StateHasChanged();
+            }
         }
         else
         {
             var stream = singleFile.OpenReadStream(20000000);
-            var donneesImportes =new DonneesImportes { Donnees=new List<DonneesAAnalyser>() };
+            var donneesImportes = new DonneesImportes { Donnees = new List<DonneesAAnalyser>(), Nom = Path.GetFileNameWithoutExtension(e.File.Name) };
             MemoryStream ms = new MemoryStream();
             await stream.CopyToAsync(ms);
             stream.Close();
             var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
             int index = 0;
             var lignes = outputFileString.Split(Environment.NewLine);
-            foreach (var item in lignes)
+            try
             {
-                if (item != string.Empty)
+                foreach (var item in lignes)
                 {
-                    if (index == 0)
+                    if (item != string.Empty)
                     {
-                        foreach (var header in SplitCSV(item.ToString()))
+                        if (index == 0)
                         {
-                            donneesImportes.Donnees.Add(new DonneesAAnalyser { Name = header, Values = new double[lignes.Count(a=>a!=string.Empty) - 1] });
+                            foreach (var header in SplitCSV(item.ToString()))
+                            {
+                                donneesImportes.Donnees.Add(new DonneesAAnalyser { Name = header, Values = new double[lignes.Count(a => a != string.Empty) - 1] });
+                            }
+                        }
+                        else
+                        {
+                            var colonnes = SplitCSV(item.ToString());
+                            for (int i = 0; i < colonnes.Length; i++)
+                            {
+                                donneesImportes.Donnees[i].Values[index - 1] = Convert.ToDouble(colonnes[i]);
+                            }
                         }
                     }
-                    else
-                    {
-                        var colonnes = SplitCSV(item.ToString());
-                        for (int i = 0; i < colonnes.Length; i++)
-                        {
-                            donneesImportes.Donnees[i].Values[index - 1] = Convert.ToDouble(colonnes[i]);
-                        }
-                    }
+                    index++;
                 }
-                index++;
+                DonneesImportes = donneesImportes;
+                foreach (var v in DonneesImportes.Donnees)
+                {
+                    v.Initialize();
+                }
+                nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+                string json = JsonConvert.SerializeObject(DonneesImportes);
+                await sessionStorage.SetItemAsync<string>("donnees", json);
             }
-            DonneesImportes = donneesImportes;
-            foreach(var v in DonneesImportes.Donnees)
+            catch (Exception ex)
             {
-                v.Initialize();
+                Errors.Add("Le fichier csv n'est pas au bon format. Il faut que la première ligne soit au format texte et que tout le reste soit des nombres.");
+                StateHasChanged();
             }
-            string json = JsonConvert.SerializeObject(DonneesImportes);
-            await sessionStorage.SetItemAsync<string>("donnees", json);
+    }
+    }
+
+    protected override async void OnInitialized()
+    {
+        var donnees = await sessionStorage.GetItemAsync<string>("donnees");
+        if (donnees != null)
+        {
+            DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(donnees);
+            nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
         }
+        StateHasChanged();
     }
 
     private string[] SplitCSV(string input)
@@ -111,5 +229,31 @@
     {
         sessionStorage.SetItemAsync<string>("dataToAnalyse", nameData);
         NavManager.NavigateTo("/CalibrateDistribution");
+    }
+
+    private void ShowAcordion()
+    {
+        showAcordion = !showAcordion;
+    }
+    private void ShowModal()
+    {
+        showModal = !showModal;
+    }
+
+    private void SupprimerDonnee()
+    {
+        DonneesImportes = null;
+    }
+
+    private async void SauvegarderDonnee()
+    {
+        var text = JsonConvert.SerializeObject(DonneesImportes);
+        var bytes = System.Text.Encoding.UTF8.GetBytes(text);
+        await js.InvokeAsync<object?>("saveFile", new object?[] { DonneesImportes.Nom + ".data", bytes });
+    }
+
+    private void SuppressionErreur(string error)
+    {
+        Errors.Remove(error);
     }
 }

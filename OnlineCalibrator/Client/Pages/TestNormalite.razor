@@ -8,7 +8,13 @@
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @page "/TestNormalite"
-
+<nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+        <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@name)</a></li>
+        <li class="breadcrumb-item active">Test de Normalité</li>
+    </ol>
+</nav>
 <h3>TestNormalite</h3>
 <div> Test Normalité</div>
 @if (isInit)
@@ -17,13 +23,14 @@
 }
 @code {
     private bool isInit;
+    private string name;
     private DonneesImportes? DonneesImportes;
     private DonneesAAnalyser? DonneesAAnalyser;
     protected override async void OnInitialized()
     {
         var json = await sessionStorage.GetItemAsync<string>("donnees");
         DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
-        var name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
+        name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
         DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
         DonneesAAnalyser.CalculerTest();
         isInit=true;

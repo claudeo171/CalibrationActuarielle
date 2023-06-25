@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCalibrator.Client", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCalibrator.Shared", "OnlineCalibrator\Shared\OnlineCalibrator.Shared.csproj", "{DFF12D3F-D91E-4031-AEE1-49DD87C0D9EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stochastique", "Stochastique\Stochastique.csproj", "{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{DFF12D3F-D91E-4031-AEE1-49DD87C0D9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFF12D3F-D91E-4031-AEE1-49DD87C0D9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFF12D3F-D91E-4031-AEE1-49DD87C0D9EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -9,49 +9,103 @@
 @inject NavigationManager NavManager
 @page "/CalibrateDistribution"
 
-<h3>CalibrateDistribution</h3>
-<div class="row">
-    @if (ChartCDF != null)
-    {
-        <div class="mx-auto col-xl-6 bg-white shadow chart-sample rounded mx-auto mt-5 divChart">
-            <h5 style="text-align:center">Fonction de répartition empirique</h5>
-            <CartesianChart  Series="ChartCDF.Series" DrawMarginFrame="ChartCDF.DrawMarginFrame">
-            </CartesianChart>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+        <li class="breadcrumb-item active">Calibration des données (@name)</li>
+    </ol>
+</nav>
 
-            <div> Caracteristiques </div>
-            <div> Moyenne : @DonneesAAnalyser.Moyenne </div>
-            <div> Variance : @DonneesAAnalyser.Variance </div>
-            <div> Skewness : @DonneesAAnalyser.Skewness </div>
-            <div> Kurtosis : @DonneesAAnalyser.Kurtosis </div>
+
+<div class="card">
+    <div class="card-header main-card-header">
+        Calibrer la distribution d'une Variable Aléatoire
+    </div>
+    <div class="card-body row">
+        @if (ChartCDF != null)
+        {
+            <div class="col-xl-6">
+                <div class="card ">
+                    <div class="card-header">
+                        Fonction de répartition empirique
+                    </div>
+                    <div class="card-body divChart">
+                        <CartesianChart Series="ChartCDF.Series" DrawMarginFrame="ChartCDF.DrawMarginFrame">
+                        </CartesianChart>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (ChartKDE != null)
+        {
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        Estimateur à noyau de la Densité
+                    </div>
+                    <div class="card-body divChart">
+                        <CartesianChart Series="ChartKDE.Series" DrawMarginFrame="ChartKDE.DrawMarginFrame">
+                        </CartesianChart>
+                    </div>
+                </div>
+            </div>
+
+        }
+        @if (DonneesAAnalyser != null)
+        {
+            <div class="col-xl-6 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        Caracteristiques Empiriques
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li> Moyenne : @DonneesAAnalyser.Moyenne </li>
+                            <li> Variance : @DonneesAAnalyser.Variance </li>
+                            <li> Skewness : @DonneesAAnalyser.Skewness </li>
+                            <li> Kurtosis : @DonneesAAnalyser.Kurtosis </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-xl-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    Caracteristiques
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="/TestNormalite"> Etude de la normalité </a>
+                </div>
+            </div>
+
         </div>
-    }
-    @if (ChartKDE != null)
-    {
-        <div class="mx-auto col-xl-6 bg-white shadow chart-sample rounded mx-auto mt-5 divChart">
-            <h5 style="text-align:center">Estimateur à noyau de la Densité</h5>
-            <CartesianChart  Series="ChartKDE.Series" DrawMarginFrame="ChartKDE.DrawMarginFrame">
-            </CartesianChart>
-        </div>
-        <a class="btn btn-primary" href="/TestNormalite" ></a>
-    }
+    </div>
 </div>
-
 @code {
     private ChartViewModelLine ChartCDF;
     private ChartViewModelLine ChartKDE;
     private DonneesImportes? DonneesImportes;
     private DonneesAAnalyser? DonneesAAnalyser;
+    private string name;
     protected override async void OnInitialized()
     {
-        var json = await sessionStorage.GetItemAsync<string>("donnees");
-        DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
-        var name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
-        DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
-        if (DonneesAAnalyser != null)
+        try
         {
-            ChartKDE = new ChartViewModelLine(DonneesAAnalyser.PointsKDE);
-            ChartCDF = new ChartViewModelLine(DonneesAAnalyser.PointsCDF);
+            var json = await sessionStorage.GetItemAsync<string>("donnees");
+            DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
+            name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
+            DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
+            if (DonneesAAnalyser != null)
+            {
+                ChartKDE = new ChartViewModelLine(DonneesAAnalyser.PointsKDE);
+                ChartCDF = new ChartViewModelLine(DonneesAAnalyser.PointsCDF);
+            }
+            StateHasChanged();
         }
-        StateHasChanged();
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
     }
 }

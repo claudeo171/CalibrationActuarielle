@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\GenerationImageDistribution\GenerationImageDistribution.csproj" />
+    <ProjectReference Include="..\..\Stochastique\Stochastique.csproj" />
   </ItemGroup>
 
   <ItemGroup>
