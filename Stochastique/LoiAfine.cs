@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace Stochastique
 {
-    public class LoiAfine:LoiProbabilite
+    public class LoiAfine:Distribution
     {
-        public LoiProbabilite LoiBase { get; set; }
+        public Distribution LoiBase { get; set; }
 
-        public LoiAfine(LoiProbabilite loiBase,double a, double b)
+        public LoiAfine(Distribution loiBase,double a, double b)
         {
             LoiBase = loiBase;
             foreach (Parameter param in loiBase.AllParameters())
             {
                 AddParameter(param);
             }
-            AddParameter(new Parameter(Enums.NomParametre.aAfine, a));
-            AddParameter(new Parameter(Enums.NomParametre.bAfine, b));
+            AddParameter(new Parameter(Enums.ParametreName.aAfine, a));
+            AddParameter(new Parameter(Enums.ParametreName.bAfine, b));
         }
 
         public override double PDF(double x)
@@ -33,17 +33,22 @@ namespace Stochastique
             throw new NotImplementedException();
         }
 
-        public override double DerivePDF(NomParametre param, double x)
+        public override double DerivePDF(ParametreName param, double x)
         {
             throw new NotImplementedException();
         }
 
-        public override double DeriveSecondePDF(NomParametre param, double x)
+        public override double DeriveSecondePDF(ParametreName param, double x)
         {
             throw new NotImplementedException();
         }
 
         public override double CDF(double x)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override double InverseCDF(double x)
         {
             throw new NotImplementedException();
         }

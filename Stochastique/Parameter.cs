@@ -9,20 +9,20 @@ namespace Stochastique
 {
     public class Parameter
     {
-        public Parameter(NomParametre nom, double valeur ) {
+        public Parameter(ParametreName nom, double valeur ) {
             Value = valeur;
             NomParametre = nom;
         }
-        public Parameter(NomParametre nom, double valeur, LoiProbabilite? estimateur)
+        public Parameter(ParametreName nom, double valeur, Distribution? estimateur)
         {
             Value = valeur;
             NomParametre = nom;
             Estimateur = estimateur;
         }
         public double Value { get; set; }
-        public LoiProbabilite? Estimateur { get; set; }
+        public Distribution? Estimateur { get; set; }
 
-        public NomParametre NomParametre { get; set; }
+        public ParametreName NomParametre { get; set; }
 
         public double MinValue
         {
@@ -30,15 +30,15 @@ namespace Stochastique
             {
                 switch (NomParametre)
                 {
-                    case NomParametre.aAfine:
+                    case ParametreName.aAfine:
                         return double.MinValue;
-                    case NomParametre.bAfine:
+                    case ParametreName.bAfine:
                         return double.MinValue;
-                    case NomParametre.mu:
+                    case ParametreName.mu:
                         return double.MinValue;
-                    case NomParametre.sigma:
+                    case ParametreName.sigma:
                         return 0;
-                    case NomParametre.n:
+                    case ParametreName.n:
                         return 0;
                     default:
                         return 0;
@@ -51,15 +51,15 @@ namespace Stochastique
             {
                 switch (NomParametre)
                 {
-                    case NomParametre.aAfine:
+                    case ParametreName.aAfine:
                         return double.MaxValue;
-                    case NomParametre.bAfine:
+                    case ParametreName.bAfine:
                         return double.MaxValue;
-                    case NomParametre.mu:
+                    case ParametreName.mu:
                         return double.MaxValue;
-                    case NomParametre.sigma:
+                    case ParametreName.sigma:
                         return double.MaxValue;
-                    case NomParametre.n:
+                    case ParametreName.n:
                         return double.MaxValue;
                     default:
                         return 0;

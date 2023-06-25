@@ -10,7 +10,7 @@ namespace Stochastique.Enums
     {
         Moment, LeastSquare, MaximumLikelyhood
     }
-    public enum NomParametre
+    public enum ParametreName
     {
         aAfine, bAfine, mu, sigma, n
     }

@@ -6,7 +6,7 @@ using Stochastique.Enums;
 
 namespace Stochastique
 {
-    public abstract class LoiProbabilite
+    public abstract class Distribution
     {
         public bool AllowMomentParameter { get; set; }
         public List<ObservablePoint> DensityGraph()
@@ -49,8 +49,8 @@ namespace Stochastique
 
         public abstract double PDF(double x);
 
-        public abstract double DerivePDF(NomParametre param, double x);
-        public abstract double DeriveSecondePDF(NomParametre param, double x);
+        public abstract double DerivePDF(ParametreName param, double x);
+        public abstract double DeriveSecondePDF(ParametreName param, double x);
 
         public abstract double CDF(double x);
         public abstract double InverseCDF(double x);
@@ -59,7 +59,7 @@ namespace Stochastique
 
 
 
-        private Dictionary<NomParametre, Parameter> ParametresParNom { get; set; } = new Dictionary<NomParametre, Parameter>();
+        private Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
 
         public void AddParameter(Parameter parameter)
         {
@@ -73,7 +73,7 @@ namespace Stochastique
             }
         }
 
-        public Parameter GetParameter(NomParametre nomParametre)
+        public Parameter GetParameter(ParametreName nomParametre)
         {
             return ParametresParNom[nomParametre];
         }

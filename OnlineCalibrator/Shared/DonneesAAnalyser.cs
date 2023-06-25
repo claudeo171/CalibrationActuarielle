@@ -48,7 +48,7 @@ namespace OnlineCalibrator.Shared
             TestStatistiques.Add(new ShapiroTest(Values));
         }
 
-        public List<Point> GetQQPlot(LoiProbabilite loi, TypeCalibration calibration)
+        public List<Point> GetQQPlot(Distribution loi, TypeCalibration calibration)
         {
             List<Point> rst = new List<Point>();
             loi.Initialize(Values, calibration);
