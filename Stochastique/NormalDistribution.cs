@@ -23,7 +23,7 @@ namespace Stochastique
 
         public override double InverseCDF(double x)
         {
-            return SpecialFunctions.ErfInv(2*x-0.5)*GetParameter(ParametreName.sigma).Value*Constants.Sqrt2+GetParameter(ParametreName.mu).Value;
+            return SpecialFunctions.ErfInv(2*x-1)*GetParameter(ParametreName.sigma).Value*Constants.Sqrt2+GetParameter(ParametreName.mu).Value;
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
@@ -41,7 +41,7 @@ namespace Stochastique
 
         public override double PDF(double x)
         {
-            return Math.Exp((x - GetParameter(ParametreName.mu).Value) * (x - GetParameter(ParametreName.mu).Value) / (2 * GetParameter(ParametreName.sigma).Value * GetParameter(ParametreName.sigma).Value)) / (Math.Sqrt(Math.PI * 2) * GetParameter(ParametreName.sigma).Value);
+            return Math.Exp(-(x - GetParameter(ParametreName.mu).Value) * (x - GetParameter(ParametreName.mu).Value) / (2 * GetParameter(ParametreName.sigma).Value * GetParameter(ParametreName.sigma).Value)) / (Math.Sqrt(Math.PI * 2) * GetParameter(ParametreName.sigma).Value);
         }
 
         public override double DerivePDF(ParametreName param, double x)

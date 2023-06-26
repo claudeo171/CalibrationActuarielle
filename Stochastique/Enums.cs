@@ -19,4 +19,8 @@ namespace Stochastique.Enums
     {
         NewtonRaphson, FisherScoring, LevenbergMarquardt, BLEICAlgorithm
     }
+    public enum TypeDistribution
+    {
+        Normal, Student, LoiStudentAfine
+    }
 }

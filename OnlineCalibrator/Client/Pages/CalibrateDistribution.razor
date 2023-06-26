@@ -93,7 +93,7 @@
         try
         {
             var json = await sessionStorage.GetItemAsync<string>("donnees");
-            DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
+            DonneesImportes = DonneesImportes.FromJson(json);
             name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
             DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
             if (DonneesAAnalyser != null)

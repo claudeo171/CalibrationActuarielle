@@ -8,6 +8,20 @@ namespace Stochastique
 {
     public abstract class Distribution
     {
+        public static Distribution CreateDistribution(TypeDistribution typeDistribution)
+        {
+            switch (typeDistribution)
+            {
+                case TypeDistribution.Normal:
+                    return new NormalDistribution();
+                case TypeDistribution.Student:
+                    return new StudentDistribution(0);
+                case TypeDistribution.LoiStudentAfine:
+                    return new LoiAfine(new StudentDistribution(1),1,0);
+                default:
+                    return null;
+            }
+        }
         public bool AllowMomentParameter { get; set; }
         public List<ObservablePoint> DensityGraph()
         {
@@ -63,13 +77,13 @@ namespace Stochastique
 
         public void AddParameter(Parameter parameter)
         {
-            if (ParametresParNom.ContainsKey(parameter.NomParametre))
+            if (ParametresParNom.ContainsKey(parameter.Name))
             {
                 throw new ArgumentException("Un paramètre avec le même nom existe");
             }
             else
             {
-                ParametresParNom.Add(parameter.NomParametre, parameter);
+                ParametresParNom.Add(parameter.Name, parameter);
             }
         }
 
@@ -78,7 +92,7 @@ namespace Stochastique
             return ParametresParNom[nomParametre];
         }
 
-        internal IEnumerable<Parameter> AllParameters()
+        public IEnumerable<Parameter> AllParameters()
         {
             return ParametresParNom.Values;
         }

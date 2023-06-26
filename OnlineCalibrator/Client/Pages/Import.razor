@@ -150,7 +150,7 @@
                 await stream.CopyToAsync(ms);
                 stream.Close();
                 var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-                DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(outputFileString);
+                DonneesImportes = DonneesImportes.FromJson(outputFileString); 
                 nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
             }
             else
@@ -207,7 +207,7 @@
                 Errors.Add("Le fichier csv n'est pas au bon format. Il faut que la première ligne soit au format texte et que tout le reste soit des nombres.");
                 StateHasChanged();
             }
-    }
+        }
     }
 
     protected override async void OnInitialized()
@@ -215,7 +215,7 @@
         var donnees = await sessionStorage.GetItemAsync<string>("donnees");
         if (donnees != null)
         {
-            DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(donnees);
+            DonneesImportes = DonneesImportes.FromJson(donnees);
             nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
         }
         StateHasChanged();

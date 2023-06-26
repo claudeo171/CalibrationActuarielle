@@ -5,6 +5,10 @@
 @using System.IO
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
+@using SkiaSharp;
+@using Stochastique.Enums;
+@using Stochastique;
+@using LiveChartsCore.SkiaSharpView.Painting;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @page "/TestNormalite"
@@ -15,26 +19,137 @@
         <li class="breadcrumb-item active">Test de Normalité</li>
     </ol>
 </nav>
-<h3>TestNormalite</h3>
-<div> Test Normalité</div>
-@if (isInit)
-{
-    <div> Shapiro-Wilk: pvalue : @DonneesAAnalyser.GetTest(TypeTestStatistique.ShapiroWilk)?.PValue??0 </div>
-}
+<div class="row">
+    @if (isInit)
+    {
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    Tests stratistiques
+                </div>
+                <div class="card-body">
+                    <ul>
+                        <li>Shapiro-Wilk: pvalue : @(DonneesAAnalyser.GetTest(TypeTestStatistique.ShapiroWilk)?.PValue??0) </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    }
+    @if (distribution != null)
+    {
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    Parametres
+                </div>
+                <div class="card-body">
+                    @if (isInit)
+                    {
+                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>distribution.Calibration)" Value="@distribution.Calibration" ValueChanged="(TypeCalibration s)=>ChangeCalibration(s)">
+                            @foreach (var item in Enum.GetValues(typeof(TypeCalibration)))
+                            {
+                                <option value="@item">@item</option>
+                            })
+                        </InputSelect>
+                    }
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Parametre</th>
+                                <th scope="col">Valeur</th>
+                            </tr>
+                        </thead>
+                        @foreach (var parameter in distribution.Distribution.AllParameters())
+                        {
+                            <tr>
+                                <td>@parameter.Name</td>
+                                <td>@parameter.Value</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+    @if (QQPlot != null)
+    {
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    QQPlot
+                </div>
+                <div class="card-body divChart">
+                    <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
+                </div>
+            </div>
+        </div>
+    }
+    @if(distribution!=null)
+    {
+        <div class="col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    Analyse
+                </div>
+                <div class="card-body">
+                    <label></label>
+                    <InputText class="form-control" @bind-Value="@distribution.SeuilAlphaString" />
+
+                    <label for="exampleFormControlTextarea1" class="form-label">Commentaires</label>
+                    <InputTextArea class="form-control" @onchange="@Save" @bind-Value="@distribution.Comment" />
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+
+
 @code {
     private bool isInit;
     private string name;
+    private ChartViewModelLine? QQPlot;
+    private DistributionWithDatas? distribution;
     private DonneesImportes? DonneesImportes;
     private DonneesAAnalyser? DonneesAAnalyser;
     protected override async void OnInitialized()
     {
         var json = await sessionStorage.GetItemAsync<string>("donnees");
-        DonneesImportes = JsonConvert.DeserializeObject<DonneesImportes>(json);
+        DonneesImportes = DonneesImportes.FromJson(json);
         name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
         DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
         DonneesAAnalyser.CalculerTest();
-        isInit=true;
+        UpdateCalibration(null);
+        isInit = true;
         StateHasChanged();
-        
+    }
+    public void ChangeCalibration(TypeCalibration typeCalibration)
+    {
+        UpdateCalibration(typeCalibration);
+        distribution.Calibration = typeCalibration;
+        StateHasChanged();
+    }
+
+    public async void UpdateCalibration(TypeCalibration? typeCalibration)
+    {
+        distribution = DonneesAAnalyser.GetDistribution(TypeDistribution.Normal, typeCalibration);
+        QQPlot = new ChartViewModelLine(
+    DonneesAAnalyser.GetQQPlot(TypeDistribution.Normal),
+    new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+    new List<Paint>() { null, null });
+    }
+
+    public async void Save()
+    {
+        sessionStorage.SetItemAsync<string>("donnees", DonneesImportes.ToJson());
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (DonneesImportes != null)
+        {
+            Save();
+        }
+        return base.OnAfterRenderAsync(firstRender);
     }
 }

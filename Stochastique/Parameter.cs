@@ -11,24 +11,24 @@ namespace Stochastique
     {
         public Parameter(ParametreName nom, double valeur ) {
             Value = valeur;
-            NomParametre = nom;
+            Name = nom;
         }
         public Parameter(ParametreName nom, double valeur, Distribution? estimateur)
         {
             Value = valeur;
-            NomParametre = nom;
+            Name = nom;
             Estimateur = estimateur;
         }
         public double Value { get; set; }
         public Distribution? Estimateur { get; set; }
 
-        public ParametreName NomParametre { get; set; }
+        public ParametreName Name { get; set; }
 
         public double MinValue
         {
             get
             {
-                switch (NomParametre)
+                switch (Name)
                 {
                     case ParametreName.aAfine:
                         return double.MinValue;
@@ -37,7 +37,7 @@ namespace Stochastique
                     case ParametreName.mu:
                         return double.MinValue;
                     case ParametreName.sigma:
-                        return 0;
+                        return Math.Pow(10,-100);
                     case ParametreName.n:
                         return 0;
                     default:
@@ -49,7 +49,7 @@ namespace Stochastique
         {
             get
             {
-                switch (NomParametre)
+                switch (Name)
                 {
                     case ParametreName.aAfine:
                         return double.MaxValue;
