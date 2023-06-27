@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using OnlineCalibrator.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
-
+builder.Services.AddSingleton<DonneeContainer>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

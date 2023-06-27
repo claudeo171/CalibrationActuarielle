@@ -5,9 +5,11 @@
 @using System.IO
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
+@using System.Text;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
+@inject DonneeContainer donneeContainer
 @page "/Import"
 <PageTitle>Selectionnez vos données</PageTitle>
 
@@ -58,7 +60,7 @@
         {
             <div class="row">
                 <div class="col-12">
-                    <select @bind="nameData">
+                    <select @bind="DonneesImportes.NomData">
                         @foreach (var forecast in DonneesImportes.Donnees)
                         {
                             <option value="@forecast.Name">@forecast.Name</option>
@@ -129,7 +131,6 @@
 </div>
 
 @code {
-    private string nameData;
     private DonneesImportes DonneesImportes;
     private bool showAcordion = true;
     private bool showModal = false;
@@ -150,8 +151,9 @@
                 await stream.CopyToAsync(ms);
                 stream.Close();
                 var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-                DonneesImportes = DonneesImportes.FromJson(outputFileString); 
-                nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+                DonneesImportes = DonneesImportes.FromJson(outputFileString);
+                donneeContainer.SetValue(DonneesImportes);
+                DonneesImportes.NomData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
             }
             else
             {
@@ -198,9 +200,8 @@
                 {
                     v.Initialize();
                 }
-                nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
-                string json = JsonConvert.SerializeObject(DonneesImportes);
-                await sessionStorage.SetItemAsync<string>("donnees", json);
+                DonneesImportes.NomData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+                donneeContainer.SetValue(DonneesImportes);
             }
             catch (Exception ex)
             {
@@ -212,11 +213,9 @@
 
     protected override async void OnInitialized()
     {
-        var donnees = await sessionStorage.GetItemAsync<string>("donnees");
-        if (donnees != null)
+        if (donneeContainer.Value != null)
         {
-            DonneesImportes = DonneesImportes.FromJson(donnees);
-            nameData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+            DonneesImportes = donneeContainer.Value;
         }
         StateHasChanged();
     }
@@ -227,7 +226,6 @@
     }
     private void CalibrerDonne()
     {
-        sessionStorage.SetItemAsync<string>("dataToAnalyse", nameData);
         NavManager.NavigateTo("/CalibrateDistribution");
     }
 
@@ -247,9 +245,10 @@
 
     private async void SauvegarderDonnee()
     {
-        var text = JsonConvert.SerializeObject(DonneesImportes);
-        var bytes = System.Text.Encoding.UTF8.GetBytes(text);
-        await js.InvokeAsync<object?>("saveFile", new object?[] { DonneesImportes.Nom + ".data", bytes });
+        var text = DonneesImportes.ToJson();
+        var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+        await js.InvokeAsync<object?>("downloadFileFromStream", new object?[] { DonneesImportes?.Nom + ".data", streamRef });
     }
 
     private void SuppressionErreur(string error)

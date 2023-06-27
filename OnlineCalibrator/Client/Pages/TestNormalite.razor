@@ -11,11 +11,12 @@
 @using LiveChartsCore.SkiaSharpView.Painting;
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
+@inject DonneeContainer donneeContainer
 @page "/TestNormalite"
 <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
-        <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@name)</a></li>
+        <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@DonneesImportes.NomData)</a></li>
         <li class="breadcrumb-item active">Test de Normalité</li>
     </ol>
 </nav>
@@ -29,7 +30,7 @@
                 </div>
                 <div class="card-body">
                     <ul>
-                        <li>Shapiro-Wilk: pvalue : @(DonneesAAnalyser.GetTest(TypeTestStatistique.ShapiroWilk)?.PValue??0) </li>
+                        <li>Shapiro-Wilk: pvalue : @(DonneesImportes?.ActualData?.GetTest(TypeTestStatistique.ShapiroWilk)?.PValue??0) </li>
                     </ul>
                 </div>
             </div>
@@ -96,7 +97,7 @@
                     <InputText class="form-control" @bind-Value="@distribution.SeuilAlphaString" />
 
                     <label for="exampleFormControlTextarea1" class="form-label">Commentaires</label>
-                    <InputTextArea class="form-control" @onchange="@Save" @bind-Value="@distribution.Comment" />
+                    <InputTextArea class="form-control" @bind-Value="@distribution.Comment" />
                 </div>
             </div>
         </div>
@@ -107,18 +108,14 @@
 
 @code {
     private bool isInit;
-    private string name;
     private ChartViewModelLine? QQPlot;
     private DistributionWithDatas? distribution;
     private DonneesImportes? DonneesImportes;
-    private DonneesAAnalyser? DonneesAAnalyser;
     protected override async void OnInitialized()
     {
-        var json = await sessionStorage.GetItemAsync<string>("donnees");
-        DonneesImportes = DonneesImportes.FromJson(json);
-        name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
-        DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
-        DonneesAAnalyser.CalculerTest();
+        
+        DonneesImportes = donneeContainer.Value;
+        DonneesImportes.ActualData?.CalculerTest();
         UpdateCalibration(null);
         isInit = true;
         StateHasChanged();
@@ -132,24 +129,11 @@
 
     public async void UpdateCalibration(TypeCalibration? typeCalibration)
     {
-        distribution = DonneesAAnalyser.GetDistribution(TypeDistribution.Normal, typeCalibration);
+        distribution = DonneesImportes.ActualData?.GetDistribution(TypeDistribution.Normal, typeCalibration);
         QQPlot = new ChartViewModelLine(
-    DonneesAAnalyser.GetQQPlot(TypeDistribution.Normal),
+    DonneesImportes.ActualData?.GetQQPlot(TypeDistribution.Normal),
     new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
     new List<Paint>() { null, null });
     }
 
-    public async void Save()
-    {
-        sessionStorage.SetItemAsync<string>("donnees", DonneesImportes.ToJson());
-    }
-
-    protected override Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (DonneesImportes != null)
-        {
-            Save();
-        }
-        return base.OnAfterRenderAsync(firstRender);
-    }
 }

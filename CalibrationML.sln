@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCalibrator.Client", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineCalibrator.Shared", "OnlineCalibrator\Shared\OnlineCalibrator.Shared.csproj", "{DFF12D3F-D91E-4031-AEE1-49DD87C0D9EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stochastique", "Stochastique\Stochastique.csproj", "{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stochastique", "Stochastique\Stochastique.csproj", "{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MauiApp1", "MauiApp1\MauiApp1.csproj", "{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,12 @@ Global
 		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA5BFB71-24FD-4CB2-AFAC-023021D14ED8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

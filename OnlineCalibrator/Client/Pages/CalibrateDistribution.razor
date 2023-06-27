@@ -7,14 +7,17 @@
 @using Microsoft.Extensions.Logging
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
+@inject DonneeContainer donneeContainer
 @page "/CalibrateDistribution"
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
-        <li class="breadcrumb-item active">Calibration des données (@name)</li>
-    </ol>
-</nav>
+@if (DonneesImportes != null)
+{
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+            <li class="breadcrumb-item active">Calibration des données (@DonneesImportes.NomData)</li>
+        </ol>
+    </nav>
+}
 
 
 <div class="card">
@@ -51,7 +54,7 @@
             </div>
 
         }
-        @if (DonneesAAnalyser != null)
+        @if (DonneesImportes.ActualData != null)
         {
             <div class="col-xl-6 col-sm-12">
                 <div class="card">
@@ -60,10 +63,10 @@
                     </div>
                     <div class="card-body">
                         <ul>
-                            <li> Moyenne : @DonneesAAnalyser.Moyenne </li>
-                            <li> Variance : @DonneesAAnalyser.Variance </li>
-                            <li> Skewness : @DonneesAAnalyser.Skewness </li>
-                            <li> Kurtosis : @DonneesAAnalyser.Kurtosis </li>
+                            <li> Moyenne : @DonneesImportes.ActualData.Moyenne </li>
+                            <li> Variance : @DonneesImportes.ActualData.Variance </li>
+                            <li> Skewness : @DonneesImportes.ActualData.Skewness </li>
+                            <li> Kurtosis : @DonneesImportes.ActualData.Kurtosis </li>
                         </ul>
                     </div>
                 </div>
@@ -86,20 +89,16 @@
     private ChartViewModelLine ChartCDF;
     private ChartViewModelLine ChartKDE;
     private DonneesImportes? DonneesImportes;
-    private DonneesAAnalyser? DonneesAAnalyser;
-    private string name;
     protected override async void OnInitialized()
     {
         try
         {
-            var json = await sessionStorage.GetItemAsync<string>("donnees");
-            DonneesImportes = DonneesImportes.FromJson(json);
-            name = await sessionStorage.GetItemAsync<string>("dataToAnalyse");
-            DonneesAAnalyser = DonneesImportes?.Donnees.FirstOrDefault(a => a.Name == name);
-            if (DonneesAAnalyser != null)
+            DonneesImportes = donneeContainer.Value;
+
+            if (DonneesImportes != null && DonneesImportes.ActualData!=null)
             {
-                ChartKDE = new ChartViewModelLine(DonneesAAnalyser.PointsKDE);
-                ChartCDF = new ChartViewModelLine(DonneesAAnalyser.PointsCDF);
+                ChartKDE = new ChartViewModelLine(DonneesImportes.ActualData.PointsKDE);
+                ChartCDF = new ChartViewModelLine(DonneesImportes.ActualData.PointsCDF);
             }
             StateHasChanged();
         }
