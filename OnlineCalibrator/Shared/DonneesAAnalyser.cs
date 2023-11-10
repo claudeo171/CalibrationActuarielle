@@ -2,7 +2,7 @@
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 using Newtonsoft.Json;
-using Stochastique;
+using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;

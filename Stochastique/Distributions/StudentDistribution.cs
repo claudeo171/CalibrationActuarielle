@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
     public class StudentDistribution : Distribution
     {
@@ -22,18 +22,18 @@ namespace Stochastique
         public override double CDF(double x)
         {
             //TODO int à la place du du double???
-            return 0.5 + x * SpecialFunctions.Gamma((n + 1) / 2) * SpecialFunctions.GeneralizedHypergeometric(new double[] { 0.5, (n + 1) / 2 }, new double[] { 1.5 },(int)( -x * x / n));
+            return 0.5 + x * SpecialFunctions.Gamma((n + 1) / 2) * SpecialFunctions.GeneralizedHypergeometric(new double[] { 0.5, (n + 1) / 2 }, new double[] { 1.5 }, (int)(-x * x / n));
         }
 
 
         public override double PDF(double x)
         {
-            return SpecialFunctions.Gamma((n + 1) / 2) / (SpecialFunctions.Gamma(n / 2) * Math.Sqrt(Math.PI * n)) * Math.Pow(1+x*x/n,-(n+1)/2);
+            return SpecialFunctions.Gamma((n + 1) / 2) / (SpecialFunctions.Gamma(n / 2) * Math.Sqrt(Math.PI * n)) * Math.Pow(1 + x * x / n, -(n + 1) / 2);
         }
 
         public override double ExpextedValue()
         {
-            if(n>1)
+            if (n > 1)
             {
                 return 0;
             }
@@ -45,10 +45,10 @@ namespace Stochastique
 
         public override double Variance()
         {
-            if(n<=2)
+            if (n <= 2)
             {
                 return n / (n - 2);
-            }    
+            }
             else
             {
                 return double.NaN;

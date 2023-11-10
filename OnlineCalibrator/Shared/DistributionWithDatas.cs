@@ -1,4 +1,4 @@
-﻿using Stochastique;
+﻿using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;

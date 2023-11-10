@@ -6,22 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
     public class Khi2Distribution : Distribution
     {
         public override TypeDistribution Type => TypeDistribution.Khi2;
-        public Khi2Distribution() {
+        public Khi2Distribution()
+        {
         }
         public double k => GetParameter(ParametreName.k).Value;
 
-        public Khi2Distribution(int k):base()
+        public Khi2Distribution(int k) : base()
         {
             AddParameter(new Parameter(ParametreName.k, k));
         }
         public override double CDF(double x)
         {
-            return SpecialFunctions.GammaLowerIncomplete(GetParameter(ParametreName.k).Value/2,x)/SpecialFunctions.Gamma(GetParameter(ParametreName.k).Value / 2);
+            return SpecialFunctions.GammaLowerIncomplete(GetParameter(ParametreName.k).Value / 2, x) / SpecialFunctions.Gamma(GetParameter(ParametreName.k).Value / 2);
         }
 
         public override double PDF(double x)

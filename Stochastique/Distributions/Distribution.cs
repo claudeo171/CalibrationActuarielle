@@ -4,7 +4,7 @@ using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
 using Stochastique.Enums;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
     public abstract class Distribution
     {
@@ -252,8 +252,8 @@ namespace Stochastique
             alglib.minbleicreport rep;
             alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
             alglib.minbleicresults(state, out x, out rep);
-            System.Console.WriteLine("{0}", rep.terminationtype); // EXPECTED: 4
-            System.Console.WriteLine("{0}", alglib.ap.format(x, 2)); // EXPECTED: [-1,1]
+            Console.WriteLine("{0}", rep.terminationtype); // EXPECTED: 4
+            Console.WriteLine("{0}", alglib.ap.format(x, 2)); // EXPECTED: [-1,1]
 
             //
             // Check that OptGuard did not report errors
@@ -264,8 +264,8 @@ namespace Stochastique
             //
             alglib.optguardreport ogrep;
             alglib.minbleicoptguardresults(state, out ogrep);
-            System.Console.WriteLine("{0}", ogrep.nonc0suspected); // EXPECTED: false
-            System.Console.WriteLine("{0}", ogrep.nonc1suspected); // EXPECTED: false
+            Console.WriteLine("{0}", ogrep.nonc0suspected); // EXPECTED: false
+            Console.WriteLine("{0}", ogrep.nonc1suspected); // EXPECTED: false
         }
 
         public void MaximumDeVraisemblance(List<double> values, TypeOptimisation opti = TypeOptimisation.NewtonRaphson)

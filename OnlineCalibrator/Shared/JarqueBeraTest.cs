@@ -1,6 +1,7 @@
 ﻿using MathNet.Numerics.Statistics;
 using Newtonsoft.Json.Linq;
 using Stochastique;
+using Stochastique.Distributions;
 using System;
 using System.Collections.Generic;
 using System.Linq;

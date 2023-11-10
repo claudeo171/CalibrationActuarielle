@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
     public class TrunkatedDistribution : Distribution
     {
@@ -15,7 +15,7 @@ namespace Stochastique
         /// <summary>
         /// The distribution which is trunkated
         /// </summary>
-        public Distribution BaseDistribution {  get; set; }
+        public Distribution BaseDistribution { get; set; }
         /// <summary>
         /// Define if the distributtion is trunkated at is lower or upper bound
         /// </summary>
@@ -29,7 +29,7 @@ namespace Stochastique
 
         public override double CDF(double x)
         {
-            double baseCDF= BaseDistribution.CDF(x);
+            double baseCDF = BaseDistribution.CDF(x);
             if (baseCDF > QuantileUp)
             {
                 return 1;
@@ -44,8 +44,8 @@ namespace Stochastique
             }
         }
 
-        private double MinValue=> Bisection.FindRoot((a) => CDF(a) - (1e-10), double.MinValue, double.MaxValue, maxIterations: 1000);
-        private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) + (1e-10), double.MinValue, double.MaxValue, maxIterations: 1000);
+        private double MinValue => Bisection.FindRoot((a) => CDF(a) - 1e-10, double.MinValue, double.MaxValue, maxIterations: 1000);
+        private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) + 1e-10, double.MinValue, double.MaxValue, maxIterations: 1000);
         public override double ExpextedValue()
         {
             if (ComputedExpectedValue == null)
@@ -74,7 +74,7 @@ namespace Stochastique
         {
             if (ComputedVariance == null)
             {
-                ComputedVariance = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => x * x * PDF(x), MinValue, MaxValue, 1e-2) - ExpextedValue()* ExpextedValue();
+                ComputedVariance = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => x * x * PDF(x), MinValue, MaxValue, 1e-2) - ExpextedValue() * ExpextedValue();
             }
             return ComputedVariance.Value;
         }

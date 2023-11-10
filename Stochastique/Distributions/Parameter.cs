@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
     public class Parameter
     {
-        public Parameter(ParametreName nom, double valeur ) {
+        public Parameter(ParametreName nom, double valeur)
+        {
             Value = valeur;
             Name = nom;
         }
@@ -37,9 +38,17 @@ namespace Stochastique
                     case ParametreName.mu:
                         return double.MinValue;
                     case ParametreName.sigma:
-                        return Math.Pow(10,-100);
+                        return Math.Pow(10, -100);
+                    case ParametreName.qDown:
+                        return 0;
+                    case ParametreName.qUp:
+                        return 0;
+                    case ParametreName.p:
+                        return 0;
                     case ParametreName.n:
                         return 0;
+                    case ParametreName.lambda:
+                        return Math.Pow(10, -100);
                     default:
                         return 0;
                 }
@@ -59,7 +68,15 @@ namespace Stochastique
                         return double.MaxValue;
                     case ParametreName.sigma:
                         return double.MaxValue;
+                    case ParametreName.p:
+                        return 1;
                     case ParametreName.n:
+                        return double.MaxValue;
+                    case ParametreName.qDown:
+                        return 1;
+                    case ParametreName.qUp:
+                        return 1;
+                    case ParametreName.lambda:
                         return double.MaxValue;
                     default:
                         return 0;

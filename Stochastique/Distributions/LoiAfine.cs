@@ -6,23 +6,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique
+namespace Stochastique.Distributions
 {
-    public class LoiAfine:Distribution
+    public class LoiAfine : Distribution
     {
         public Distribution LoiBase { get; set; }
 
         public override TypeDistribution Type => TypeDistribution.LoiStudentAfine;
 
-        public LoiAfine(Distribution loiBase,double a, double b)
+        public LoiAfine(Distribution loiBase, double a, double b)
         {
             LoiBase = loiBase;
             foreach (Parameter param in loiBase.AllParameters())
             {
                 AddParameter(param);
             }
-            AddParameter(new Parameter(Enums.ParametreName.aAfine, a));
-            AddParameter(new Parameter(Enums.ParametreName.bAfine, b));
+            AddParameter(new Parameter(ParametreName.aAfine, a));
+            AddParameter(new Parameter(ParametreName.bAfine, b));
         }
 
         public override double PDF(double x)
@@ -48,12 +48,12 @@ namespace Stochastique
 
         public override double ExpextedValue()
         {
-            return LoiBase.ExpextedValue()* GetParameter(ParametreName.aAfine).Value + GetParameter(ParametreName.bAfine).Value;
+            return LoiBase.ExpextedValue() * GetParameter(ParametreName.aAfine).Value + GetParameter(ParametreName.bAfine).Value;
         }
 
         public override double Variance()
         {
-            return LoiBase.Variance()* GetParameter(ParametreName.aAfine).Value* GetParameter(ParametreName.aAfine).Value;
+            return LoiBase.Variance() * GetParameter(ParametreName.aAfine).Value * GetParameter(ParametreName.aAfine).Value;
         }
     }
 }

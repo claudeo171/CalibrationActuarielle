@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Serialization;
-using Stochastique;
+using Stochastique.Distributions;
 
 namespace OnlineCalibrator.Shared
 {
