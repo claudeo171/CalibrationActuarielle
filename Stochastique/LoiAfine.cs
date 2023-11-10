@@ -12,6 +12,8 @@ namespace Stochastique
     {
         public Distribution LoiBase { get; set; }
 
+        public override TypeDistribution Type => TypeDistribution.LoiStudentAfine;
+
         public LoiAfine(Distribution loiBase,double a, double b)
         {
             LoiBase = loiBase;
@@ -33,15 +35,6 @@ namespace Stochastique
             throw new NotImplementedException();
         }
 
-        public override double DerivePDF(ParametreName param, double x)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override double DeriveSecondePDF(ParametreName param, double x)
-        {
-            throw new NotImplementedException();
-        }
 
         public override double CDF(double x)
         {
@@ -51,6 +44,16 @@ namespace Stochastique
         public override double InverseCDF(double x)
         {
             throw new NotImplementedException();
+        }
+
+        public override double ExpextedValue()
+        {
+            return LoiBase.ExpextedValue()* GetParameter(ParametreName.aAfine).Value + GetParameter(ParametreName.bAfine).Value;
+        }
+
+        public override double Variance()
+        {
+            return LoiBase.Variance()* GetParameter(ParametreName.aAfine).Value* GetParameter(ParametreName.aAfine).Value;
         }
     }
 }

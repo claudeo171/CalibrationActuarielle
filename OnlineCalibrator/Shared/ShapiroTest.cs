@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    public class ShapiroTest : TestStatistiques
+    public class ShapiroTest : TestStatistique
     {
         public ShapiroTest(double[] values)
         {
+            Name = "Shapiro-Wilk";
             StateH0= TypeDonnees.Normal;
             StateH1= TypeDonnees.NotNormal;
             Test = new ShapiroWilkTest(values);
@@ -18,5 +19,7 @@ namespace OnlineCalibrator.Shared
         }
 
         public ShapiroWilkTest Test { get; set; }
+
+
     }
 }

@@ -30,7 +30,13 @@
                 </div>
                 <div class="card-body">
                     <ul>
-                        <li>Shapiro-Wilk: pvalue : @(DonneesImportes?.ActualData?.GetTest(TypeTestStatistique.ShapiroWilk)?.PValue??0) </li>
+                        @if (distribution != null)
+                        {
+                            @foreach (var test in distribution.TestStatistiques)
+                            {
+                                <li>@test.Name : pvalue : @(test?.PValue ?? 0) </li>
+                            }
+                        }
                     </ul>
                 </div>
             </div>
@@ -85,7 +91,7 @@
             </div>
         </div>
     }
-    @if(distribution!=null)
+    @if (distribution != null)
     {
         <div class="col-xl-6">
             <div class="card">
@@ -93,8 +99,15 @@
                     Analyse
                 </div>
                 <div class="card-body">
-                    <label></label>
+                    <label class="form-label">Seuil de significativité choisie</label>
                     <InputText class="form-control" @bind-Value="@distribution.SeuilAlphaString" />
+
+                    @foreach(var test in distribution.ResultatTest)
+                    {
+                        <ul>
+                            <li>@test.Key.Name : Conclusion : @test.Value </li>
+                        </ul>
+                    }
 
                     <label for="exampleFormControlTextarea1" class="form-label">Commentaires</label>
                     <InputTextArea class="form-control" @bind-Value="@distribution.Comment" />
@@ -113,7 +126,7 @@
     private DonneesImportes? DonneesImportes;
     protected override async void OnInitialized()
     {
-        
+
         DonneesImportes = donneeContainer.Value;
         DonneesImportes.ActualData?.CalculerTest();
         UpdateCalibration(null);

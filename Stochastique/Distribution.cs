@@ -8,16 +8,20 @@ namespace Stochastique
 {
     public abstract class Distribution
     {
+        public virtual bool CanComputeExpectedValueEasily => true;
+        public abstract TypeDistribution Type { get; }
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
             switch (typeDistribution)
             {
                 case TypeDistribution.Normal:
                     return new NormalDistribution();
+                case TypeDistribution.Khi2:
+                    return new Khi2Distribution();
                 case TypeDistribution.Student:
                     return new StudentDistribution(0);
                 case TypeDistribution.LoiStudentAfine:
-                    return new LoiAfine(new StudentDistribution(1),1,0);
+                    return new LoiAfine(new StudentDistribution(1), 1, 0);
                 default:
                     return null;
             }
@@ -63,11 +67,69 @@ namespace Stochastique
 
         public abstract double PDF(double x);
 
-        public abstract double DerivePDF(ParametreName param, double x);
-        public abstract double DeriveSecondePDF(ParametreName param, double x);
 
+        public abstract double ExpextedValue();
+        public abstract double Variance();
+        public double EcartType()
+        {
+            return Math.Sqrt(Variance());
+        }
         public abstract double CDF(double x);
-        public abstract double InverseCDF(double x);
+        public virtual double InverseCDF(double x)
+        {
+            if (x <= 0 || x >= 1)
+            {
+                throw new ArgumentException("Le paramètre doit être compris entre 0 et 1");
+            }
+            double min = -1;
+            double max = 1;
+            if (CanComputeExpectedValueEasily && !double.IsNaN(ExpextedValue()) && !double.IsNaN(Variance()))
+            {
+                min = ExpextedValue() - EcartType() * 10;
+                max = ExpextedValue() + EcartType() * 10;
+            }
+
+            while (CDF(min) > x)
+            {
+                if (!double.IsNaN(Variance()))
+                {
+                    min -= EcartType() * 10;
+                }
+                else
+                {
+                    min *= 10;
+                }
+
+            }
+            while (CDF(max) < x)
+            {
+                if (!double.IsNaN(Variance()))
+                {
+                    max += EcartType() * 10;
+                }
+                else
+                {
+                    min *= 10;
+                }
+
+            }
+            double abs = (max + min) / 2;
+            double ordonne = CDF(abs);
+            while (Math.Abs(ordonne - x) > 1e-6)
+            {
+                if (x < ordonne)
+                {
+                    max = ordonne;
+                }
+                else if (x > ordonne)
+                {
+                    min = ordonne;
+                }
+                abs = (max + min) / 2;
+                ordonne = CDF(abs);
+            }
+            return abs;
+        }
 
         public Intervale? IntervaleForDisplay { get; set; }
 
@@ -117,11 +179,15 @@ namespace Stochastique
         }
         public void GetLogVraissemblanceOptim(IEnumerable<double> values, double[] x, ref double func, object obj)
         {
-            for(int i=0;i<x.Length;i++)
+            for (int i = 0; i < x.Length; i++)
             {
                 ParametresParNom.Values.ElementAt(i).Value = x[i];
             }
-            func= -GetLogVraissemblance(values);
+            func = -GetLogVraissemblance(values);
+            if (double.IsPositiveInfinity(func))
+            {
+                func = double.MaxValue;
+            }
         }
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
@@ -153,7 +219,7 @@ namespace Stochastique
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = new double[] { 1, 1 };
 
-            double[] bndl = parameters.Select(p=> p.MinValue).ToArray();
+            double[] bndl = parameters.Select(p => p.MinValue).ToArray();
             double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
             alglib.minbleicstate state;
             double epsg = 0;

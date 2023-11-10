@@ -8,10 +8,10 @@ namespace OnlineCalibrator.Shared
 {
     public enum TypeTestStatistique
     {
-        ShapiroWilk
+        ShapiroWilk, JarqueBera
     }
     public enum TypeDonnees
     {
-        Normal,NotNormal
+        Normal,NotNormal,NA
     }
 }

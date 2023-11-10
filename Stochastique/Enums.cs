@@ -12,7 +12,8 @@ namespace Stochastique.Enums
     }
     public enum ParametreName
     {
-        aAfine, bAfine, mu, sigma, n
+        aAfine, bAfine, mu, sigma, n,
+        k,qUp,qDown
     }
 
     public enum TypeOptimisation
@@ -21,6 +22,7 @@ namespace Stochastique.Enums
     }
     public enum TypeDistribution
     {
-        Normal, Student, LoiStudentAfine
+        Normal, Student, LoiStudentAfine,
+        Khi2
     }
 }

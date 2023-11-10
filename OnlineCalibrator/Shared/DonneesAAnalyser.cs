@@ -27,7 +27,8 @@ namespace OnlineCalibrator.Shared
 
         public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
-        public List<TestStatistiques>? TestStatistiques { get; set; }
+
+        public Dictionary<TestStatistique, bool>? ResultatStatistique { get; set; }
         /// <summary>
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
@@ -40,18 +41,10 @@ namespace OnlineCalibrator.Shared
             PointsKDE= GenerationGraphique.GetDensity(Values,100);
         }
 
-        public TestStatistiques? GetTest(TypeTestStatistique type)
-        {
-            if(type== TypeTestStatistique.ShapiroWilk)
-            {
-                return TestStatistiques.FirstOrDefault(a=>a.GetType() == typeof(ShapiroTest));
-            }
-            return null;
-        }
+
         public void CalculerTest()
         {
-            TestStatistiques = new List<TestStatistiques>();
-            TestStatistiques.Add(new ShapiroTest(Values));
+
         }
 
         public List<Point[]> GetQQPlot(TypeDistribution typeDistribution)
@@ -93,7 +86,7 @@ namespace OnlineCalibrator.Shared
                 }
                 else
                 {
-                    Distributions.Add(new DistributionWithDatas(distrib) { Calibration=calibration.Value});
+                    Distributions.Add(new DistributionWithDatas(distrib,Values) { Calibration=calibration.Value});
                 }
             }
             else if(calibration ==null  && !Distributions.Any(a => a.Distribution.GetType() == distrib.GetType()))
