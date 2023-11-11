@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Discrete
 {
     public class PoissonDistribution : DiscreteDistribution
     {
@@ -21,7 +21,7 @@ namespace Stochastique.Distributions
 
         protected override double PDFInt(int x)
         {
-            return Math.Exp(-Lambda)*Math.Exp(Math.Log(Lambda)*x-SpecialFunctions.FactorialLn(x));
+            return Math.Exp(-Lambda) * Math.Exp(Math.Log(Lambda) * x - SpecialFunctions.FactorialLn(x));
         }
 
         public override double Variance()

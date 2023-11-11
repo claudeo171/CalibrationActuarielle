@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
+using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 
 namespace Stochastique.Distributions

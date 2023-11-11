@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Discrete
 {
     public class BinomialDistribution : DiscreteDistribution
     {
@@ -14,7 +14,7 @@ namespace Stochastique.Distributions
         private double N => GetParameter(ParametreName.n).Value;
         public override TypeDistribution Type => TypeDistribution.Binomial;
 
-        protected override double MaxValue=> N;
+        protected override double MaxValue => N;
 
         public override double ExpextedValue()
         {
@@ -23,12 +23,12 @@ namespace Stochastique.Distributions
 
         protected override double PDFInt(int x)
         {
-            return Math.Exp(SpecialFunctions.FactorialLn((int)N)- SpecialFunctions.FactorialLn((int)(N-x)) - SpecialFunctions.FactorialLn((int)x) + x * Math.Log(P) + (N-x) * Math.Log(1-P));
+            return Math.Exp(SpecialFunctions.FactorialLn((int)N) - SpecialFunctions.FactorialLn((int)(N - x)) - SpecialFunctions.FactorialLn(x) + x * Math.Log(P) + (N - x) * Math.Log(1 - P));
         }
 
         public override double Variance()
         {
-            return N * P * (1-P);
+            return N * P * (1 - P);
         }
     }
 }

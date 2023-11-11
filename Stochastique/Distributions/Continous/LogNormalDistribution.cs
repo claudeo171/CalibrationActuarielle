@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Continous
 {
     internal class LogNormalDistribution : Distribution
     {

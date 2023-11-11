@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Continous
 {
     public class NormalDistribution : Distribution
     {

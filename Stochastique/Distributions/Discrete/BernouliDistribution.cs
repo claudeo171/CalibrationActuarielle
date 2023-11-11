@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Discrete
 {
     public class BernouliDistribution : DiscreteDistribution
     {

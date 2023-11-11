@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using Stochastique;
 using Stochastique.Distributions;
+using Stochastique.Distributions.Continous;
 using System;
 using System.Collections.Generic;
 using System.Linq;

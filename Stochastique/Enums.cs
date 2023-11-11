@@ -14,7 +14,8 @@ namespace Stochastique.Enums
     {
         aAfine, bAfine, mu, sigma, n,
         k,qUp,qDown,
-        p,lambda
+        p,lambda,r,N,a,b,d1,d2,
+        theta
     }
 
     public enum TypeOptimisation
@@ -24,6 +25,6 @@ namespace Stochastique.Enums
     public enum TypeDistribution
     {
         Normal, Student, LoiStudentAfine,
-        Khi2, Bernouli, Binomial,Poisson
+        Khi2, Bernouli, Binomial,Poisson, Geometric,NegativeBinomial,Pascal,Hypergeometrical,Beta,Cauchy,Exponential,Fisher,Gamma,Uniform,Weibull
     }
 }

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Stochastique.Distributions
+namespace Stochastique.Distributions.Discrete
 {
-    public abstract class DiscreteDistribution:Distribution
+    public abstract class DiscreteDistribution : Distribution
     {
-        protected virtual double MaxValue => 0;
+        protected virtual double MaxValue => double.MaxValue;
         public override double CDF(double k)
         {
             if (k > MaxValue)
@@ -20,7 +20,7 @@ namespace Stochastique.Distributions
                 var rst = 0.0;
                 for (int i = 0; i < k; i++)
                 {
-                    rst += PDF((double)i);
+                    rst += PDF(i);
                 }
                 return rst;
             }
@@ -33,6 +33,12 @@ namespace Stochastique.Distributions
             }
             return 0;
         }
+
+        /// <summary>
+        /// Value of mass distribution for int for discrete distribution
+        /// </summary>
+        /// <param name="k">the value of the absice</param>
+        /// <returns></returns>
         protected abstract double PDFInt(int k);
 
     }
