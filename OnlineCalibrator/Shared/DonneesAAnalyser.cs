@@ -95,5 +95,7 @@ namespace OnlineCalibrator.Shared
             }
             return Distributions.First(a => a.Distribution.GetType() == distrib.GetType()); 
         } 
+
+
     }
 }

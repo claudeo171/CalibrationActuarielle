@@ -1,4 +1,6 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics.Statistics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -40,5 +42,20 @@ namespace Stochastique.Distributions.Continous
         {
             return Lambda * Lambda * SpecialFunctions.Gamma(1 + 2 / K) - Math.Pow(ExpextedValue(), 2);
         }
+
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            var mm = variance / ev / ev;
+            AddParameter(new Parameter(ParametreName.k, OptimHelper.OptimHelper.GetOptimalParametre(ev, GetParameter(ParametreName.k).MinValue, GetParameter(ParametreName.k).MaxValue, (a) =>
+            {
+                return Math.Pow(mm - (SpecialFunctions.Gamma(1 + 2 / a) - SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)) / (SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)), 2);
+            })));
+            AddParameter(new Parameter(ParametreName.theta, Math.Pow( ev/(SpecialFunctions.Gamma(1/K)+1), K)));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
+        }
+
     }
 }

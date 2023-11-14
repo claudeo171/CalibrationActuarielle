@@ -1,4 +1,5 @@
-﻿using Stochastique.Enums;
+﻿using MathNet.Numerics.Statistics;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,5 +55,24 @@ namespace Stochastique.Distributions.Continous
         {
             return (B - A) * (B - A) / 12;
         }
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            if(variance * 192 -60*ev*ev>0)
+            {
+                AddParameter(new Parameter(ParametreName.b, Math.Max(value.Max(), (-2 * ev + Math.Sqrt(variance*192-60*ev*ev))/8)));
+                AddParameter(new Parameter(ParametreName.a, Math.Min(value.Min(), 2*ev - GetParameter(ParametreName.b).Value)));
+            }
+            else
+            {
+                AddParameter(new Parameter(ParametreName.b, value.Max()));
+                AddParameter(new Parameter(ParametreName.a, value.Min()));
+            }
+
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
+        }
+
     }
 }

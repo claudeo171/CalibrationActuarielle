@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -29,6 +30,16 @@ namespace Stochastique.Distributions.Discrete
         public override double Variance()
         {
             return N * P * (1 - P);
+        }
+
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            AddParameter(new Parameter(ParametreName.p, Math.Min(1,Math.Max(0, (1-variance/ev)))));
+            AddParameter(new Parameter(ParametreName.n, ev/P));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Stochastique.Distributions.Discrete
 {
     public abstract class DiscreteDistribution : Distribution
     {
+        public override bool IsDiscreet => true;
         protected virtual double MaxValue => double.MaxValue;
         public override double CDF(double k)
         {

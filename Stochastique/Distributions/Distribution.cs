@@ -3,7 +3,9 @@ using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
 using Stochastique.Distributions.Continous;
+using Stochastique.Distributions.Discrete;
 using Stochastique.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Stochastique.Distributions
 {
@@ -11,6 +13,8 @@ namespace Stochastique.Distributions
     {
         public virtual bool CanComputeExpectedValueEasily => true;
         public abstract TypeDistribution Type { get; }
+
+        public virtual bool IsDiscreet => false;
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
             switch (typeDistribution)
@@ -23,6 +27,31 @@ namespace Stochastique.Distributions
                     return new StudentDistribution(0);
                 case TypeDistribution.LoiStudentAfine:
                     return new LoiAfine(new StudentDistribution(1), 1, 0);
+                case TypeDistribution.Bernouli:
+                    return new BernouliDistribution();
+                case TypeDistribution.Poisson:
+                    return new PoissonDistribution();
+                case TypeDistribution.Weibull:
+                    return new WeibullDistribution();
+                case TypeDistribution.Binomial:
+                    return new BinomialDistribution();
+                case TypeDistribution.Beta:
+                    return new BetaDistribution();
+                case TypeDistribution.Cauchy:
+                    return new CauchyDistribution();
+                case TypeDistribution.Exponential:
+                    return new ExponentialDistribution();
+                case TypeDistribution.Fisher:
+                    return new FisherDistribution();
+                case TypeDistribution.Gamma:
+                    return new GammaDistribution();
+                case TypeDistribution.Geometric:
+                    return new GeometricDistribution();
+                case TypeDistribution.Hypergeometrical:
+                    return new HyperGeometricalDistribution();
+                case TypeDistribution.NegativeBinomial: return new NegativeBinomialDistribution();
+                case TypeDistribution.Pascal: return new PascalDistribution();
+                case TypeDistribution.Uniform: return new UniformDistribution();
                 default:
                     return null;
             }
@@ -62,6 +91,7 @@ namespace Stochastique.Distributions
                     Optim(value, typeCalibration);
                     break;
                 case TypeCalibration.LeastSquare:
+                    Optim(value, typeCalibration);
                     break;
             }
         }
@@ -190,36 +220,30 @@ namespace Stochastique.Distributions
                 func = double.MaxValue;
             }
         }
+
+        public void GetSquaredError(IEnumerable<double> values, double[] x, ref double func, object obj)
+        {
+            for (int i = 0; i < x.Length; i++)
+            {
+                ParametresParNom.Values.ElementAt(i).Value = x[i];
+            }
+            double increment = 1.0 / (values.Count()-1);
+            double value = increment / 2;
+            foreach(var val in values)
+            {
+                var invCDF = InverseCDF(value);
+                func += (val - invCDF)* (val - invCDF);
+            }
+            if (double.IsPositiveInfinity(func))
+            {
+                func = double.MaxValue;
+            }
+        }
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
-            //
-            // This example demonstrates minimization of
-            //
-            //     f(x,y) = 100*(x+3)^4+(y-3)^4
-            //
-            // subject to box constraints
-            //
-            //     -1<=x<=+1, -1<=y<=+1
-            //
-            // using BLEIC optimizer with:
-            // * numerical differentiation being used
-            // * initial point x=[0,0]
-            // * unit scale being set for all variables (see minbleicsetscale for more info)
-            // * stopping criteria set to "terminate after short enough step"
-            // * OptGuard integrity check being used to check problem statement
-            //   for some common errors like nonsmoothness or bad analytic gradient
-            //
-            // First, we create optimizer object and tune its properties:
-            // * set box constraints
-            // * set variable scales
-            // * set stopping criteria
-
             var parameters = AllParameters().ToList();
-
-
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = new double[] { 1, 1 };
-
             double[] bndl = parameters.Select(p => p.MinValue).ToArray();
             double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
             alglib.minbleicstate state;
@@ -234,54 +258,23 @@ namespace Stochastique.Distributions
             alglib.minbleicsetscale(state, s);
             alglib.minbleicsetcond(state, epsg, epsf, epsx, maxits);
 
-            //
-            // Then we activate OptGuard integrity checking.
-            //
-            // Numerical differentiation always produces "correct" gradient
-            // (with some truncation error, but unbiased). Thus, we just have
-            // to check smoothness properties of the target: C0 and C1 continuity.
-            //
-            // Sometimes user accidentally tries to solve nonsmooth problems
-            // with smooth optimizer. OptGuard helps to detect such situations
-            // early, at the prototyping stage.
-            //
             alglib.minbleicoptguardsmoothness(state);
 
-            //
-            // Optimize and evaluate results
-            //
             alglib.minbleicreport rep;
-            alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
+            if (typeCalibration == TypeCalibration.LeastSquare)
+            {
+                values = values.Order();
+                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetSquaredError(values, xx, ref yy, zz), null, null);
+            }
+            else
+            {
+                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
+            }
             alglib.minbleicresults(state, out x, out rep);
-            Console.WriteLine("{0}", rep.terminationtype); // EXPECTED: 4
-            Console.WriteLine("{0}", alglib.ap.format(x, 2)); // EXPECTED: [-1,1]
 
-            //
-            // Check that OptGuard did not report errors
-            //
-            // Want to challenge OptGuard? Try to make your problem
-            // nonsmooth by replacing 100*(x+3)^4 by 100*|x+3| and
-            // re-run optimizer.
-            //
             alglib.optguardreport ogrep;
             alglib.minbleicoptguardresults(state, out ogrep);
-            Console.WriteLine("{0}", ogrep.nonc0suspected); // EXPECTED: false
-            Console.WriteLine("{0}", ogrep.nonc1suspected); // EXPECTED: false
         }
-
-        public void MaximumDeVraisemblance(List<double> values, TypeOptimisation opti = TypeOptimisation.NewtonRaphson)
-        {
-            if (opti == TypeOptimisation.LevenbergMarquardt)
-            {
-                LevenbergMarquardtMinimizer levenbergMarquardtMinimizer = new LevenbergMarquardtMinimizer();
-                //levenbergMarquardtMinimizer.FindMinimum(()
-            }
-            else if (opti == TypeOptimisation.BLEICAlgorithm)
-            {
-                alglib.minbleicstate state;
-            }
-        }
-
 
     }
 

@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -32,6 +33,16 @@ namespace Stochastique.Distributions.Continous
         public override double Variance()
         {
             return K * Theta * Theta;
+        }
+
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            AddParameter(new Parameter(ParametreName.theta, variance/ev));
+            AddParameter(new Parameter(ParametreName.k, ev*ev / variance));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
     }
 }

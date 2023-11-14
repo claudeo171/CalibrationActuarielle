@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Stochastique.Distributions.Discrete
         /// <summary>
         /// p parameter value
         /// </summary>
-        public double P => GetParameter(ParametreName.p).Value;
+        public double NP => GetParameter(ParametreName.Np).Value;
         /// <summary>
         /// n parameter value
         /// </summary>
@@ -31,27 +32,38 @@ namespace Stochastique.Distributions.Discrete
 
         public override double ExpextedValue()
         {
-            return n * P;
+            return n * NP / N;
         }
 
         public override double Variance()
         {
-            return n * P * (1 - P) * (N - n) / (N - 1);
+            return n * NP * (N - NP) / N / N * (N - n) / (N - 1);
         }
 
         protected override double PDFInt(int k)
         {
             return Math.Exp(
-                SpecialFunctions.FactorialLn((int)(P * N))
-                + SpecialFunctions.FactorialLn((int)((1 - P) * N))
+                SpecialFunctions.FactorialLn((int)(NP ))
+                + SpecialFunctions.FactorialLn((int)(N-NP))
                 + SpecialFunctions.FactorialLn((int)n)
                 + SpecialFunctions.FactorialLn((int)(N - n))
-                - (SpecialFunctions.FactorialLn((int)(P * N) - k)
+                - (SpecialFunctions.FactorialLn((int)(NP) - k)
                 + SpecialFunctions.FactorialLn(k)
                 + SpecialFunctions.FactorialLn((int)(n - k))
-                + SpecialFunctions.FactorialLn((int)((1 - P) * n - n + k))
+                + SpecialFunctions.FactorialLn((int)((N - NP) - n + k))
                 + SpecialFunctions.FactorialLn((int)N)
                 ));
+        }
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            //We take the hypothesis of NP = 0,5 * N
+            AddParameter(new Parameter(ParametreName.n,(int)(ev*2)));
+            AddParameter(new Parameter(ParametreName.N, (-2*ev+2* variance / ev )/(2*variance/ev-1)));
+            AddParameter(new Parameter(ParametreName.Np, N*0/5));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
     }
 }
