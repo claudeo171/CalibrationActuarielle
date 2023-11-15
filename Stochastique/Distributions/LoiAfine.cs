@@ -12,7 +12,7 @@ namespace Stochastique.Distributions
     {
         public Distribution LoiBase { get; set; }
 
-        public override TypeDistribution Type => TypeDistribution.LoiStudentAfine;
+        public override TypeDistribution Type => throw new NotImplementedException();
 
         public LoiAfine(Distribution loiBase, double a, double b)
         {

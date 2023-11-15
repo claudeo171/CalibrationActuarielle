@@ -25,8 +25,8 @@ namespace Stochastique.Distributions
                     return new Khi2Distribution();
                 case TypeDistribution.Student:
                     return new StudentDistribution(0);
-                case TypeDistribution.LoiStudentAfine:
-                    return new LoiAfine(new StudentDistribution(1), 1, 0);
+                /*case TypeDistribution.LoiStudentAfine:
+                    return new LoiAfine(new StudentDistribution(1), 1, 0);*/
                 case TypeDistribution.Bernouli:
                     return new BernouliDistribution();
                 case TypeDistribution.Poisson:
@@ -199,7 +199,7 @@ namespace Stochastique.Distributions
             }
             return rst;
         }
-        public double GetLogVraissemblance(IEnumerable<double> values)
+        public double GetLogLikelihood(IEnumerable<double> values)
         {
             double rst = 0;
             foreach (var val in values)
@@ -214,7 +214,7 @@ namespace Stochastique.Distributions
             {
                 ParametresParNom.Values.ElementAt(i).Value = x[i];
             }
-            func = -GetLogVraissemblance(values);
+            func = -GetLogLikelihood(values);
             if (double.IsPositiveInfinity(func))
             {
                 func = double.MaxValue;

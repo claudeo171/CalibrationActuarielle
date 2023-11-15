@@ -25,7 +25,7 @@ namespace Stochastique.Enums
     }
     public enum TypeDistribution
     {
-        Normal, Student, LoiStudentAfine,
+        Normal, Student, /*LoiStudentAfine,*/
         Khi2, Bernouli, Binomial,Poisson, Geometric,NegativeBinomial,Pascal,Hypergeometrical,Beta,Cauchy,Exponential,Fisher,Gamma,Uniform,Weibull
     }
 }

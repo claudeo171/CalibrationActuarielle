@@ -73,6 +73,19 @@ namespace OnlineCalibrator.Shared
             return rst;
         }
 
+
+        public List<DistributionWithDatas> GetAllDistributions(bool isDiscrete, bool includeTrunkated)
+        {
+            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a).IsDiscreet==isDiscrete).ToList();
+            if(includeTrunkated)
+            {
+                //TODO Create all trunkated distribution
+            }
+            return distributions.Select(a=> GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
+
+        }
+
+
         public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration)
         {
             var distrib= Distribution.CreateDistribution(typeDistribution);

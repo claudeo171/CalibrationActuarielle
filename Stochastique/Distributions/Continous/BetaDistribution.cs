@@ -45,8 +45,9 @@ namespace Stochastique.Distributions.Continous
             var repot = new alglib.polynomialsolver.polynomialsolverreport();
             alglib.xparams xparams = new alglib.xparams(1);
             alglib.polynomialsolver.polynomialsolve(new double[4] { 0, ev * (ev - 1), variance * (4 * ev * ev * ev - 8 * ev * ev + 5 * ev + ev - 1), variance * (8 * ev * ev * ev - 12 * ev * ev + 6 * ev - 1) }, 3,ref rst, repot, xparams);
-            
-            AddParameter(new Parameter(ParametreName.k, k));
+            AddParameter(new Parameter(ParametreName.b, rst.Where(a => a.y == 0).Max(a => a.x)));
+            AddParameter(new Parameter(ParametreName.a, B/(1-ev)));
+
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
             base.Initialize(value, typeCalibration);

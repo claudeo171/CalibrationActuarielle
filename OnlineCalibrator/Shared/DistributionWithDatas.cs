@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OnlineCalibrator.Shared
 {
@@ -21,8 +22,13 @@ namespace OnlineCalibrator.Shared
                 ResultatTest.Add(v, TypeDonnees.NA);
             }
             UpdateTest();
-
+            LogLikelihood = distribution.GetLogLikelihood(data);
+            N=data.Length;
         }
+        public double N { get; set; }
+        public double LogLikelihood { get; set; }
+        public double AIC=> 2*Distribution.AllParameters().Count()-2*LogLikelihood;
+        public double BIC => Math.Log(N) * Distribution.AllParameters().Count() - 2 * LogLikelihood;
         public TypeDistribution TypeDistribution { get; set; }
         public Distribution Distribution { get; set; }
         public TypeCalibration Calibration { get; set; }

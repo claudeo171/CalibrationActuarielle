@@ -17,104 +17,45 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
         <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@DonneesImportes.NomData)</a></li>
-        <li class="breadcrumb-item active">Test de Normalité</li>
+        <li class="breadcrumb-item active">Identification de la loi</li>
     </ol>
 </nav>
 <div class="row">
-    @if (isInit)
-    {
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    Tests stratistiques
-                </div>
-                <div class="card-body">
-                    <ul>
-                        @if (distribution != null)
+
+    <div class="col-xl-6">
+        <div class="card">
+            <div class="card-header">
+                Tests stratistiques
+            </div>
+            <div class="card-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Loi</th>
+                            <th>LogLikelihood</th>
+                            <th>AIC</th>
+                            <th>BIC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (distributions != null)
                         {
-                            @foreach (var test in distribution.TestStatistiques)
+                            @foreach (var test in distributions)
                             {
-                                <li>@test.Name : pvalue : @(test?.PValue ?? 0) </li>
+                                <tr>
+                                    <td>@test.Distribution</td>
+                                    <td>@test.LogLikelihood</td>
+                                    <td>@test.AIC</td>
+                                    <td>@test.BIC</td>
+                                </tr>
                             }
                         }
-                    </ul>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
-    }
-    @if (distribution != null)
-    {
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    Parametres
-                </div>
-                <div class="card-body">
-                    @if (isInit)
-                    {
-                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>distribution.Calibration)" Value="@distribution.Calibration" ValueChanged="(TypeCalibration s)=>ChangeCalibration(s)">
-                            @foreach (var item in Enum.GetValues(typeof(TypeCalibration)))
-                            {
-                                <option value="@item">@item</option>
-                            })
-                        </InputSelect>
-                    }
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Parametre</th>
-                                <th scope="col">Valeur</th>
-                            </tr>
-                        </thead>
-                        @foreach (var parameter in distribution.Distribution.AllParameters())
-                        {
-                            <tr>
-                                <td>@parameter.Name</td>
-                                <td>@parameter.Value</td>
-                            </tr>
-                        }
-                    </table>
-                </div>
-            </div>
-        </div>
-    }
-    @if (QQPlot != null)
-    {
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    QQPlot
-                </div>
-                <div class="card-body divChart">
-                    <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
-                </div>
-            </div>
-        </div>
-    }
-    @if (distribution != null)
-    {
-        <div class="col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    Analyse
-                </div>
-                <div class="card-body">
-                    <label class="form-label">Seuil de significativité choisie</label>
-                    <InputText class="form-control" @bind-Value="@distribution.SeuilAlphaString" />
+    </div>
 
-                    @foreach (var test in distribution.ResultatTest)
-                    {
-                        <ul>
-                            <li>@test.Key.Name : Conclusion : @test.Value </li>
-                        </ul>
-                    }
-
-                    <label for="exampleFormControlTextarea1" class="form-label">Commentaires</label>
-                    <InputTextArea class="form-control" @bind-Value="@distribution.Comment" />
-                </div>
-            </div>
-        </div>
-    }
 
 </div>
 
@@ -122,31 +63,20 @@
 @code {
     private bool isInit;
     private ChartViewModelLine? QQPlot;
-    private DistributionWithDatas? distribution;
+    private List<DistributionWithDatas>? distributions;
     private DonneesImportes? DonneesImportes;
+    private bool IsDiscreteDistribution;
+    private bool IncludeTrunkatedDistributions;
     protected override async void OnInitialized()
     {
 
         DonneesImportes = donneeContainer.Value;
         DonneesImportes.ActualData?.CalculerTest();
-        UpdateCalibration(null);
+        distributions = DonneesImportes.ActualData?.GetAllDistributions(IsDiscreteDistribution, IncludeTrunkatedDistributions);
         isInit = true;
         StateHasChanged();
     }
-    public void ChangeCalibration(TypeCalibration typeCalibration)
-    {
-        UpdateCalibration(typeCalibration);
-        distribution.Calibration = typeCalibration;
-        StateHasChanged();
-    }
 
-    public async void UpdateCalibration(TypeCalibration? typeCalibration)
-    {
-        distribution = DonneesImportes.ActualData?.GetDistribution(TypeDistribution.Normal, typeCalibration);
-        QQPlot = new ChartViewModelLine(
-    DonneesImportes.ActualData?.GetQQPlot(TypeDistribution.Normal),
-    new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
-    new List<Paint>() { null, null });
-    }
+
 
 }
