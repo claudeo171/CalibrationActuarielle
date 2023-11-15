@@ -15,7 +15,7 @@ namespace Stochastique.Enums
         aAfine, bAfine, mu, sigma, n,
         k,qUp,qDown,
         p,lambda,r,N,a,b,d1,d2,
-        theta,
+        theta,aCauchy,bCauchy,
         Np
     }
 

@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace Stochastique.Distributions.Continous
     {
         public double D1 => GetParameter(ParametreName.d1).Value;
         public double D2 => GetParameter(ParametreName.d2).Value;
-        public override TypeDistribution Type => throw new NotImplementedException();
+        public override TypeDistribution Type => TypeDistribution.Fisher;
 
         public override double CDF(double x)
         {
@@ -32,6 +33,16 @@ namespace Stochastique.Distributions.Continous
         public override double Variance()
         {
             return D2 > 4 ? 2*D2*D2*(D1+D2-2) / (D1*(D2 - 2)* (D2 - 2)* (D2 - 4)) : double.NaN;
+        }
+
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            AddParameter(new Parameter(ParametreName.d2,Math.Max(5, (int)(2*ev/ev-1))));
+            AddParameter(new Parameter(ParametreName.d1,(int)(2*D2 * D2 * D2-4 * D2 * D2/(variance*(D2-2)*(D2-2)*(D2-4)-2*D2))));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * ev);
         }
     }
 }

@@ -47,8 +47,22 @@ namespace Stochastique.Distributions
                         return 0;
                     case ParametreName.n:
                         return 0;
+                    case ParametreName.a:
+                         return Math.Pow(10, -10);
+                    case ParametreName.b:
+                        return Math.Pow(10, -10);
+                    case ParametreName.aCauchy:
+                        return Math.Pow(10, -10);
+                    case ParametreName.bCauchy:
+                        return double.MinValue;
                     case ParametreName.lambda:
                         return Math.Pow(10, -100);
+                    case ParametreName.k:
+                        return Math.Pow(10, -100);
+                    case ParametreName.d1:
+                        return 1;
+                    case ParametreName.d2:
+                        return 1;
                     default:
                         return 0;
                 }
@@ -77,6 +91,20 @@ namespace Stochastique.Distributions
                     case ParametreName.qUp:
                         return 1;
                     case ParametreName.lambda:
+                        return double.MaxValue;
+                    case ParametreName.a:
+                        return double.MaxValue;
+                    case ParametreName.b:
+                        return double.MaxValue;
+                    case ParametreName.aCauchy:
+                        return double.MaxValue;
+                    case ParametreName.bCauchy:
+                        return double.MaxValue;
+                    case ParametreName.d1:
+                        return double.MaxValue;
+                    case ParametreName.d2:
+                        return double.MaxValue;
+                    case ParametreName.k:
                         return double.MaxValue;
                     default:
                         return 0;

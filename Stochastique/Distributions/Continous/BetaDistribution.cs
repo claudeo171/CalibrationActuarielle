@@ -44,13 +44,12 @@ namespace Stochastique.Distributions.Continous
             alglib.complex[] rst = new alglib.complex[3];
             var repot = new alglib.polynomialsolver.polynomialsolverreport();
             alglib.xparams xparams = new alglib.xparams(1);
-            alglib.polynomialsolver.polynomialsolve(new double[4] { 0, ev * (ev - 1), variance * (4 * ev * ev * ev - 8 * ev * ev + 5 * ev + ev - 1), variance * (8 * ev * ev * ev - 12 * ev * ev + 6 * ev - 1) }, 3,ref rst, repot, xparams);
-            AddParameter(new Parameter(ParametreName.b, rst.Where(a => a.y == 0).Max(a => a.x)));
-            AddParameter(new Parameter(ParametreName.a, B/(1-ev)));
+            alglib.polynomialsolver.polynomialsolve(new double[4] { 0, 0, variance/ev -1 + ev, variance/ev/ev }, 3,ref rst, repot, xparams);
+            AddParameter(new Parameter(ParametreName.a, rst.Where(a => a.y == 0 && a.x!=0).Min(a => a.x)));
+            AddParameter(new Parameter(ParametreName.b, A*(1-ev)/ev));
 
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
-            base.Initialize(value, typeCalibration);
         }
     }
 }
