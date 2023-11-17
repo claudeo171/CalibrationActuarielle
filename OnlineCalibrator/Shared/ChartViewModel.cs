@@ -5,6 +5,7 @@ using LiveChartsCore.Drawing;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MathNet.Numerics;
+using MessagePack;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
+    [MessagePackObject]
     public class ChartViewModelLine
     {
         public ChartViewModelLine(Point[] valeurs)
@@ -43,9 +45,12 @@ namespace OnlineCalibrator.Shared
             });
             Series= serieAsList.ToArray();
         }
-        public ISeries[] Series { get; set; } 
+
+        [Key(0)]
+        public ISeries[] Series { get; set; }
 
         // Creates a gray background and border in the draw margin.
+        [Key(1)]
         public DrawMarginFrame DrawMarginFrame => new()
         {
             

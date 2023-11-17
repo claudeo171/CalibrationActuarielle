@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,11 +9,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     internal class LogNormalDistribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => throw new NotImplementedException();
 
+        [Key(7)]
         public double mu => GetParameter(ParametreName.mu).Value;
+
+        [Key(8)]
         public double sigma => GetParameter(ParametreName.sigma).Value;
 
         public override double CDF(double x)

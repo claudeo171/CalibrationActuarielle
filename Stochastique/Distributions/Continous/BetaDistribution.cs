@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class BetaDistribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Beta;
 
+        [Key(7)]
         public double A => GetParameter(ParametreName.a).Value;
+
+        [Key(8)]
         public double B => GetParameter(ParametreName.b).Value;
 
         public override double CDF(double x)

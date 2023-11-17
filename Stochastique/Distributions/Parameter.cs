@@ -1,4 +1,5 @@
-﻿using Stochastique.Enums;
+﻿using MessagePack;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
+    [MessagePackObject]
     public class Parameter
     {
+        public Parameter() { }
         public Parameter(ParametreName nom, double valeur)
         {
             Value = valeur;
@@ -20,11 +23,16 @@ namespace Stochastique.Distributions
             Name = nom;
             Estimateur = estimateur;
         }
+
+        [Key(0)]
         public double Value { get; set; }
+        [Key(1)]
         public Distribution? Estimateur { get; set; }
 
+        [Key(2)]
         public ParametreName Name { get; set; }
 
+        [Key(3)]
         public double MinValue
         {
             get
@@ -68,6 +76,8 @@ namespace Stochastique.Distributions
                 }
             }
         }
+
+        [Key(4)]
         public double MaxValue
         {
             get

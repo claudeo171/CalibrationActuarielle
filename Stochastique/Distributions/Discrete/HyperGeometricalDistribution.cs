@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,21 +14,28 @@ namespace Stochastique.Distributions.Discrete
     /// Represents Hypergeometrical distribution
     /// https://fr.wikipedia.org/wiki/Loi_hyperg%C3%A9om%C3%A9trique
     /// </summary>
+    [MessagePackObject]
     public class HyperGeometricalDistribution : DiscreteDistribution
     {
         /// <summary>
         /// p parameter value
         /// </summary>
+        [Key(11)]
         public double NP => GetParameter(ParametreName.Np).Value;
+
         /// <summary>
         /// n parameter value
         /// </summary>
+        [Key(12)]
         public double n => GetParameter(ParametreName.n).Value;
+
         /// <summary>
         /// N parameter value
         /// </summary>
+        [Key(13)]
         public double N => GetParameter(ParametreName.N).Value;
 
+        [Key(14)]
         public override TypeDistribution Type => TypeDistribution.Hypergeometrical;
 
         public override double ExpextedValue()

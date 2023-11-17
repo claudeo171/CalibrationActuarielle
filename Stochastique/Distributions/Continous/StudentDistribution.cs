@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class StudentDistribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Student;
 
+        [Key(7)]
         public double n => GetParameter(ParametreName.n).Value;
 
         public StudentDistribution(int n)

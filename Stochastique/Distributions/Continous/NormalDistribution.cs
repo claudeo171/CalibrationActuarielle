@@ -1,5 +1,6 @@
 ﻿using LiveChartsCore.Defaults;
 using MathNet.Numerics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,8 +10,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class NormalDistribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Normal;
         public NormalDistribution()
         {

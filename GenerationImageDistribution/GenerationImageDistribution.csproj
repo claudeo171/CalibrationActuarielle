@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -10,6 +10,7 @@
     <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.710" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="MessagePack.Annotations" Version="2.5.129" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class ExponentialDistribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Exponential;
 
+        [Key(7)]
         public double Labda => GetParameter(ParametreName.lambda).Value;
         public override double CDF(double x)
         {

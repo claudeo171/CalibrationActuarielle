@@ -1,4 +1,5 @@
 ﻿using LiveChartsCore.Defaults;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,13 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
+    [MessagePackObject]
     public class LoiAfine : Distribution
     {
+        [Key(6)]
         public Distribution LoiBase { get; set; }
 
+        [Key(7)]
         public override TypeDistribution Type => throw new NotImplementedException();
 
         public LoiAfine(Distribution loiBase, double a, double b)

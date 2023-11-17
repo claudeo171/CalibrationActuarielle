@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class FisherDistribution : Distribution
     {
+        [Key(6)]
         public double D1 => GetParameter(ParametreName.d1).Value;
+
+        [Key(7)]
         public double D2 => GetParameter(ParametreName.d2).Value;
+
+        [Key(8)]
         public override TypeDistribution Type => TypeDistribution.Fisher;
 
         public override double CDF(double x)

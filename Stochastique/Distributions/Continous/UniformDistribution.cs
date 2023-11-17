@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     internal class UniformDistribution : Distribution
     {
+        [Key(6)]
         public double A => GetParameter(ParametreName.a).Value;
+
+        [Key(7)]
         public double B => GetParameter(ParametreName.b).Value;
+
+        [Key(8)]
         public override TypeDistribution Type => TypeDistribution.Uniform;
 
         public override double CDF(double x)

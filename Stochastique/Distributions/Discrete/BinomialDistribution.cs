@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,19 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
+    [MessagePackObject]
     public class BinomialDistribution : DiscreteDistribution
     {
+        [Key(11)]
         private double P => GetParameter(ParametreName.p).Value;
+
+        [Key(12)]
         private double N => GetParameter(ParametreName.n).Value;
+
+        [Key(13)]
         public override TypeDistribution Type => TypeDistribution.Binomial;
 
+        [Key(14)]
         protected override double MaxValue => N;
 
         public override double ExpextedValue()

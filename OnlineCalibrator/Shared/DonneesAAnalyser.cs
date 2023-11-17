@@ -1,6 +1,7 @@
 ﻿using GenerationImageDistribution;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Newtonsoft.Json;
 using Stochastique.Distributions;
 using Stochastique.Enums;
@@ -12,26 +13,38 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
+    [MessagePackObject]
     public class DonneesAAnalyser
     {
+        [Key(0)]
         public string? Name { get; set; }
+        [Key(1)]
         public double[]? Values { get; set; }
 
+        [Key(2)]
         public Point[]? PointsKDE { get; set; }
+        [Key(3)]
         public Point[]? PointsCDF { get; set; }
 
+        [Key(4)]
         public double Moyenne => Values?.Average()??0;
+
+        [Key(5)]
         public double Variance => Values == null ? 0: Values.Select(a=>a*a).Mean() - Moyenne* Moyenne;
-        
+
+        [Key(6)]
         public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
 
+        [Key(7)]
         public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
-
+        [Key(8)]
         public Dictionary<TestStatistique, bool>? ResultatStatistique { get; set; }
+
         /// <summary>
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
+        [Key(9)]
         public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>(); 
 
         public DonneesAAnalyser() { }

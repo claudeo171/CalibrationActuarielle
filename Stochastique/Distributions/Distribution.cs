@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
+using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Distributions.Discrete;
 using Stochastique.Enums;
@@ -9,11 +10,35 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Stochastique.Distributions
 {
-    public abstract class Distribution
+    [MessagePackObject]
+    [MessagePack.Union(0, typeof(BetaDistribution))]
+    [MessagePack.Union(1, typeof(CauchyDistribution))]
+    [MessagePack.Union(2, typeof(ExponentialDistribution))]
+    [MessagePack.Union(3, typeof(FisherDistribution))]
+    [MessagePack.Union(4, typeof(GammaDistribution))]
+    [MessagePack.Union(5, typeof(Khi2Distribution))]
+    [MessagePack.Union(6, typeof(LogNormalDistribution))]
+    [MessagePack.Union(7, typeof(NormalDistribution))]
+    [MessagePack.Union(8, typeof(StudentDistribution))]
+    [MessagePack.Union(9, typeof(UniformDistribution))]
+    [MessagePack.Union(10, typeof(WeibullDistribution))]
+    [MessagePack.Union(11, typeof(BernouliDistribution))]
+    [MessagePack.Union(12, typeof(BinomialDistribution))]
+    [MessagePack.Union(13, typeof(DiscreteDistribution))]
+    [MessagePack.Union(14, typeof(GeometricDistribution))]
+    [MessagePack.Union(15, typeof(HyperGeometricalDistribution))]
+    [MessagePack.Union(16, typeof(NegativeBinomialDistribution))]
+    [MessagePack.Union(17, typeof(PascalDistribution))]
+    [MessagePack.Union(18, typeof(PoissonDistribution))]
+    public abstract class Distribution : IMessagePackSerializationCallbackReceiver
     {
+        [MessagePack.Key(0)]
         public virtual bool CanComputeExpectedValueEasily => true;
+
+        [MessagePack.Key(1)]
         public abstract TypeDistribution Type { get; }
 
+        [MessagePack.Key(2)]
         public virtual bool IsDiscreet => false;
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
@@ -56,6 +81,8 @@ namespace Stochastique.Distributions
                     return null;
             }
         }
+
+        [MessagePack.Key(3)]
         public bool AllowMomentParameter { get; set; }
         public List<ObservablePoint> DensityGraph()
         {
@@ -162,11 +189,15 @@ namespace Stochastique.Distributions
             return abs;
         }
 
+        [MessagePack.Key(4)]
         public Intervale? IntervaleForDisplay { get; set; }
 
 
 
+        [MessagePack.IgnoreMember]
         private Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
+        [MessagePack.Key(5)]
+        public List<Parameter> ParametersList { get; set; }
 
         public void AddParameter(Parameter parameter)
         {
@@ -227,12 +258,12 @@ namespace Stochastique.Distributions
             {
                 ParametresParNom.Values.ElementAt(i).Value = x[i];
             }
-            double increment = 1.0 / (values.Count()-1);
+            double increment = 1.0 / (values.Count() - 1);
             double value = increment / 2;
-            foreach(var val in values)
+            foreach (var val in values)
             {
                 var invCDF = InverseCDF(value);
-                func += (val - invCDF)* (val - invCDF);
+                func += (val - invCDF) * (val - invCDF);
             }
             if (double.IsPositiveInfinity(func))
             {
@@ -276,6 +307,15 @@ namespace Stochastique.Distributions
             alglib.minbleicoptguardresults(state, out ogrep);
         }
 
+        public void OnBeforeSerialize()
+        {
+            ParametersList= AllParameters().ToList();
+        }
+
+        public void OnAfterDeserialize()
+        {
+            ParametresParNom= ParametersList.ToDictionary(a=>a.Name, a=>a);
+        }
     }
 
 }

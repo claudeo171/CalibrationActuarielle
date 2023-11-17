@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stochastique", "Stochastiqu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MauiApp1", "MauiApp1\MauiApp1.csproj", "{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{C8B6EE0E-331F-4250-8106-D38A280699A6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnlineCalibrator.Service", "OnlineCalibrator.Service\OnlineCalibrator.Service.csproj", "{4E81DB5B-15D7-4676-BB78-567C2DE92859}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +57,14 @@ Global
 		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7A5A1DA6-9811-4F9F-93BC-1F28039F7B1B}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C8B6EE0E-331F-4250-8106-D38A280699A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8B6EE0E-331F-4250-8106-D38A280699A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8B6EE0E-331F-4250-8106-D38A280699A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8B6EE0E-331F-4250-8106-D38A280699A6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E81DB5B-15D7-4676-BB78-567C2DE92859}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E81DB5B-15D7-4676-BB78-567C2DE92859}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E81DB5B-15D7-4676-BB78-567C2DE92859}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E81DB5B-15D7-4676-BB78-567C2DE92859}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

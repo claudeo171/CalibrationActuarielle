@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.Statistics;
+using MessagePack;
 using Newtonsoft.Json.Linq;
 using Stochastique;
 using Stochastique.Distributions;
@@ -11,8 +12,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
+    [MessagePackObject]
     public class JarqueBeraTest : TestStatistique
     {
+        public JarqueBeraTest() { }
         public JarqueBeraTest(double[] values)
         {
             Name = "Jarque Bera";

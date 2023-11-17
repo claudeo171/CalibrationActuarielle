@@ -1,5 +1,6 @@
 ﻿using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class CauchyDistribution : Distribution
     {
+        [Key(6)]
         public double A => GetParameter(ParametreName.aCauchy).Value;
+
+        [Key(7)]
         public double B => GetParameter(ParametreName.bCauchy).Value;
+
+        [Key(8)]
         public override TypeDistribution Type => TypeDistribution.Cauchy;
 
         public override double CDF(double x)

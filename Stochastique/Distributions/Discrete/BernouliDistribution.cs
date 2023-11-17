@@ -6,13 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace Stochastique.Distributions.Discrete
 {
+    [MessagePackObject]
     public class BernouliDistribution : DiscreteDistribution
     {
+        [Key(6)]
         private double P => GetParameter(ParametreName.p).Value;
+
+        [Key(7)]
         public override TypeDistribution Type => TypeDistribution.Bernouli;
+
+        [Key(8)]
         protected override double MaxValue => 1;
 
         public override double ExpextedValue()

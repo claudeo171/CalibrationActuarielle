@@ -6,6 +6,8 @@
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
 @using System.Text;
+@using OnlineCalibrator.Service;
+
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -139,76 +141,21 @@
     {
         SupprimerDonnee();
         var singleFile = e.File;
+        var stream = singleFile.OpenReadStream(20000000);
+        MemoryStream ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        stream.Close();
+        try
+        {
+            DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
+            donneeContainer.SetValue(FileService.GetDataFromFile(ms, e.File.Name));
+        }
+        catch(Exception ex)
+        {
+            Errors.Add(ex.Message);
+        }
 
-        Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
-        if (!regex.IsMatch(singleFile.Name))
-        {
-            regex = new Regex(".+\\.data", RegexOptions.Compiled);
-            if (regex.IsMatch(singleFile.Name))
-            {
-                var stream = singleFile.OpenReadStream(20000000);
-                MemoryStream ms = new MemoryStream();
-                await stream.CopyToAsync(ms);
-                stream.Close();
-                var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-                DonneesImportes = DonneesImportes.FromJson(outputFileString);
-                donneeContainer.SetValue(DonneesImportes);
-                DonneesImportes.NomData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
-            }
-            else
-            {
-                Errors.Add("Le fichier n'est pas au bon format");
-                StateHasChanged();
-            }
-        }
-        else
-        {
-            var stream = singleFile.OpenReadStream(20000000);
-            var donneesImportes = new DonneesImportes { Donnees = new List<DonneesAAnalyser>(), Nom = Path.GetFileNameWithoutExtension(e.File.Name) };
-            MemoryStream ms = new MemoryStream();
-            await stream.CopyToAsync(ms);
-            stream.Close();
-            var outputFileString = System.Text.Encoding.UTF8.GetString(ms.ToArray());
-            int index = 0;
-            var lignes = outputFileString.Split(Environment.NewLine);
-            try
-            {
-                foreach (var item in lignes)
-                {
-                    if (item != string.Empty)
-                    {
-                        if (index == 0)
-                        {
-                            foreach (var header in SplitCSV(item.ToString()))
-                            {
-                                donneesImportes.Donnees.Add(new DonneesAAnalyser { Name = header, Values = new double[lignes.Count(a => a != string.Empty) - 1] });
-                            }
-                        }
-                        else
-                        {
-                            var colonnes = SplitCSV(item.ToString());
-                            for (int i = 0; i < colonnes.Length; i++)
-                            {
-                                donneesImportes.Donnees[i].Values[index - 1] = Convert.ToDouble(colonnes[i]);
-                            }
-                        }
-                    }
-                    index++;
-                }
-                DonneesImportes = donneesImportes;
-                foreach (var v in DonneesImportes.Donnees)
-                {
-                    v.Initialize();
-                }
-                DonneesImportes.NomData = DonneesImportes.Donnees.FirstOrDefault()?.Name;
-                donneeContainer.SetValue(DonneesImportes);
-            }
-            catch (Exception ex)
-            {
-                Errors.Add("Le fichier csv n'est pas au bon format. Il faut que la première ligne soit au format texte et que tout le reste soit des nombres.");
-                StateHasChanged();
-            }
-        }
+        
     }
 
     protected override async void OnInitialized()
@@ -220,10 +167,7 @@
         StateHasChanged();
     }
 
-    private string[] SplitCSV(string input)
-    {
-        return input.Split(';');
-    }
+
     private void CalibrerDonne()
     {
         NavManager.NavigateTo("/CalibrateDistribution");
@@ -245,11 +189,13 @@
 
     private async void SauvegarderDonnee()
     {
-        var text = DonneesImportes.ToJson();
-        var fileStream = new MemoryStream(Encoding.UTF8.GetBytes(text));
+
+        var fileStream = new MemoryStream(DonneesImportes.ToMsgPack());
+        var fileName = "test.data";
         using var streamRef = new DotNetStreamReference(stream: fileStream);
-        await js.InvokeAsync<object?>("downloadFileFromStream", new object?[] { DonneesImportes?.Nom + ".data", streamRef });
+        await js.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
     }
+
 
     private void SuppressionErreur(string error)
     {

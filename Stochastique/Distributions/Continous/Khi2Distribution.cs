@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,13 +9,17 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class Khi2Distribution : Distribution
     {
+        [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Khi2;
         public Khi2Distribution()
         {
         }
-        public double k => GetParameter(ParametreName.k).Value;
+
+        [Key(7)]
+        public double K => GetParameter(ParametreName.k).Value;
 
         public Khi2Distribution(int k) : base()
         {
@@ -27,7 +32,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double PDF(double x)
         {
-            return Math.Pow(0.5, k / 2) / SpecialFunctions.Gamma(k / 2) * Math.Pow(x, k / 2 - 1) * Math.Exp(-x / 2);
+            return Math.Pow(0.5, K / 2) / SpecialFunctions.Gamma(K / 2) * Math.Pow(x, K / 2 - 1) * Math.Exp(-x / 2);
         }
 
         public override double ExpextedValue()

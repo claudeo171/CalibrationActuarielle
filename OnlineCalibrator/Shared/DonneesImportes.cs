@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using MessagePack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,42 +8,30 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
+    [MessagePackObject]
     public class DonneesImportes
     {
+        [Key(0)]
         public List<DonneesAAnalyser>? Donnees { get; set; }
+        [Key(1)]
         public string? Nom { get; set; }
 
+        [Key(2)]
         public string? NomData { get; set; }
 
+        [Key(3)]
         public DonneesAAnalyser? ActualData => Donnees?.FirstOrDefault(a => a.Name == NomData);
 
-        public string ToJson()
+        public byte[] ToMsgPack()
         {
-            try
-            {
-                var jsonParam = new JsonSerializerSettings();
-                jsonParam.Error += (s, a) => a.ErrorContext.Handled = true;
-                jsonParam.TypeNameHandling = TypeNameHandling.Auto;
-                jsonParam.SerializationBinder=new CustomSerializationBinder();
-                var rst = JsonConvert.SerializeObject(this, jsonParam);
-                return rst;
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
+            return MessagePack.MessagePackSerializer.Serialize(this);
         }
 
-        public static DonneesImportes? FromJson(string json)
+        public static DonneesImportes? FromMsgPack(byte[] json)
         {
             try
             {
-                var jsonParam = new JsonSerializerSettings();
-                jsonParam.Error += (s, a) => a.ErrorContext.Handled = true;
-                jsonParam.TypeNameHandling = TypeNameHandling.Auto;
-                jsonParam.SerializationBinder = new CustomSerializationBinder();
-                var rst = JsonConvert.DeserializeObject<DonneesImportes>(json, jsonParam);
-                return rst;
+                return MessagePack.MessagePackSerializer.Deserialize<DonneesImportes?>(json);
             }
             catch (Exception e)
             {

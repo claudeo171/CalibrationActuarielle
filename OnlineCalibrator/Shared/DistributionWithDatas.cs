@@ -1,4 +1,5 @@
-﻿using Stochastique.Distributions;
+﻿using MessagePack;
+using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,12 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OnlineCalibrator.Shared
 {
+    [MessagePackObject]
     public class DistributionWithDatas
     {
+        public DistributionWithDatas()
+        {
+        }
         public DistributionWithDatas(Distribution distribution, double[] data)
         {
             Distribution = distribution;
@@ -25,13 +30,26 @@ namespace OnlineCalibrator.Shared
             LogLikelihood = distribution.GetLogLikelihood(data);
             N=data.Length;
         }
+
+        [Key(0)]
         public double N { get; set; }
+        [Key(1)]
         public double LogLikelihood { get; set; }
+
+        [Key(2)]
         public double AIC=> 2*Distribution.AllParameters().Count()-2*LogLikelihood;
+
+        [Key(3)]
         public double BIC => Math.Log(N) * Distribution.AllParameters().Count() - 2 * LogLikelihood;
+
+        [Key(4)]
         public TypeDistribution TypeDistribution { get; set; }
+        [Key(5)]
         public Distribution Distribution { get; set; }
+        [Key(6)]
         public TypeCalibration Calibration { get; set; }
+
+        [Key(7)]
         public string SeuilAlphaString
         {
             get
@@ -52,24 +70,35 @@ namespace OnlineCalibrator.Shared
 
             }
         }
+
+        [Key(8)]
         public double SeuilAlpha { get; set; } = 0.05;
+        [Key(9)]
         public string? Comment { get; set; }
         public void UpdateTest()
         {
-            foreach (var test in TestStatistiques)
+            if (TestStatistiques != null)
             {
-                ResultatTest[test] = test.GetTypeDonnee(SeuilAlpha);
+                foreach (var test in TestStatistiques)
+                {
+                    ResultatTest[test] = test.GetTypeDonnee(SeuilAlpha);
+                }
             }
         }
         public void RAZTest()
         {
-            foreach (var test in TestStatistiques)
+            if (TestStatistiques != null)
             {
-                ResultatTest[test] = TypeDonnees.NA;
+                foreach (var test in TestStatistiques)
+                {
+                    ResultatTest[test] = TypeDonnees.NA;
+                }
             }
         }
 
+        [Key(10)]
         public List<TestStatistique> TestStatistiques { get; set; }
+        [Key(11)]
         public Dictionary<TestStatistique, TypeDonnees> ResultatTest { get; set; }
     }
 }

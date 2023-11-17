@@ -1,6 +1,7 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class WeibullDistribution : Distribution
     {
+        [Key(6)]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
+
+        [Key(7)]
         public double K => GetParameter(ParametreName.k).Value;
+
+        [Key(8)]
         public override TypeDistribution Type => TypeDistribution.Weibull;
 
         public override double CDF(double x)
