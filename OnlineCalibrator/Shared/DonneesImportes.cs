@@ -22,6 +22,7 @@ namespace OnlineCalibrator.Shared
         [Key(3)]
         public DonneesAAnalyser? ActualData => Donnees?.FirstOrDefault(a => a.Name == NomData);
 
+
         public byte[] ToMsgPack()
         {
             return MessagePack.MessagePackSerializer.Serialize(this);

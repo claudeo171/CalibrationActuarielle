@@ -45,7 +45,12 @@ namespace OnlineCalibrator.Shared
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
         [Key(9)]
-        public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>(); 
+        public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>();
+
+        [Key(10)]
+        public bool IsDiscreteDistribution { get; set; }
+        [Key(11)]
+        public bool IncludeTrunkatedDistributions { get; set; }
 
         public DonneesAAnalyser() { }
         public void Initialize() 
@@ -87,10 +92,10 @@ namespace OnlineCalibrator.Shared
         }
 
 
-        public List<DistributionWithDatas> GetAllDistributions(bool isDiscrete, bool includeTrunkated)
+        public List<DistributionWithDatas> GetAllDistributions()
         {
-            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a).IsDiscreet==isDiscrete).ToList();
-            if(includeTrunkated)
+            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a).IsDiscreet==IsDiscreteDistribution).ToList();
+            if(IncludeTrunkatedDistributions)
             {
                 //TODO Create all trunkated distribution
             }

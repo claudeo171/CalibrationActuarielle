@@ -24,6 +24,11 @@ namespace Stochastique.Distributions
             Estimateur = estimateur;
         }
 
+        public override string ToString()
+        {
+            return Name + " : " + Value.ToString("F2");
+        }
+
         [Key(0)]
         public double Value { get; set; }
         [Key(1)]
@@ -67,6 +72,8 @@ namespace Stochastique.Distributions
                         return Math.Pow(10, -100);
                     case ParametreName.k:
                         return Math.Pow(10, -100);
+                    case ParametreName.theta:
+                        return Math.Pow(10, -10);
                     case ParametreName.d1:
                         return 1;
                     case ParametreName.d2:

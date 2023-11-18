@@ -34,7 +34,9 @@ namespace Stochastique.Distributions.Continous
 
         public override double PDF(double x)
         {
-            return Math.Sqrt( Math.Pow(D1*x,D1)*Math.Pow(D2,D2)/Math.Pow(D1*x+D2,D1+D2))/(x*SpecialFunctions.Beta(D1/2,D2/2));
+
+
+            return Math.Exp( 0.5*( Math.Log(D1*x)*D1+ Math.Log(D2)*D2 -Math.Log(D1*x+D2)*(D1+D2))-(Math.Log(x)+SpecialFunctions.BetaLn(D1/2,D2/2)));
         }
 
         public override double Variance()
