@@ -12,6 +12,7 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class StudentDistribution : Distribution
     {
+        public StudentDistribution() { }
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Student;
 

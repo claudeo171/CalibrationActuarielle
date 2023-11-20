@@ -34,7 +34,14 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int k)
         {
-            return Math.Exp(SpecialFunctions.FactorialLn(k - 1) - SpecialFunctions.FactorialLn((int)(R - 1)) - SpecialFunctions.FactorialLn((int)(k - R)) + R * Math.Log(P) + (k - R) * Math.Log(1 - P));
+            if (k < R)
+            {
+                return 0;
+            }
+            else
+            {
+                return Math.Exp(SpecialFunctions.FactorialLn(k - 1) - SpecialFunctions.FactorialLn((int)(R - 1)) - SpecialFunctions.FactorialLn((int)(k - R)) + R * Math.Log(P) + (k - R) * Math.Log(1 - P));
+            }
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

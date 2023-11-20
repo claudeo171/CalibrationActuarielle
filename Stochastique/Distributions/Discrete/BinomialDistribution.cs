@@ -32,7 +32,14 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int x)
         {
-            return Math.Exp(SpecialFunctions.FactorialLn((int)N) - SpecialFunctions.FactorialLn((int)(N - x)) - SpecialFunctions.FactorialLn(x) + x * Math.Log(P) + (N - x) * Math.Log(1 - P));
+            if (N - x < 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return Math.Exp(SpecialFunctions.FactorialLn((int)N) - SpecialFunctions.FactorialLn((int)(N - x)) - SpecialFunctions.FactorialLn(x) + x * Math.Log(P) + (N - x) * Math.Log(1 - P));
+            }
         }
 
         public override double Variance()

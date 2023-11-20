@@ -33,9 +33,13 @@ namespace Stochastique.Distributions.Discrete
             {
                 return 1 - P;
             }
-            else
+            else if (x==1)
             {
                 return P;
+            }
+            else
+            {
+                return 0;
             }
         }
 

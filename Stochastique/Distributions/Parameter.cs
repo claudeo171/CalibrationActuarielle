@@ -57,7 +57,7 @@ namespace Stochastique.Distributions
                     case ParametreName.qUp:
                         return 0;
                     case ParametreName.p:
-                        return 0;
+                        return Math.Pow(10, -14);
                     case ParametreName.n:
                         return 0;
                     case ParametreName.a:
@@ -78,6 +78,12 @@ namespace Stochastique.Distributions
                         return 1;
                     case ParametreName.d2:
                         return 1;
+                    case ParametreName.N:
+                        return 1;
+                    case ParametreName.r:
+                        return 1;
+                    case ParametreName.Np:
+                        return 0;
                     default:
                         return 0;
                 }
@@ -100,7 +106,7 @@ namespace Stochastique.Distributions
                     case ParametreName.sigma:
                         return double.MaxValue;
                     case ParametreName.p:
-                        return 1;
+                        return 1- Math.Pow(10, -14);
                     case ParametreName.n:
                         return double.MaxValue;
                     case ParametreName.qDown:
@@ -122,6 +128,12 @@ namespace Stochastique.Distributions
                     case ParametreName.d2:
                         return double.MaxValue;
                     case ParametreName.k:
+                        return double.MaxValue;
+                    case ParametreName.N:
+                        return double.MaxValue;
+                    case ParametreName.Np:
+                        return double.MaxValue;
+                    case ParametreName.r:
                         return double.MaxValue;
                     default:
                         return 0;

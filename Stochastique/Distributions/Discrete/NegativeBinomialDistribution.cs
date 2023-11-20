@@ -40,8 +40,8 @@ namespace Stochastique.Distributions.Discrete
         {
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
-            AddParameter(new Parameter(ParametreName.p, Math.Min(1,Math.Max(0, ev/variance))));
-            AddParameter(new Parameter(ParametreName.r,Math.Max(1,ev*P/(1-P))));
+            AddParameter(new Parameter(ParametreName.p, Math.Min(1, Math.Max(0, ev / variance))));
+            AddParameter(new Parameter(ParametreName.r, Math.Max(1, P == 1 ? 0 : ev * P / (1 - P))));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }

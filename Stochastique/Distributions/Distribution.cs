@@ -274,7 +274,7 @@ namespace Stochastique.Distributions
         {
             var parameters = AllParameters().ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
-            double[] s = new double[] { 1, 1 };
+            double[] s = Enumerable.Repeat(1.0, x.Length).ToArray() ;
             double[] bndl = parameters.Select(p => p.MinValue).ToArray();
             double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
             alglib.minbleicstate state;
@@ -309,7 +309,7 @@ namespace Stochastique.Distributions
 
         public void OnBeforeSerialize()
         {
-            ParametersList= AllParameters().ToList();
+            ParametersList= AllParameters()?.ToList();
         }
 
         public void OnAfterDeserialize()

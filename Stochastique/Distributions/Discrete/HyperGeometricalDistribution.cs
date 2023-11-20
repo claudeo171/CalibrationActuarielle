@@ -50,26 +50,33 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int k)
         {
-            return Math.Exp(
-                SpecialFunctions.FactorialLn((int)(NP ))
-                + SpecialFunctions.FactorialLn((int)(N-NP))
-                + SpecialFunctions.FactorialLn((int)n)
-                + SpecialFunctions.FactorialLn((int)(N - n))
-                - (SpecialFunctions.FactorialLn((int)(NP) - k)
-                + SpecialFunctions.FactorialLn(k)
-                + SpecialFunctions.FactorialLn((int)(n - k))
-                + SpecialFunctions.FactorialLn((int)((N - NP) - n + k))
-                + SpecialFunctions.FactorialLn((int)N)
-                ));
+            if (k > NP || n>N || (N - NP) - n + k<0)
+            {
+                return 0;
+            }
+            else
+            {
+                return Math.Exp(
+                    SpecialFunctions.FactorialLn((int)(NP))
+                    + SpecialFunctions.FactorialLn((int)(N - NP))
+                    + SpecialFunctions.FactorialLn((int)n)
+                    + SpecialFunctions.FactorialLn((int)(N - n))
+                    - (SpecialFunctions.FactorialLn((int)(NP) - k)
+                    + SpecialFunctions.FactorialLn(k)
+                    + SpecialFunctions.FactorialLn((int)(n - k))
+                    + SpecialFunctions.FactorialLn((int)((N - NP) - n + k))
+                    + SpecialFunctions.FactorialLn((int)N)
+                    ));
+            }
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
             //We take the hypothesis of NP = 0,5 * N
-            AddParameter(new Parameter(ParametreName.n,(int)(ev*2)));
-            AddParameter(new Parameter(ParametreName.N, (-2*ev+2* variance / ev )/(2*variance/ev-1)));
-            AddParameter(new Parameter(ParametreName.Np, N*0/5));
+            AddParameter(new Parameter(ParametreName.n,Math.Max(1,(int)(ev*2))));
+            AddParameter(new Parameter(ParametreName.N, Math.Max(1, (int) (-2*ev+2* variance / ev )/(2*variance/ev-1))));
+            AddParameter(new Parameter(ParametreName.Np, (int)N*0/5));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }

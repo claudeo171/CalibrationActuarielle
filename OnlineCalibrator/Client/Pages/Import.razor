@@ -62,7 +62,7 @@
         {
             <div class="row">
                 <div class="col-12">
-                    <select @bind="DonneesImportes.NomData">
+                    <select @onchange="(ChangeEventArgs a)=>ChangeData(a)">
                         @foreach (var forecast in DonneesImportes.Donnees)
                         {
                             <option value="@forecast.Name">@forecast.Name</option>
@@ -148,14 +148,20 @@
         try
         {
             DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
-            donneeContainer.SetValue(FileService.GetDataFromFile(ms, e.File.Name));
+            donneeContainer.SetValue(DonneesImportes);
+            StateHasChanged();
         }
         catch(Exception ex)
         {
             Errors.Add(ex.Message);
         }
 
-        
+
+    }
+
+    public void ChangeData(ChangeEventArgs e)
+    {
+        DonneesImportes.NomData= e.Value.ToString();
     }
 
     protected override async void OnInitialized()

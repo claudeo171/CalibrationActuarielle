@@ -21,21 +21,48 @@
     </ol>
 </nav>
 <div class="row">
+    @if (DonneesImportes != null)
+    {
+        <div class="col-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    Paramétrage de la calibration
+                </div>
+                <div class="card-body">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,true)" value="@DonneesImportes.ActualData.IncludeTrunkatedDistributions" id="flexCheckDefault">
+                        <label class="form-check-label" for="flexCheckDefault" >
+                            Inclure les distributions tronqués
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,false)" value="@DonneesImportes.ActualData.IsDiscreteDistribution">
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Distributions discrètes?
+                        </label>
+                    </div>
 
-    <div class="col-xl-6">
+                </div>
+            </div>
+        </div>
+    }
+    <div class="col-xl-12">
         <div class="card">
             <div class="card-header">
                 Tests stratistiques
             </div>
             <div class="card-body">
-                <table>
+                <table class="table">
                     <thead>
-                        <tr>
-                            <th>Loi</th>
-                            <th>LogLikelihood</th>
-                            <th>AIC</th>
-                            <th>BIC</th>
-                        </tr>
+
+                    <th>Loi</th>
+                    <th>LogLikelihood</th>
+                    <th>AIC</th>
+                    <th>BIC</th>
+                        @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
+                        {
+                        <th>Parametre @(i + 1)</th>
+                        }
                     </thead>
                     <tbody>
                         @if (distributions != null)
@@ -43,10 +70,21 @@
                             @foreach (var test in distributions)
                             {
                                 <tr>
-                                    <td>@test.Distribution</td>
-                                    <td>@test.LogLikelihood</td>
-                                    <td>@test.AIC</td>
-                                    <td>@test.BIC</td>
+                                    <td>@test.Distribution.Type</td>
+                                    <td>@test.LogLikelihood.ToString("F4")</td>
+                                    <td>@test.AIC.ToString("F4")</td>
+                                    <td>@test.BIC.ToString("F4")</td>
+                                    @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
+                                    {
+                                        if (i < test.Distribution.AllParameters().Count())
+                                        {
+                                            <td>@test.Distribution.AllParameters().ElementAt(i).ToString()</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    }
                                 </tr>
                             }
                         }
@@ -56,25 +94,39 @@
         </div>
     </div>
 
-
 </div>
 
 
 @code {
     private bool isInit;
-    private ChartViewModelLine? QQPlot;
     private List<DistributionWithDatas>? distributions;
     private DonneesImportes? DonneesImportes;
-    private bool IsDiscreteDistribution;
-    private bool IncludeTrunkatedDistributions;
+
     protected override async void OnInitialized()
     {
 
         DonneesImportes = donneeContainer.Value;
         DonneesImportes.ActualData?.CalculerTest();
-        distributions = DonneesImportes.ActualData?.GetAllDistributions(IsDiscreteDistribution, IncludeTrunkatedDistributions);
+        distributions = DonneesImportes.ActualData?.GetAllDistributions();
         isInit = true;
         StateHasChanged();
+    }
+
+    protected void UpdateCalibration(ChangeEventArgs e,bool isTrunkated)
+    {
+        if (isTrunkated)
+        {
+            DonneesImportes.ActualData.IncludeTrunkatedDistributions = (bool)e.Value;
+        }
+        else
+        {
+            DonneesImportes.ActualData.IsDiscreteDistribution = (bool)e.Value;
+        }
+        if (isInit)
+        {
+            distributions = DonneesImportes.ActualData?.GetAllDistributions();
+            StateHasChanged();
+        }
     }
 
 

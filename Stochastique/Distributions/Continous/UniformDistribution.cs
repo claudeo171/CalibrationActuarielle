@@ -10,8 +10,14 @@ using System.Threading.Tasks;
 namespace Stochastique.Distributions.Continous
 {
     [MessagePackObject]
-    internal class UniformDistribution : Distribution
+    public class UniformDistribution : Distribution
     {
+        
+        public UniformDistribution()
+        {
+
+        }
+
         [Key(6)]
         public double A => GetParameter(ParametreName.a).Value;
 
