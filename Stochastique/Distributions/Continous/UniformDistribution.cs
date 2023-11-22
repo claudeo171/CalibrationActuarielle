@@ -12,7 +12,9 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class UniformDistribution : Distribution
     {
-        
+        [IgnoreMember]
+        public override bool IsTrunkable => false;
+
         public UniformDistribution()
         {
 

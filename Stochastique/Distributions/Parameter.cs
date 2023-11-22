@@ -26,7 +26,7 @@ namespace Stochastique.Distributions
 
         public override string ToString()
         {
-            return Name + " : " + Value.ToString("F2");
+            return Name + " : " + Value.ToString("F5");
         }
 
         [Key(0)]
@@ -138,6 +138,17 @@ namespace Stochastique.Distributions
                     default:
                         return 0;
                 }
+            }
+        }
+
+        public static List<Constraint> Contraints
+        {
+            get
+            {
+                return new List<Constraint>
+                {
+                    new Constraint(ParametreName.qUp, ParametreName.qDown)
+                };
             }
         }
     }

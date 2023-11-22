@@ -40,6 +40,8 @@ namespace Stochastique.Distributions
 
         [MessagePack.Key(2)]
         public virtual bool IsDiscreet => false;
+        [IgnoreMember]
+        public virtual bool IsTrunkable => true;
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
             switch (typeDistribution)
@@ -195,7 +197,7 @@ namespace Stochastique.Distributions
 
 
         [MessagePack.IgnoreMember]
-        private Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
+        protected Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
         [MessagePack.Key(5)]
         public List<Parameter> ParametersList { get; set; }
 
@@ -211,12 +213,12 @@ namespace Stochastique.Distributions
             }
         }
 
-        public Parameter GetParameter(ParametreName nomParametre)
+        public virtual Parameter GetParameter(ParametreName nomParametre)
         {
-            return ParametresParNom[nomParametre];
+            return  ParametresParNom[nomParametre];
         }
 
-        public IEnumerable<Parameter> AllParameters()
+        public virtual IEnumerable<Parameter> AllParameters()
         {
             return ParametresParNom.Values;
         }
@@ -230,6 +232,17 @@ namespace Stochastique.Distributions
             }
             return rst;
         }
+        public virtual void SetParameter(double[] values)
+        {
+            int i = 0;
+            var parameters = AllParameters();
+            foreach(var param in parameters)
+            {
+                param.Value = values[i];
+                i++;
+            }
+
+        }
         public double GetLogLikelihood(IEnumerable<double> values)
         {
             double rst = 0;
@@ -241,10 +254,7 @@ namespace Stochastique.Distributions
         }
         public void GetLogVraissemblanceOptim(IEnumerable<double> values, double[] x, ref double func, object obj)
         {
-            for (int i = 0; i < x.Length; i++)
-            {
-                ParametresParNom.Values.ElementAt(i).Value = x[i];
-            }
+            SetParameter(x);
             func = -GetLogLikelihood(values);
             if (double.IsPositiveInfinity(func))
             {
@@ -254,10 +264,7 @@ namespace Stochastique.Distributions
 
         public void GetSquaredError(IEnumerable<double> values, double[] x, ref double func, object obj)
         {
-            for (int i = 0; i < x.Length; i++)
-            {
-                ParametresParNom.Values.ElementAt(i).Value = x[i];
-            }
+            SetParameter(x);
             double increment = 1.0 / (values.Count() - 1);
             double value = increment / 2;
             foreach (var val in values)
@@ -270,22 +277,69 @@ namespace Stochastique.Distributions
                 func = double.MaxValue;
             }
         }
+
+        private void CreateConstraints(alglib.minbleicstate state)
+        {
+
+            var parameters= AllParameters().ToList();
+            double[] bndl = parameters.Select(p => p.MinValue).ToArray();
+            double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
+            alglib.minbleicsetbc(state, bndl, bndu);
+            if (Parameter.Contraints.Any(a => a.Parametres.All(b => parameters.Any(c => c.Name == b))))
+            {
+                var constraint = Parameter.Contraints.Where(a => a.Parametres.All(b => parameters.Any(c => c.Name == b))).ToList();
+                int x = parameters.Count * 2 + constraint.Count;
+                int y = parameters.Count + 1;
+                double[,] c = (double[,])Array.CreateInstance(typeof(double), x, y);
+                for(int i = 0; i < parameters.Count; i++)
+                {
+                    c[i, i] = 1;
+                    c[i,parameters.Count] = parameters[i].MinValue;
+                    c[i + parameters.Count, i] = -1;
+                    c[i + parameters.Count, parameters.Count] = -parameters[i].MaxValue;
+                }
+                foreach(var contrainte in constraint)
+                {
+                    int i = 0;
+                    foreach(var param in parameters)
+                    {
+                        int indice =contrainte.Parametres.IndexOf(param.Name);
+                        if (indice!=-1)
+                        {
+                            c[i + parameters.Count * 2, indice] = contrainte.Multiplier[indice];
+                        }
+                        
+                    }
+                    c[i + parameters.Count * 2, parameters.Count] = contrainte.Value;
+                    i++;
+                }
+                int[] ct = Enumerable.Repeat(1, x).ToArray();
+                alglib.minbleicsetlc(state, c, ct);
+            }
+
+        }
+
+
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
             var parameters = AllParameters().ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = Enumerable.Repeat(1.0, x.Length).ToArray() ;
-            double[] bndl = parameters.Select(p => p.MinValue).ToArray();
-            double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
+            if(this is TrunkatedDistribution)
+            {
+                s[0] = 0.1;
+                s[1] = 0.1;
+            }
+
             alglib.minbleicstate state;
             double epsg = 0;
             double epsf = 0;
-            double epsx = 0.000001;
-            int maxits = 0;
+            double epsx = 0;
+            int maxits = 1000;
             double diffstep = 1.0e-6;
 
             alglib.minbleiccreatef(x, diffstep, out state);
-            alglib.minbleicsetbc(state, bndl, bndu);
+            CreateConstraints(state);
             alglib.minbleicsetscale(state, s);
             alglib.minbleicsetcond(state, epsg, epsf, epsx, maxits);
 

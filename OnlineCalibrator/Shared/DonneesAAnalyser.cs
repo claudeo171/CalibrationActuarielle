@@ -94,37 +94,43 @@ namespace OnlineCalibrator.Shared
 
         public List<DistributionWithDatas> GetAllDistributions()
         {
-            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a).IsDiscreet==IsDiscreteDistribution).ToList();
-            if(IncludeTrunkatedDistributions)
+            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a)!=null && Distribution.CreateDistribution(a).IsDiscreet==IsDiscreteDistribution).ToList();
+            var rst=distributions.Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
+
+            if (IncludeTrunkatedDistributions)
             {
-                //TODO Create all trunkated distribution
+                rst.AddRange(distributions.Where(a=> Distribution.CreateDistribution(a).IsTrunkable).Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood,true)));
             }
-            return distributions.Select(a=> GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
+            return rst;
 
         }
 
 
-        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration)
+        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration,bool isTrunkated=false)
         {
             var distrib= Distribution.CreateDistribution(typeDistribution);
-            if (calibration!=null && !Distributions.Any(a => a.Distribution.GetType() == distrib.GetType() && a.Calibration == calibration))
+            if(isTrunkated)
+            {
+                distrib=new TrunkatedDistribution(distrib);
+            }
+            if (calibration!=null && !Distributions.Any(a => a.Distribution.Type == distrib.Type && a.Calibration == calibration))
             {
                 distrib.Initialize(Values, calibration.GetValueOrDefault());
-                if (Distributions.Any(a => a.Distribution.GetType() == distrib.GetType()))
+                if (Distributions.Any(a => a.Distribution.Type == distrib.Type))
                 {
-                    Distributions.First(a => a.Distribution.GetType() == distrib.GetType()).Distribution = distrib;
-                    Distributions.First(a => a.Distribution.GetType() == distrib.GetType()).Calibration = calibration.GetValueOrDefault();
+                    Distributions.First(a => a.Distribution.Type == distrib.Type).Distribution = distrib;
+                    Distributions.First(a => a.Distribution.Type == distrib.Type).Calibration = calibration.GetValueOrDefault();
                 }
                 else
                 {
                     Distributions.Add(new DistributionWithDatas(distrib,Values) { Calibration=calibration.Value});
                 }
             }
-            else if(calibration ==null  && !Distributions.Any(a => a.Distribution.GetType() == distrib.GetType()))
+            else if(calibration ==null  && !Distributions.Any(a => a.Distribution.Type == distrib.Type))
             {
                 return GetDistribution(typeDistribution, default(TypeCalibration));
             }
-            return Distributions.First(a => a.Distribution.GetType() == distrib.GetType()); 
+            return Distributions.First(a => a.Distribution.Type == distrib.Type); 
         } 
 
 

@@ -6,7 +6,7 @@ Console.WriteLine("Hello, World!");
 //DonneesImportes.FromMsgPack(File.ReadAllBytes("C:\\Users\\Claude\\Downloads\\log (3).data"));
 var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents\\data.csv", FileMode.Open), "data.csv");
 elt.NomData= "A";
-elt.ActualData.IsDiscreteDistribution = true;
+elt.ActualData.IncludeTrunkatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
 var toto = elt.ActualData.GetAllDistributions();
