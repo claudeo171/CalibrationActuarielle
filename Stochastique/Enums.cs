@@ -19,6 +19,11 @@ namespace Stochastique.Enums
         Np
     }
 
+    public enum MethodeCalibrationRetenue
+    {
+        Vraisemblance, AIC, BIC, Manuelle
+    }
+
     public enum TypeOptimisation
     {
         NewtonRaphson, FisherScoring, LevenbergMarquardt, BLEICAlgorithm

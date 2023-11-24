@@ -21,6 +21,8 @@ namespace Stochastique.Distributions
 
         [Key(6)]
         public override bool CanComputeExpectedValueEasily => false;
+        [IgnoreMember]
+        public override bool CanComputeVarianceEasily => false;
 
         /// <summary>
         /// The distribution which is trunkated

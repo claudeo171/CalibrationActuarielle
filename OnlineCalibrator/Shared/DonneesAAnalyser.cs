@@ -51,6 +51,10 @@ namespace OnlineCalibrator.Shared
         public bool IsDiscreteDistribution { get; set; }
         [Key(11)]
         public bool IncludeTrunkatedDistributions { get; set; }
+        [Key(13)]
+        public MethodeCalibrationRetenue MethodeCalibration { get; set; }
+        [Key(12)]
+        public Distribution CalibratedDistribution { get; set; }
 
         public DonneesAAnalyser() { }
         public void Initialize() 
@@ -65,17 +69,25 @@ namespace OnlineCalibrator.Shared
 
         }
 
-        public List<Point[]> GetQQPlot(TypeDistribution typeDistribution)
+        public List<Point[]> GetQQPlot(TypeDistribution? typeDistribution=null)
         {
             List<Point[]> rst = new List<Point[]>();
             rst.Add(new Point[Values.Length]);
             rst.Add(new Point[Values.Length]);
-            var loi = GetDistribution(typeDistribution,null);
+            Distribution loi;
+            if (typeDistribution == null)
+            {
+                loi = CalibratedDistribution;
+            }
+            else
+            {
+                loi = GetDistribution(typeDistribution.GetValueOrDefault(), null).Distribution;
+            }
 
             int i = 0;
             foreach(var elts in Values.Order())
             {
-                double x = loi.Distribution.InverseCDF((0.5 + i) / (Values.Length + 1));
+                double x = loi.InverseCDF((0.5 + i) / (Values.Length + 1));
                 double y = elts;
                 if (i<Values.Length/2)
                 {
@@ -91,6 +103,8 @@ namespace OnlineCalibrator.Shared
             return rst;
         }
 
+        [Key(14)]
+        public List<DistributionWithDatas> VisisbleData { get; set; }
 
         public List<DistributionWithDatas> GetAllDistributions()
         {
@@ -101,6 +115,7 @@ namespace OnlineCalibrator.Shared
             {
                 rst.AddRange(distributions.Where(a=> Distribution.CreateDistribution(a).IsTrunkable).Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood,true)));
             }
+            VisisbleData = rst;
             return rst;
 
         }
@@ -131,8 +146,27 @@ namespace OnlineCalibrator.Shared
                 return GetDistribution(typeDistribution, default(TypeCalibration));
             }
             return Distributions.First(a => a.Distribution.Type == distrib.Type); 
-        } 
+        }
+        public void ChangeSelectionMethod(MethodeCalibrationRetenue m)
+        {
+            MethodeCalibration = m;
+            if (VisisbleData != null)
+            {
+                switch (m)
+                {
+                    case MethodeCalibrationRetenue.AIC:
+                        CalibratedDistribution = VisisbleData.OrderBy(a => a.AIC).First().Distribution;
+                        break;
+                    case MethodeCalibrationRetenue.BIC:
+                        CalibratedDistribution = VisisbleData.OrderBy(a => a.BIC).First().Distribution;
+                        break;
+                    case MethodeCalibrationRetenue.Vraisemblance:
+                        CalibratedDistribution = VisisbleData.OrderBy(a => -a.LogLikelihood).First().Distribution;
+                        break;
+                }
+            }
 
+        }
 
     }
 }

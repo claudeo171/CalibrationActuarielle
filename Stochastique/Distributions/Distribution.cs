@@ -35,6 +35,9 @@ namespace Stochastique.Distributions
         [MessagePack.Key(0)]
         public virtual bool CanComputeExpectedValueEasily => true;
 
+        [IgnoreMember]
+        public virtual bool CanComputeVarianceEasily => true;
+
         [MessagePack.Key(1)]
         public abstract TypeDistribution Type { get; }
 
@@ -151,7 +154,11 @@ namespace Stochastique.Distributions
 
             while (CDF(min) > x)
             {
-                if (!double.IsNaN(Variance()))
+                if(min>0)
+                {
+                    min = -1;
+                }
+                if (CanComputeVarianceEasily && !double.IsNaN(Variance()))
                 {
                     min -= EcartType() * 10;
                 }
@@ -163,13 +170,17 @@ namespace Stochastique.Distributions
             }
             while (CDF(max) < x)
             {
-                if (!double.IsNaN(Variance()))
+                if(max < 0)
+                {
+                    max = 1;
+                }
+                if (CanComputeVarianceEasily && !double.IsNaN(Variance()))
                 {
                     max += EcartType() * 10;
                 }
                 else
                 {
-                    min *= 10;
+                    max *= 10;
                 }
 
             }
@@ -179,11 +190,11 @@ namespace Stochastique.Distributions
             {
                 if (x < ordonne)
                 {
-                    max = ordonne;
+                    max = abs;
                 }
                 else if (x > ordonne)
                 {
-                    min = ordonne;
+                    min = abs;
                 }
                 abs = (max + min) / 2;
                 ordonne = CDF(abs);

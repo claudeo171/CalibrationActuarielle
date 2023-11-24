@@ -24,6 +24,8 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
+            if(x<0) return 0;
+            if(x>1) return 1;
             return SpecialFunctions.BetaIncomplete(A, B, x) / SpecialFunctions.Beta(A, B);
         }
 
