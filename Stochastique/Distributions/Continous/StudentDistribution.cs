@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using MessagePack;
 using Stochastique.Enums;
 using System;
@@ -50,7 +51,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double Variance()
         {
-            if (n <= 2)
+            if (n > 2)
             {
                 return n / (n - 2);
             }
@@ -58,6 +59,13 @@ namespace Stochastique.Distributions.Continous
             {
                 return double.NaN;
             }
+        }
+
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            var variance = value.Variance();
+            AddParameter(new Parameter(ParametreName.n,Math.Max(3, 2* variance/(variance-1))));
+            base.Initialize(value, typeCalibration);    
         }
     }
 }

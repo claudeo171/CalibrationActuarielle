@@ -11,7 +11,12 @@ elt.ActualData.IncludeTrunkatedDistributions = true;
 elt.ActualData.IsDiscreteDistribution = false;
 var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
-elt.ActualData.GetQQPlot();
+foreach (var v in elt.ActualData.VisisbleData)
+{ 
+    elt.ActualData.CalibratedDistribution = v.Distribution;
+    elt.ActualData.GetQQPlot();
+}
+
 elt.ToMsgPack();
 
 elt.ToMsgPack();

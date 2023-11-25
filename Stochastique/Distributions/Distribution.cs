@@ -54,7 +54,7 @@ namespace Stochastique.Distributions
                 case TypeDistribution.Khi2:
                     return new Khi2Distribution();
                 case TypeDistribution.Student:
-                    return new StudentDistribution(0);
+                    return new StudentDistribution();
                 /*case TypeDistribution.LoiStudentAfine:
                     return new LoiAfine(new StudentDistribution(1), 1, 0);*/
                 case TypeDistribution.Bernouli:

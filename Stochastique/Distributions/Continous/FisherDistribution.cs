@@ -24,6 +24,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
+            if(x<0) return 0;
             return SpecialFunctions.BetaRegularized(D1 / 2, D2 / 2, D1 * x / (D1 * x + D2));
         }
 

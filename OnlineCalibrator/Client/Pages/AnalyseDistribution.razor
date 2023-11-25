@@ -51,7 +51,7 @@
                     Selection de la loi
                 </div>
                 <div class="card-body">
-                    @if (DonneesImportes.ActualData!=null && DonneesImportes.ActualData.CalibratedDistribution != null)
+                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
 
                         <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
@@ -61,6 +61,16 @@
                             }
                             )
                         </InputSelect>
+                        @if (DonneesImportes.ActualData.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
+                        {
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.CalibratedTypeDistribution)" Value="@DonneesImportes.ActualData.CalibratedTypeDistribution" ValueChanged="(TypeDistribution? s)=>{DonneesImportes.ActualData.CalibratedTypeDistribution=s; UpdateChart();}">
+                                @foreach (var item in DonneesImportes.ActualData.VisisbleData.Select(a => a.Distribution))
+                                {
+                                    <option value="@item.Type">@item.Type</option>
+                                }
+                                )
+                            </InputSelect>
+                        }
                         <div>
                             @DonneesImportes.ActualData.CalibratedDistribution?.Type
                         </div>
@@ -71,7 +81,7 @@
                             }
                         </ul>
                         <div> QQPlot </div>
-                        <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" /> 
+                        <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
                     }
                 </div>
             </div>
@@ -163,7 +173,7 @@
             ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration);
             UpdateChart();
             donneeContainer.SetValue(DonneesImportes);
-            StateHasChanged();
+
         }
     }
 
@@ -181,6 +191,7 @@
     DonneesImportes.ActualData?.GetQQPlot(),
     new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
     new List<Paint>() { null, null });
+        StateHasChanged();
     }
 
 

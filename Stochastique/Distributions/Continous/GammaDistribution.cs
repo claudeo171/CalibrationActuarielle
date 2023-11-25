@@ -24,6 +24,8 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
+            if(x<0)
+            { return 0; }
             return SpecialFunctions.GammaLowerIncomplete(K,x/Theta) / SpecialFunctions.Gamma(K);
         }
 

@@ -56,6 +56,20 @@ namespace OnlineCalibrator.Shared
         [Key(12)]
         public Distribution CalibratedDistribution { get; set; }
 
+        [Key(15)]
+        public TypeDistribution? CalibratedTypeDistribution
+        {
+            get
+            {
+                return CalibratedDistribution?.Type;
+            }
+            set
+            {
+                CalibratedDistribution= VisisbleData.FirstOrDefault(a=>a.Distribution.Type == value)?.Distribution;
+
+            }
+        }
+
         public DonneesAAnalyser() { }
         public void Initialize() 
         {
@@ -87,8 +101,8 @@ namespace OnlineCalibrator.Shared
             int i = 0;
             foreach(var elts in Values.Order())
             {
-                double x = loi.InverseCDF((0.5 + i) / (Values.Length + 1));
-                double y = elts;
+                double x = loi.CDF(elts);
+                double y = i * 1.0 / Values.Length;
                 if (i<Values.Length/2)
                 {
                     rst[1][i] = new Point() { X = Math.Min(x,y), Y= Math.Min(x, y) };
@@ -155,13 +169,13 @@ namespace OnlineCalibrator.Shared
                 switch (m)
                 {
                     case MethodeCalibrationRetenue.AIC:
-                        CalibratedDistribution = VisisbleData.OrderBy(a => a.AIC).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a=>!double.IsNaN(a.AIC)).OrderBy(a => a.AIC).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.BIC:
-                        CalibratedDistribution = VisisbleData.OrderBy(a => a.BIC).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.AIC)).OrderBy(a => a.BIC).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.Vraisemblance:
-                        CalibratedDistribution = VisisbleData.OrderBy(a => -a.LogLikelihood).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.AIC)).OrderBy(a => -a.LogLikelihood).First().Distribution;
                         break;
                 }
             }

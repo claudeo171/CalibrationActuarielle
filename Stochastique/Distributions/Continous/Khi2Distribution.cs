@@ -27,6 +27,10 @@ namespace Stochastique.Distributions.Continous
         }
         public override double CDF(double x)
         {
+            if(x<0)
+            {
+                return 0;
+            }
             return SpecialFunctions.GammaLowerIncomplete(GetParameter(ParametreName.k).Value / 2, x) / SpecialFunctions.Gamma(GetParameter(ParametreName.k).Value / 2);
         }
 
