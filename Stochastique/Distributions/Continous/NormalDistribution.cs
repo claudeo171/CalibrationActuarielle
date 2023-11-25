@@ -56,5 +56,27 @@ namespace Stochastique.Distributions.Continous
         {
             return GetParameter(ParametreName.sigma).Value * GetParameter(ParametreName.sigma).Value;
         }
+
+        public override double Simulate(Random r)
+        {
+            var u1 = r.NextDouble();
+            var u2 = r.NextDouble();
+            return Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+        }
+        public override double[] Simulate(Random r, int n)
+        {
+            double[] result = new double[n];
+            for (int i = 0; i < n/2 +1; i++)
+            {
+                var u1 = r.NextDouble();
+                var u2 = r.NextDouble();
+                result[2*i] = Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+                if(2*i+1<n)
+                {
+                    result[2 * i + 1] = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
+                }
+            }
+            return result;
+        }
     }
 }

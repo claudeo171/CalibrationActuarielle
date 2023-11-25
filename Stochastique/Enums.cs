@@ -47,6 +47,7 @@ namespace Stochastique.Enums
         Gamma=15,
         Uniform=16,
         Weibull=17,
+        LogNormal=18,
         Trunkated=1000,
         TrunkatedNormal = 1001,
         TrunkatedStudent = 1002, 
@@ -64,6 +65,7 @@ namespace Stochastique.Enums
         TrunkatedFisher = 1014,
         TrunkatedGamma = 1015,
         TrunkatedUniform = 1016,
-        TrunkatedWeibull = 1017
+        TrunkatedWeibull = 1017,
+        TrunkatedLogNormal = 1018,
     }
 }

@@ -32,19 +32,37 @@ namespace Stochastique.Distributions
     [MessagePack.Union(18, typeof(PoissonDistribution))]
     public abstract class Distribution : IMessagePackSerializationCallbackReceiver
     {
+        /// <summary>
+        /// If true, the expected value can be computed easily.
+        /// </summary>
         [MessagePack.Key(0)]
         public virtual bool CanComputeExpectedValueEasily => true;
-
+        /// <summary>
+        /// If true, the variance can be computed easily.
+        /// </summary>
         [IgnoreMember]
         public virtual bool CanComputeVarianceEasily => true;
+        /// <summary>
+        /// The expected value of the distribution.
+        /// </summary>
 
         [MessagePack.Key(1)]
         public abstract TypeDistribution Type { get; }
-
+        /// <summary>
+        /// If true, the distribution is discreet.
+        /// </summary>
         [MessagePack.Key(2)]
         public virtual bool IsDiscreet => false;
+        /// <summary>
+        /// If true, the distribution can be trukated. Useful for uniform distribution witch is not well defined with four parameter.
+        /// </summary>
         [IgnoreMember]
         public virtual bool IsTrunkable => true;
+        /// <summary>
+        /// Create a distribution with the type of the distribution.
+        /// </summary>
+        /// <param name="typeDistribution">The type of distribution that will be created</param>
+        /// <returns>A distribution of the asked type </returns>
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
             switch (typeDistribution)
@@ -55,8 +73,6 @@ namespace Stochastique.Distributions
                     return new Khi2Distribution();
                 case TypeDistribution.Student:
                     return new StudentDistribution();
-                /*case TypeDistribution.LoiStudentAfine:
-                    return new LoiAfine(new StudentDistribution(1), 1, 0);*/
                 case TypeDistribution.Bernouli:
                     return new BernouliDistribution();
                 case TypeDistribution.Poisson:
@@ -82,13 +98,20 @@ namespace Stochastique.Distributions
                 case TypeDistribution.NegativeBinomial: return new NegativeBinomialDistribution();
                 case TypeDistribution.Pascal: return new PascalDistribution();
                 case TypeDistribution.Uniform: return new UniformDistribution();
+                case TypeDistribution.LogNormal: return new LogNormalDistribution();
                 default:
                     return null;
             }
         }
-
+        /// <summary>
+        /// If true, the distribution can be calibrated with moment method. (for example cauchy or hypergeometrical distribution can't be calibrated with moment method)
+        /// </summary>
         [MessagePack.Key(3)]
         public bool AllowMomentParameter { get; set; }
+        /// <summary>
+        /// Return the kernel density graph of the distribution.
+        /// </summary>
+        /// <returns>List of 100 point with uniformly distributed absices, and all PDF Values</returns>
         public List<ObservablePoint> DensityGraph()
         {
             List<ObservablePoint> result = new List<ObservablePoint>();
@@ -102,6 +125,10 @@ namespace Stochastique.Distributions
             }
             return result;
         }
+        /// <summary>
+        /// Comtpute points for display CDF graph.
+        /// </summary>
+        /// <returns>List of 100 point with uniformly distributed absices, and all CDF Values</returns>
         public List<ObservablePoint> CDFGraph()
         {
             List<ObservablePoint> result = new List<ObservablePoint>();
@@ -115,6 +142,17 @@ namespace Stochastique.Distributions
             }
             return result;
         }
+
+        /// <summary>
+        /// Compute all the parameters of the disttribution for a given set of value and type of calibration
+        /// </summary>
+        /// <param name="value">List of value that represents a sample of a distribution</param>
+        /// <param name="typeCalibration">
+        /// The type of calibration between:
+        ///     - Moments
+        ///     - MaximumLikelyhood (https://en.wikipedia.org/wiki/Maximum_likelihood_estimation)
+        ///     - LeastSquare on the CDF curve (https://en.wikipedia.org/wiki/Least_squares)
+        /// </param>
         public virtual void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             switch (typeCalibration)
@@ -127,17 +165,43 @@ namespace Stochastique.Distributions
                     break;
             }
         }
-
+        /// <summary>
+        /// Compute the value of the PDF for a given value
+        /// </summary>
+        /// <param name="x">The value</param>
+        /// <returns></returns>
         public abstract double PDF(double x);
 
-
+        /// <summary>
+        /// Compute the expected value of the distribution
+        /// </summary>
+        /// <returns>The expected value of the distribution</returns>
         public abstract double ExpextedValue();
+        /// <summary>
+        /// Compute the variance of the distribution
+        /// </summary>
+        /// <returns>The variance of the distribution</returns>
         public abstract double Variance();
-        public double EcartType()
+        /// <summary>
+        /// Compute the standard deviation of the distribution
+        /// </summary>
+        /// <returns>The standard deviation of the distribution</returns>
+        public double StandardDeviation()
         {
             return Math.Sqrt(Variance());
         }
+        /// <summary>
+        /// Compute the CDF of the distribution for a given value
+        /// </summary>
+        /// <param name="x">the value of CDF parameter</param>
+        /// <returns>The CDF value for x.</returns>
         public abstract double CDF(double x);
+        /// <summary>
+        /// Compute the inverse CDF of the distribution for a given value. Can be called quantile function.
+        /// </summary>
+        /// <param name="x">The value in [0;1] </param>
+        /// <returns>The quantile</returns>
+        /// <exception cref="ArgumentException">If the parameter is not between 0 and 1</exception>
         public virtual double InverseCDF(double x)
         {
             if (x <= 0 || x >= 1)
@@ -148,8 +212,8 @@ namespace Stochastique.Distributions
             double max = 1;
             if (CanComputeExpectedValueEasily && !double.IsNaN(ExpextedValue()) && !double.IsNaN(Variance()))
             {
-                min = ExpextedValue() - EcartType() * 10;
-                max = ExpextedValue() + EcartType() * 10;
+                min = ExpextedValue() - StandardDeviation() * 10;
+                max = ExpextedValue() + StandardDeviation() * 10;
             }
 
             while (CDF(min) > x)
@@ -160,7 +224,7 @@ namespace Stochastique.Distributions
                 }
                 if (CanComputeVarianceEasily && !double.IsNaN(Variance()))
                 {
-                    min -= EcartType() * 10;
+                    min -= StandardDeviation() * 10;
                 }
                 else
                 {
@@ -176,7 +240,7 @@ namespace Stochastique.Distributions
                 }
                 if (CanComputeVarianceEasily && !double.IsNaN(Variance()))
                 {
-                    max += EcartType() * 10;
+                    max += StandardDeviation() * 10;
                 }
                 else
                 {
@@ -201,17 +265,28 @@ namespace Stochastique.Distributions
             }
             return abs;
         }
-
+        /// <summary>
+        /// Intervale selected for displaying CDF and PDF. Must be set in all distributions. Necessary for displaing distribution on non finite interval.
+        /// </summary>
         [MessagePack.Key(4)]
         public Intervale? IntervaleForDisplay { get; set; }
 
 
-
+        /// <summary>
+        /// List of all parameter of the distribution in dictionary by parameter name
+        /// </summary>
         [MessagePack.IgnoreMember]
         protected Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
+        /// <summary>
+        /// Storing the list of parameter for serialization purpose. (MessagePack doesn't serialize dictionnary properly. Maybe because of me^^)
+        /// </summary>
         [MessagePack.Key(5)]
         public List<Parameter> ParametersList { get; set; }
-
+        /// <summary>
+        /// Adding a parameter to the distribution. If a parameter with the same name already exists, an exception is thrown.
+        /// </summary>
+        /// <param name="parameter"> The parameter added</param>
+        /// <exception cref="ArgumentException">If a parameter exist with the same name, exception is throw </exception>
         public void AddParameter(Parameter parameter)
         {
             if (ParametresParNom.ContainsKey(parameter.Name))
@@ -223,17 +298,28 @@ namespace Stochastique.Distributions
                 ParametresParNom.Add(parameter.Name, parameter);
             }
         }
-
+        /// <summary>
+        /// Get a parameter by its name
+        /// </summary>
+        /// <param name="nomParametre">Name of parameter</param>
+        /// <returns>The parameter</returns>
         public virtual Parameter GetParameter(ParametreName nomParametre)
         {
             return  ParametresParNom[nomParametre];
         }
-
+        /// <summary>
+        /// Return all parameters of the distribution
+        /// </summary>
+        /// <returns> A ienumerable containing all parameters</returns>
         public virtual IEnumerable<Parameter> AllParameters()
         {
             return ParametresParNom.Values;
         }
-
+        /// <summary>
+        /// Fuction that returns the likelihood of a set of values.
+        /// </summary>
+        /// <param name="values">A set of double values</param>
+        /// <returns>The likelihood</returns>
         public double GetVraissemblance(IEnumerable<double> values)
         {
             double rst = 1;
@@ -243,6 +329,10 @@ namespace Stochastique.Distributions
             }
             return rst;
         }
+        /// <summary>
+        /// Function that set all parameters value from an array of double
+        /// </summary>
+        /// <param name="values">Array of double that contains values of parameter</param>
         public virtual void SetParameter(double[] values)
         {
             int i = 0;
@@ -254,6 +344,11 @@ namespace Stochastique.Distributions
             }
 
         }
+        /// <summary>
+        /// Fuction that returns the loglikelihood of a set of values.
+        /// </summary>
+        /// <param name="values">A set of double values</param>
+        /// <returns>The likelihood</returns>
         public double GetLogLikelihood(IEnumerable<double> values)
         {
             double rst = 0;
@@ -263,6 +358,13 @@ namespace Stochastique.Distributions
             }
             return rst;
         }
+        /// <summary>
+        /// Method that compute the loglikelihood of a set of values. This method is used for optimization purpose.
+        /// </summary>
+        /// <param name="values">The set of value used for calibration</param>
+        /// <param name="x">The values of the parameters of the distribution</param>
+        /// <param name="func">The result of loglikelihood</param>
+        /// <param name="obj">A parameter of the optimizer not used</param>
         public void GetLogVraissemblanceOptim(IEnumerable<double> values, double[] x, ref double func, object obj)
         {
             SetParameter(x);
@@ -272,7 +374,13 @@ namespace Stochastique.Distributions
                 func = double.MaxValue;
             }
         }
-
+        /// <summary>
+        /// Method that compute the squared error (from CDF) of a set of values. This method is used for optimization purpose.
+        /// </summary>
+        /// <param name="values">The set of value used for calibration</param>
+        /// <param name="x">The values of the parameters of the distribution</param>
+        /// <param name="func">The result of square error</param>
+        /// <param name="obj">A parameter of the optimizer not used</param>
         public void GetSquaredError(IEnumerable<double> values, double[] x, ref double func, object obj)
         {
             SetParameter(x);
@@ -288,7 +396,10 @@ namespace Stochastique.Distributions
                 func = double.MaxValue;
             }
         }
-
+        /// <summary>
+        /// Function that create constraints for the optimization algorithm
+        /// </summary>
+        /// <param name="state">The state of the optimizer</param>
         private void CreateConstraints(alglib.minbleicstate state)
         {
 
@@ -330,7 +441,11 @@ namespace Stochastique.Distributions
 
         }
 
-
+        /// <summary>
+        /// Function used for schearching the best parameters of the distribution by optimisation of loglikelihood or square error
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="typeCalibration"></param>
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
             var parameters = AllParameters().ToList();
@@ -372,14 +487,38 @@ namespace Stochastique.Distributions
             alglib.minbleicoptguardresults(state, out ogrep);
         }
 
+        /// <summary>
+        /// Fonction called before serialization to store parameters in a list
+        /// </summary>
         public void OnBeforeSerialize()
         {
             ParametersList= AllParameters()?.ToList();
         }
-
+        /// <summary>
+        /// Fuction called after deserialization to store parameters in a dictionnary
+        /// </summary>
         public void OnAfterDeserialize()
         {
             ParametresParNom= ParametersList.ToDictionary(a=>a.Name, a=>a);
+        }
+        /// <summary>
+        /// Function that simulate a sample of the distribution from a random generator
+        /// </summary>
+        /// <param name="r">The random generator</param>
+        /// <returns>A value simulated from the distribution</returns>
+        public virtual double Simulate(Random r)
+        {
+            return InverseCDF(r.NextDouble());
+        }
+        /// <summary>
+        /// Function that simulate multiple sample of the distribution from a random generator
+        /// </summary>
+        /// <param name="r">The random generator</param>
+        /// <param name="nbSimulations">The number of element in the result</param>
+        /// <returns>A sample of the distribution with nbSimulations values.</returns>
+        public virtual double[] Simulate(Random r, int nbSimulations)
+        {
+            return Enumerable.Range(0, nbSimulations).Select(a => Simulate(r)).ToArray();
         }
     }
 

@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 namespace Stochastique.Distributions.Continous
 {
     [MessagePackObject]
-    internal class LogNormalDistribution : Distribution
+    internal class LogNormalDistribution : NormalDistribution
     {
         [Key(6)]
-        public override TypeDistribution Type => throw new NotImplementedException();
+        public override TypeDistribution Type => TypeDistribution.Poisson;
 
         [Key(7)]
         public double mu => GetParameter(ParametreName.mu).Value;
@@ -52,6 +52,14 @@ namespace Stochastique.Distributions.Continous
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(mu - 5 * sigma, mu + 5 * sigma);
 
+        }
+        public override double Simulate(Random r)
+        {
+            return Math.Exp( base.Simulate(r));
+        }
+        public override double[] Simulate(Random r, int n)
+        {
+            return base.Simulate(r, n).Select(a=>Math.Exp(a)).ToArray();
         }
     }
 }
