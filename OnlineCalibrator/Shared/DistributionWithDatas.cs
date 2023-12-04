@@ -42,8 +42,7 @@ namespace OnlineCalibrator.Shared
         [Key(3)]
         public double BIC => Math.Log(N) * Distribution.AllParameters().Count() - 2 * LogLikelihood;
 
-        [Key(4)]
-        public TypeDistribution TypeDistribution { get; set; }
+
         [Key(5)]
         public Distribution Distribution { get; set; }
         [Key(6)]

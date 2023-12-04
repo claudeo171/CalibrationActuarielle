@@ -11,12 +11,9 @@ elt.ActualData.IncludeTrunkatedDistributions = true;
 elt.ActualData.IsDiscreteDistribution = false;
 var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
-foreach (var v in elt.ActualData.VisisbleData)
-{ 
-    elt.ActualData.CalibratedDistribution = v.Distribution;
-    elt.ActualData.GetQQPlot();
-}
 
+FileService fs = new FileService();
+File.WriteAllBytes("test.docx", fs.ExportFile(elt));
 elt.ToMsgPack();
 
 elt.ToMsgPack();

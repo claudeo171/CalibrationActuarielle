@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,7 +36,7 @@ namespace GenerationImageDistribution
             }
 
             // kernel density estimation
-            double bandwidth = Math.Pow( (4* Math.Pow(Statistics.StandardDeviation(valOrdered),5)/(3*valOrdered.Length)),0.2);
+            double bandwidth = Math.Pow((4 * Math.Pow(Statistics.StandardDeviation(valOrdered), 5) / (3 * valOrdered.Length)), 0.2);
             int indDeb = 0;
 
             for (int i = 0; i < nbStep; i++)
@@ -44,7 +45,7 @@ namespace GenerationImageDistribution
                 bool continuer = true;
                 while (j < valOrdered.Length && continuer)
                 {
-                    var kernel = GaussianKernel((result[i].X - valOrdered[j])/bandwidth);
+                    var kernel = GaussianKernel((result[i].X - valOrdered[j]) / bandwidth);
                     if (j == indDeb && kernel < 1e-8)
                     {
                         indDeb++;
@@ -55,7 +56,7 @@ namespace GenerationImageDistribution
                     }
                     else
                     {
-                        result[i].Y += kernel/ racineN;
+                        result[i].Y += kernel / racineN;
                     }
                     j++;
                 }
@@ -82,25 +83,81 @@ namespace GenerationImageDistribution
             return 1.0 / Math.Sqrt(2 * Math.PI) * Math.Exp(-x * x / 2);
         }
 
-        public static void SaveChartImage(Point[] points,string name)
+        public static void SaveChartImage(Point[] points, string name, int width = 2000, int height = 1500, bool showAxis = false)
         {
 
-            var skChart = new SKCartesianChart() { 
+            var skChart = new SKCartesianChart()
+            {
                 Series = new List<ISeries>
                 {
                     new LineSeries<ObservablePoint>
                     {
                         Values = points.Select(a=> new ObservablePoint(a.X,  a.Y)),
                         Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4, Color= SKColors.Blue, IsStroke=true, IsFill=true,  },
-                        
+
                         GeometrySize = 0
                     }
                 },
-                Width = 2000, Height = 1500, };
-            skChart.XAxes.First().ShowSeparatorLines = false;
-            skChart.YAxes.First().ShowSeparatorLines = false;
-            skChart.XAxes.First().Labeler = a=>"";
-            skChart.YAxes.First().Labeler = a => "";
+                Width = width,
+                Height = height,
+            };
+            if (!showAxis)
+            {
+                skChart.XAxes.First().ShowSeparatorLines = false;
+                skChart.YAxes.First().ShowSeparatorLines = false;
+                skChart.XAxes.First().Labeler = a => "";
+                skChart.YAxes.First().Labeler = a => "";
+            }
+            skChart.SaveImage($"{name}.png");
+        }
+        public static void SaveChartImage(List<Point[]> pointsArray, string name, int width = 2000, int height = 1500, bool showAxis = false)
+        {
+            var series = new List<ISeries>();
+            int i = 0;
+            foreach (var points in pointsArray)
+            {
+                var skcol = SKColors.Blue;
+                switch (i % 4)
+                {
+                    case 0:
+                        skcol = SKColors.Blue;
+                        break;
+                    case 1:
+                        skcol = SKColors.Red;
+                        break;
+                    case 2:
+                        skcol = SKColors.Green;
+                        break;
+                    case 3:
+                        skcol = SKColors.Orange;
+                        break;
+                }
+
+                series.Add(new LineSeries<ObservablePoint>
+                {
+                    Values = points.Select(a => new ObservablePoint(a.X, a.Y)),
+                    Stroke = new SolidColorPaint(skcol) { StrokeThickness = 2, Color = skcol, IsStroke = true, IsFill = false },
+                    Fill = null,
+                    GeometrySize = 0
+                });
+                i++;
+
+            }
+            var skChart = new SKCartesianChart()
+            {
+                Series = series,
+                Width = width,
+                Height = height,
+
+            };
+
+            if (!showAxis)
+            {
+                skChart.XAxes.First().ShowSeparatorLines = false;
+                skChart.YAxes.First().ShowSeparatorLines = false;
+                skChart.XAxes.First().Labeler = a => "";
+                skChart.YAxes.First().Labeler = a => "";
+            }
             skChart.SaveImage($"{name}.png");
         }
 

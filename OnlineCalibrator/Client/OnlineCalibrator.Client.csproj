@@ -16,6 +16,7 @@
     <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.710" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-beta.710" />
+    <PackageReference Include="MersenneTwister" Version="1.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

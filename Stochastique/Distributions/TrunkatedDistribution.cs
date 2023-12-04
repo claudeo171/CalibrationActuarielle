@@ -65,10 +65,30 @@ namespace Stochastique.Distributions
         }
 
         [Key(13)]
-        private double MinValue => Bisection.FindRoot((a) => CDF(a) - 1e-10, double.MinValue, double.MaxValue, maxIterations: 1000);
+        private double MinValue => Bisection.FindRoot((a) => CDF(a) - 1e-10, GetMin(), GetMax(), maxIterations: 1000);
+
+        private double GetMin()
+        {
+            double d = -1;
+            while(CDF(d) > 1e-10)
+            {
+                d *= 10;
+            }
+            return d;
+        }
+
+        private double GetMax()
+        {
+            double d = 1;
+            while (1-CDF(d) > 1e-10)
+            {
+                d *= 10;
+            }
+            return d;
+        }
 
         [Key(14)]
-        private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) + 1e-10, double.MinValue, double.MaxValue, maxIterations: 1000);
+        private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) - 1e-10, GetMin(), GetMax(), maxIterations: 1000);
         public override double ExpextedValue()
         {
             if (ComputedExpectedValue == null)
