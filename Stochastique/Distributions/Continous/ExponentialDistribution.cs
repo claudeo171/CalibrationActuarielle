@@ -37,6 +37,15 @@ namespace Stochastique.Distributions.Continous
         {
             return 1 / (Labda * Labda);
         }
+        public override double Skewness()
+        {
+            return 2;
+        }
+
+        public override double Kurtosis()
+        {
+            return 6;
+        }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

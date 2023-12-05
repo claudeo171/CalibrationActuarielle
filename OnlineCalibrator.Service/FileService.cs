@@ -106,7 +106,7 @@ namespace OnlineCalibrator.Service
             bytes = totalStream.ToArray();
             return bytes;
         }
-        public byte[] ExportFile(DonneesImportes donnees)
+        public byte[] ExportFileDocx(DonneesImportes donnees)
         {
             byte[] bytes;
             using MemoryStream stream = new MemoryStream();
@@ -140,7 +140,7 @@ namespace OnlineCalibrator.Service
                         body.AddParagraph($"Les caractéristiques empiriques de la distribution sont les suivantes :");
                         body.AddPuceParagraphe($"Moyenne : {v.Moyenne}");
                         body.AddPuceParagraphe($"Variance empirique : {v.Moyenne}");
-                        body.AddPuceParagraphe($"Skrewness empirique : {v.Skewness}");
+                        body.AddPuceParagraphe($"Skewness empirique : {v.Skewness}");
                         body.AddPuceParagraphe($"Kurtosis empirique : {v.Kurtosis}");
                         body.AddParagraph($"Graphiques", "Titre3");
                         body.AddParagraph($"Les éléments graphiques sont les suivants :");
@@ -248,7 +248,7 @@ namespace OnlineCalibrator.Service
             result.Add(new List<string> { "Moment", "Valeur Empirique", "Valeur Théorique", "Ecart" });
             result.Add(new List<string> { "Esperance", datas.Moyenne.ToBeautifulString(), ev.ToBeautifulString(), ((datas.Moyenne-ev)/ datas.Moyenne).ToString("P4") });
             result.Add(new List<string> { "Variance", datas.Variance.ToBeautifulString(), variance.ToBeautifulString(), ((datas.Variance - variance) / datas.Variance).ToString("P4") }); ;
-            result.Add(new List<string> { "Skrewness", datas.Skewness.ToBeautifulString(), skewness.ToBeautifulString(), ((datas.Skewness - skewness) / datas.Skewness).ToString("P4") });
+            result.Add(new List<string> { "Skewness", datas.Skewness.ToBeautifulString(), skewness.ToBeautifulString(), ((datas.Skewness - skewness) / datas.Skewness).ToString("P4") });
             result.Add(new List<string> { "Kurtosis", datas.Kurtosis.ToBeautifulString(), kurtosis.ToBeautifulString(), ((datas.Kurtosis - kurtosis) / datas.Kurtosis).ToString("P4") });
             return result;
 

@@ -67,5 +67,28 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.n,Math.Max(3, 2* variance/(variance-1))));
             base.Initialize(value, typeCalibration);    
         }
+        public override double Skewness()
+        {
+            if (n > 3)
+            {
+                return 0;
+            }
+            else
+            {
+                return double.NaN;
+            }
+        }
+
+        public override double Kurtosis()
+        {
+            if (n > 4)
+            {
+                return 6/(n-4);
+            }
+            else
+            {
+                return double.NaN;
+            }
+        }
     }
 }

@@ -36,6 +36,15 @@ namespace Stochastique.Distributions.Discrete
         {
             return Lambda;
         }
+        public override double Skewness()
+        {
+            return 1/Math.Sqrt(Lambda);
+        }
+
+        public override double Kurtosis()
+        {
+            return 1 / Lambda;
+        }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var ev = Statistics.Mean(value);

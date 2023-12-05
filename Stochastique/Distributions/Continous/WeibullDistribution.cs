@@ -50,6 +50,20 @@ namespace Stochastique.Distributions.Continous
             return Lambda * Lambda * SpecialFunctions.Gamma(1 + 2 / K) - Math.Pow(ExpextedValue(), 2);
         }
 
+        public override double Skewness()
+        {
+            var mu = ExpextedValue();
+            var sigma = Math.Sqrt(Variance());
+            return (Lambda*Lambda*Lambda*SpecialFunctions.Gamma(1+3/K)-3*mu*Variance()-mu*mu*mu)/sigma*sigma*sigma;
+        }
+
+        public override double Kurtosis()
+        {
+            var mu = ExpextedValue();
+            var sigma2 = Variance();
+            return (Lambda * Lambda * Lambda * Lambda* SpecialFunctions.Gamma(1 + 4 / K) - 4 * mu * sigma2*Math.Sqrt(sigma2)*Skewness()-4*sigma2*sigma2 -6*mu*mu*sigma2- mu * mu * mu *mu) / sigma2* sigma2;
+        }
+
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var ev = Statistics.Mean(value);

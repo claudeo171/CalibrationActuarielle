@@ -48,6 +48,16 @@ namespace Stochastique.Distributions.Discrete
             return P * (1 - P);
         }
 
+        public override double Skewness()
+        {
+            return 1/Math.Sqrt(P*(1-P));
+        }
+
+        public override double Kurtosis()
+        {
+            return (1 - 6 * P *(1-P)) / (P * (1 - P));
+        }
+
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var ev = Statistics.Mean(value);

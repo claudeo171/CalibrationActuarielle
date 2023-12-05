@@ -78,5 +78,15 @@ namespace Stochastique.Distributions.Continous
             }
             return result;
         }
+
+        public override double Skewness()
+        {
+            return 0;
+        }
+
+        public override double Kurtosis()
+        {
+            return 0;
+        }
     }
 }

@@ -28,6 +28,16 @@ namespace Stochastique.Distributions.Discrete
             return (1 - P) / (P * P);
         }
 
+        public override double Skewness()
+        {
+            return (2 - P) / Math.Sqrt((1 - P));
+        }
+
+        public override double Kurtosis()
+        {
+            return 6 + P * P / (1 - P);
+        }
+
         protected override double PDFInt(int k)
         {
             return P * Math.Pow(1 - P, k);
@@ -36,7 +46,7 @@ namespace Stochastique.Distributions.Discrete
         {
             var ev = Statistics.Mean(value);
 
-            AddParameter(new Parameter(ParametreName.p, Math.Min(1, Math.Max(0, 1/ev))));
+            AddParameter(new Parameter(ParametreName.p, Math.Min(1, Math.Max(0, 1 / ev))));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
         }

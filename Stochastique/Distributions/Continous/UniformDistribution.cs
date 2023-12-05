@@ -70,6 +70,15 @@ namespace Stochastique.Distributions.Continous
         {
             return (B - A) * (B - A) / 12;
         }
+        public override double Skewness()
+        {
+            return 0;
+        }
+
+        public override double Kurtosis()
+        {
+            return -6/5.0;
+        }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var ev = Statistics.Mean(value);

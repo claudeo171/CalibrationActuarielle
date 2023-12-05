@@ -43,6 +43,15 @@ namespace Stochastique.Distributions.Continous
         {
             return A*B / ((A + B)* (A + B)+ (A + B + 1));
         }
+        public override double Skewness()
+        {
+            return 2*(B-A)*Math.Sqrt(A+B+1)/((A+B+2)*Math.Sqrt(A*B));
+        }
+
+        public override double Kurtosis()
+        {
+            return 6* ((B - A)* (B - A)*(B + A + 1)-A*B*(A+B+2))/(A*B*(A+B+2)*(A+B+3));
+        }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

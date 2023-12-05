@@ -521,17 +521,9 @@ namespace Stochastique.Distributions
             return Enumerable.Range(0, nbSimulations).Select(a => Simulate(r)).ToArray();
         }
 
-        public double Skewness()
-        {
-            return 0;
-            //TODO a implementer
-        }
+        public abstract double Skewness();
 
-        public double Kurtosis()
-        {
-            return 0;
-            //TODO a implementer
-        }
+        public abstract double Kurtosis();
     }
 
 }

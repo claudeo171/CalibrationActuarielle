@@ -69,5 +69,14 @@ namespace Stochastique.Distributions.Continous
         {
             return base.Simulate(r, n).Select(a=>Math.Exp(a)).ToArray();
         }
+        public override double Skewness()
+        {
+            return (Math.Exp(sigma*sigma)+2)*Math.Sqrt(Math.Exp(sigma*sigma)-1);
+        }
+
+        public override double Kurtosis()
+        {
+            return Math.Exp(4*sigma * sigma)+2* Math.Exp(3 * sigma * sigma)+ 3 * Math.Exp(2 * sigma * sigma)-6;
+        }
     }
 }

@@ -13,7 +13,7 @@ var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
 
 FileService fs = new FileService();
-File.WriteAllBytes("test.docx", fs.ExportFile(elt));
+File.WriteAllBytes("test.docx", fs.ExportFileDocx(elt));
 elt.ToMsgPack();
 
 elt.ToMsgPack();

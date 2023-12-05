@@ -34,6 +34,8 @@ namespace Stochastique.Distributions.Discrete
         /// </summary>
         [Key(13)]
         public double N => GetParameter(ParametreName.N).Value;
+        [IgnoreMember]
+        public double P => NP / N;
 
         [Key(14)]
         public override TypeDistribution Type => TypeDistribution.Hypergeometrical;
@@ -48,9 +50,19 @@ namespace Stochastique.Distributions.Discrete
             return n * NP * (N - NP) / N / N * (N - n) / (N - 1);
         }
 
+        public override double Skewness()
+        {
+            return (N - 2 * n) * (1 - 2 * P) * Math.Sqrt(N - 1) / (Math.Sqrt(n * P * (1 - P) * (N - n)) * (N - 2));
+        }
+
+        public override double Kurtosis()
+        {
+            return (N - 1) * (N * N * 1 - 6 * P * (1 - P) + N * (1 - 6 * n) + 6 * n * n) / (n * P * (1 - P) * (N - 2) * (N - 3)) + 6 * N * N / ((N - 2) * (N - 3)) - 6;
+        }
+
         protected override double PDFInt(int k)
         {
-            if (k > NP || n>N || (N - NP) - n + k<0)
+            if (k > NP || n > N || (N - NP) - n + k < 0)
             {
                 return 0;
             }
@@ -74,9 +86,9 @@ namespace Stochastique.Distributions.Discrete
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
             //We take the hypothesis of NP = 0,5 * N
-            AddParameter(new Parameter(ParametreName.n,Math.Max(1,(int)(ev*2))));
-            AddParameter(new Parameter(ParametreName.N, Math.Max(1, (int) (-2*ev+2* variance / ev )/(2*variance/ev-1))));
-            AddParameter(new Parameter(ParametreName.Np, (int)N*0/5));
+            AddParameter(new Parameter(ParametreName.n, Math.Max(1, (int)(ev * 2))));
+            AddParameter(new Parameter(ParametreName.N, Math.Max(1, (int)(-2 * ev + 2 * variance / ev) / (2 * variance / ev - 1))));
+            AddParameter(new Parameter(ParametreName.Np, (int)N * 0 / 5));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }

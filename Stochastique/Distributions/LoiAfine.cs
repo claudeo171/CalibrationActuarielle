@@ -59,5 +59,15 @@ namespace Stochastique.Distributions
         {
             return LoiBase.Variance() * GetParameter(ParametreName.aAfine).Value * GetParameter(ParametreName.aAfine).Value;
         }
+
+        public override double Skewness()
+        {
+            return LoiBase.Skewness();
+        }
+
+        public override double Kurtosis()
+        {
+            return LoiBase.Kurtosis();
+        }
     }
 }

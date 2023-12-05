@@ -41,6 +41,15 @@ namespace Stochastique.Distributions.Continous
         {
             return double.NaN;
         }
+        public override double Skewness()
+        {
+            return double.NaN;
+        }
+
+        public override double Kurtosis()
+        {
+            return double.NaN;
+        }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             double k = 0;

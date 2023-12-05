@@ -16,7 +16,7 @@ namespace Stochastique.Distributions
         public TrunkatedDistribution() { }
         public TrunkatedDistribution(Distribution distrib)
         {
-            BaseDistribution= distrib;
+            BaseDistribution = distrib;
         }
 
         [Key(6)]
@@ -45,7 +45,7 @@ namespace Stochastique.Distributions
         public double QuantileDown => GetParameter(ParametreName.qDown).Value;
 
         [Key(12)]
-        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated+(int)BaseDistribution.Type);
+        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
 
         public override double CDF(double x)
         {
@@ -70,7 +70,7 @@ namespace Stochastique.Distributions
         private double GetMin()
         {
             double d = -1;
-            while(CDF(d) > 1e-10)
+            while (CDF(d) > 1e-10)
             {
                 d *= 10;
             }
@@ -80,7 +80,7 @@ namespace Stochastique.Distributions
         private double GetMax()
         {
             double d = 1;
-            while (1-CDF(d) > 1e-10)
+            while (1 - CDF(d) > 1e-10)
             {
                 d *= 10;
             }
@@ -89,6 +89,10 @@ namespace Stochastique.Distributions
 
         [Key(14)]
         private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) - 1e-10, GetMin(), GetMax(), maxIterations: 1000);
+        [Key(15)]
+        private double? ComptedSkewness { get; set; }
+        [Key(16)]
+        private double? ComputedKurtosis { get; set; }
         public override double ExpextedValue()
         {
             if (ComputedExpectedValue == null)
@@ -121,23 +125,39 @@ namespace Stochastique.Distributions
             }
             return ComputedVariance.Value;
         }
+        public override double Skewness()
+        {
+            if (ComptedSkewness == null)
+            {
+                ComptedSkewness = NewtonCotesTrapeziumRule.IntegrateAdaptive(x =>Math.Pow( x - ExpextedValue(),3)  * PDF(x), MinValue, MaxValue, 1e-2)/ Variance() * Math.Sqrt(Variance());
+            }
+            return ComptedSkewness.Value;
+        }
+        public override double Kurtosis()
+        {
+            if (ComputedKurtosis == null)
+            {
+                ComputedKurtosis = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => Math.Pow(x - ExpextedValue(), 4) * PDF(x), MinValue, MaxValue, 1e-2) / Variance() * Variance();
+            }
+            return ComputedKurtosis.Value;
+        }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            List<double> ll=new List<double>();
+            List<double> ll = new List<double>();
             List<List<double>> param = new List<List<double>>();
             BaseDistribution.Initialize(value, typeCalibration);
             var initialParameters = BaseDistribution.AllParameters().Select(a => a.Value).ToList();
-            List<double> ratios = new List<double>() { 1, 0.1, 0.5, 0.9,  1.1, 1.5, 2,10 };
+            List<double> ratios = new List<double>() { 1, 0.1, 0.5, 0.9, 1.1, 1.5, 2, 10 };
             AddParameter(new Parameter(ParametreName.qUp, 1));
             AddParameter(new Parameter(ParametreName.qDown, 0));
             foreach (var ratio in ratios)
             {
                 var parametres = BaseDistribution.AllParameters().ToList();
-                for(int i=0;i< parametres.Count; i++)
+                for (int i = 0; i < parametres.Count; i++)
                 {
                     parametres[i].Value = initialParameters[i] * ratio;
                 }
-                GetParameter(ParametreName.qUp).Value=1 ;
+                GetParameter(ParametreName.qUp).Value = 1;
                 GetParameter(ParametreName.qDown).Value = 0;
                 try
                 {
@@ -147,22 +167,22 @@ namespace Stochastique.Distributions
                 {
                     continue;
                 }
-                
+
                 ll.Add(GetLogLikelihood(value));
-                param.Add(AllParameters().Select(a=>a.Value).ToList());
+                param.Add(AllParameters().Select(a => a.Value).ToList());
             }
             var newParam = param[ll.IndexOf(ll.Max())];
             var allParam = AllParameters().ToList();
-            for (int i=0;i< allParam.Count; i++)
+            for (int i = 0; i < allParam.Count; i++)
             {
                 allParam[i].Value = newParam[i];
             }
-            
+
         }
 
         public override Parameter GetParameter(ParametreName nomParametre)
         {
-            if(ParametresParNom.ContainsKey(nomParametre))
+            if (ParametresParNom.ContainsKey(nomParametre))
             {
                 return ParametresParNom[nomParametre];
             }
@@ -170,21 +190,27 @@ namespace Stochastique.Distributions
             {
                 return BaseDistribution.GetParameter(nomParametre);
             }
-            
+
         }
 
         public override void SetParameter(double[] values)
         {
-            for(int i=0;i< ParametresParNom.Count; i++)
+            for (int i = 0; i < ParametresParNom.Count; i++)
             {
                 ParametresParNom.ElementAt(i).Value.Value = values[i];
             }
             BaseDistribution.SetParameter(values.Skip(ParametresParNom.Count).ToArray());
+            ComputedExpectedValue = null;
+            ComputedVariance = null;
+            ComptedSkewness = null;
+            ComputedKurtosis = null;
         }
 
         public override IEnumerable<Parameter> AllParameters()
         {
             return base.AllParameters().Concat(BaseDistribution.AllParameters());
         }
+
+
     }
 }

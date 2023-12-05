@@ -43,6 +43,15 @@ namespace Stochastique.Distributions.Continous
         {
             return K * Theta * Theta;
         }
+        public override double Skewness()
+        {
+            return 2/Math.Sqrt(K);
+        }
+
+        public override double Kurtosis()
+        {
+            return 6.0/K;
+        }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

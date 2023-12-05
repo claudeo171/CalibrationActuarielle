@@ -44,6 +44,15 @@ namespace Stochastique.Distributions.Continous
         {
             return D2 > 4 ? 2*D2*D2*(D1+D2-2) / (D1*(D2 - 2)* (D2 - 2)* (D2 - 4)) : double.NaN;
         }
+        public override double Skewness()
+        {
+            return (2*D1+D2-2)*Math.Sqrt(8*(D2-4))/((D2-6)*Math.Sqrt(D1*(D1+D2-2)));
+        }
+
+        public override double Kurtosis()
+        {
+            return 12*(D1*(5*D2-22)*(D1+D2-2)+(D2-4)*(D2-2)*(D2-2))/(D1*(D2-6)*(D2-8)*(D1+D2-2));
+        }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

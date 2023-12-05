@@ -48,6 +48,15 @@ namespace Stochastique.Distributions.Continous
         {
             return ExpextedValue() * 2;
         }
+        public override double Skewness()
+        {
+            return Math.Sqrt(8.0/K);
+        }
+
+        public override double Kurtosis()
+        {
+            return 12.0/K;
+        }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

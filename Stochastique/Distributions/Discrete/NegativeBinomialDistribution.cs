@@ -31,6 +31,15 @@ namespace Stochastique.Distributions.Discrete
         {
             return R * (1 - P) / (P * P);
         }
+        public override double Skewness()
+        {
+            return (2-P)/Math.Sqrt(R*(1-P));
+        }
+
+        public override double Kurtosis()
+        {
+            return (6*(1-P)+P*P)/(R*(1-P));
+        }
 
         protected override double PDFInt(int k)
         {
