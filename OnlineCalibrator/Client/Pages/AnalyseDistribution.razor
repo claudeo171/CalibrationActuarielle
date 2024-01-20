@@ -1,5 +1,6 @@
 ﻿@using LiveChartsCore.SkiaSharpView.Blazor;
 @using Newtonsoft.Json;
+@using OnlineCalibrator.Service
 @using OnlineCalibrator.Shared;
 @using System
 @using System.Text
@@ -7,6 +8,7 @@
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
 @using SkiaSharp;
+@using SpawnDev.BlazorJS.WebWorkers
 @using Stochastique.Enums;
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
@@ -57,7 +59,7 @@
                     {
 
                         <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
-                            @foreach (var item in Enum.GetValues(typeof(MethodeCalibrationRetenue)))
+                            @foreach (var item in AviableMethod)
                             {
                                 <option value="@item">@item</option>
                             }
@@ -90,11 +92,14 @@
                         <InputNumber @bind-Value="@NbCol" />
                         <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
 
+                        <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+
                     }
                 </div>
             </div>
         </div>
     }
+
     @if (distributions != null)
     {
         <div class="col-xl-12">
@@ -146,13 +151,31 @@
         </div>
     }
 </div>
+<div class="toast-container position-absolute p-3 bottom-0 end-0">
+    @foreach (var error in Notifications)
+    {
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <iconify-icon icon="oi:info" class="text-info"></iconify-icon>
+                <strong class="me-auto">Erreur</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" @onclick="@(()=>SuppressionNotification(error))" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @error
+            </div>
+        </div>
+    }
+
+</div>
 
 
 @code {
     private bool isInit;
+    private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.Manuelle };
     private List<DistributionWithDatas>? distributions;
     private DonneesImportes? DonneesImportes;
     private ChartViewModelLine? QQPlot;
+    private List<string> Notifications = new List<string>();
     private int NbRow = 1000;
     private int NbCol = 10;
     protected override async void OnInitialized()
@@ -200,9 +223,9 @@
     {
 
         QQPlot = new ChartViewModelLine(
-    DonneesImportes.ActualData?.GetQQPlot(),
-    new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
-    new List<Paint>() { null, null });
+        DonneesImportes.ActualData?.GetQQPlot(),
+        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+        new List<Paint>() { null, null });
         StateHasChanged();
     }
     public async void ExportSample()
@@ -216,6 +239,24 @@
             sb.AppendLine(string.Join(";", sample.Select(a => a.ToString())));
         }
         await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+    }
+    public async void CalibrateMLI()
+    {
+        Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{(Environement.IsMAUI ? "" : " Ne fermez pas longlet avant la fin du calcul")}");
+        StateHasChanged();
+        var service = new MLService();
+        await service.Train(DonneesImportes.ActualData, () =>
+        {
+            AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
+            Notifications.Add($"La calibration est terminée");
+            StateHasChanged();
+        });
+
+    }
+
+    public void SuppressionNotification(string notif)
+    {
+        Notifications.Remove(notif);
     }
 
 }

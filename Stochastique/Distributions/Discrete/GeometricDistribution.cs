@@ -12,6 +12,11 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class GeometricDistribution : DiscreteDistribution
     {
+        public GeometricDistribution() { }
+        public GeometricDistribution(double p)
+        {
+            AddParameter(new Parameter(ParametreName.p, p));
+        }
         [Key(11)]
         private double P => GetParameter(ParametreName.p).Value;
 

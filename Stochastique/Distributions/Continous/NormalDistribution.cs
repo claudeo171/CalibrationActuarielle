@@ -66,7 +66,7 @@ namespace Stochastique.Distributions.Continous
         public override double[] Simulate(Random r, int n)
         {
             double[] result = new double[n];
-            for (int i = 0; i < n/2 +1; i++)
+            for (int i = 0; i < n/2 ; i++)
             {
                 var u1 = r.NextDouble();
                 var u2 = r.NextDouble();

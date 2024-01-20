@@ -13,6 +13,19 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class GammaDistribution : Distribution
     {
+        private double v;
+        private double theta;
+        public GammaDistribution()
+        {
+
+        }
+        public GammaDistribution(double k, double theta)
+        {
+            //TODO à verifier
+            AddParameter(new Parameter(ParametreName.k, k));
+            AddParameter(new Parameter(ParametreName.theta, theta));
+        }
+
         [Key(6)]
         public double K => GetParameter(ParametreName.k).Value;
 

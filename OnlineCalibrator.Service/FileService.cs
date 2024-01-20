@@ -5,7 +5,6 @@ using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
-using GenerationImageDistribution;
 using OnlineCalibrator.Shared;
 using Stochastique.Enums;
 using System.Globalization;
@@ -187,6 +186,9 @@ namespace OnlineCalibrator.Service
                                 break;
                             case MethodeCalibrationRetenue.Vraisemblance:
                                 body.AddPuceParagraphe($"La vraisemblance a été utilisé pour la sélection de distribution.");
+                                break;
+                            case MethodeCalibrationRetenue.MachineLearningImage:
+                                body.AddPuceParagraphe($"Le score de la calibration par machine learning pour la reconnaissance d'image a été utilisé pour la sélection de distribution.");
                                 break;
                         }
                         body.AddParagraph($"Loi retenue", "Titre3");

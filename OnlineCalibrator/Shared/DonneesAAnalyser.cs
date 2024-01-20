@@ -1,13 +1,20 @@
-﻿using GenerationImageDistribution;
-using MathNet.Numerics.Distributions;
+﻿using MathNet.Numerics.Distributions;
+using MathNet.Numerics.Random;
 using MathNet.Numerics.Statistics;
 using MessagePack;
+using Microsoft.ML;
+using Microsoft.ML.Data;
 using Newtonsoft.Json;
+using OnlineCalibrator.Shared.MachineLearning;
+using Stochastique;
 using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -102,7 +109,7 @@ namespace OnlineCalibrator.Shared
             foreach(var elts in Values.Order())
             {
                 double x = elts;
-                double y = loi.InverseCDF(elts);
+                double y = loi.InverseCDF((i+0.5)/Values.Length);
                 if (i<Values.Length/2)
                 {
                     rst[1][i] = new Point() { X = Math.Min(x,y), Y= Math.Min(x, y) };
@@ -177,10 +184,69 @@ namespace OnlineCalibrator.Shared
                     case MethodeCalibrationRetenue.Vraisemblance:
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.LogLikelihood).First().Distribution;
                         break;
+                    case MethodeCalibrationRetenue.MachineLearningImage:
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.ProbabiliteMachineLearningImage).First().Distribution;
+                        break;
                 }
             }
 
         }
+
+        public void CalibrerMLI()
+        {
+            var rand=MersenneTwister.MTRandom.Create(15376869);
+            DateTime date=DateTime.Now;
+            StringBuilder sbTags = new StringBuilder();
+            StringBuilder sbTagsTest = new StringBuilder();
+            foreach (var distrib in VisisbleData)
+            {
+                Directory.CreateDirectory($"./{distrib.Distribution.Type}/");
+                for (int i=0;i<1000;i++)
+                {
+                    var path = $"./{distrib.Distribution.Type}/Image {i+1}";
+                    GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(distrib.Distribution.Simulate(rand, Values.Length),Math.Min(100,Values.Length)),path,500,500);
+                    if(i<800)
+                    {
+                        sbTags.AppendLine($"{path}.png\t{distrib.Distribution.Type}");
+                    }
+                    else
+                    {
+                        sbTagsTest.AppendLine($"{path}.png\t{distrib.Distribution.Type}");
+                    }
+                }
+            }
+            File.WriteAllText($"tags{date.Ticks}.tsv", sbTags.ToString());
+            File.WriteAllText($"tags_test{date.Ticks}.tsv", sbTagsTest.ToString());
+            MLContext mlContext = new MLContext();
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "OnlineCalibrator.Shared.tensorflow_inception_graph.pb";
+            byte[] bytes;
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (BinaryReader reader = new BinaryReader(stream))
+            {
+                bytes = reader.ReadBytes((int)stream.Length);
+            }
+            File.WriteAllBytes("./tensorflow_inception_graph.pb", bytes);
+            var model=MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", $"tags_test{date.Ticks}.tsv", "./");
+            GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}");
+            var predictions=MachineLearningHelper.ClassifySingleImage(mlContext, model, $"image{date.Ticks}.png");
+            
+            for (int i= 0;i < VisisbleData.Count;i++)
+            {
+                VisisbleData[i].ProbabiliteMachineLearningImage= predictions.Score[i];
+            }
+            foreach (var distrib in VisisbleData)
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    File.Delete($"./image_PDF_{date.Ticks}_{distrib.Distribution.Type}_{i}.png");
+                }
+            }
+            File.Delete($"./image{date.Ticks}.png");
+            File.Delete($"tags{date.Ticks}.tsv");
+            File.Delete($"tags_test{date.Ticks}.tsv");
+        }
+
 
     }
 }

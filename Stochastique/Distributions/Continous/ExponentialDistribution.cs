@@ -12,6 +12,11 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class ExponentialDistribution : Distribution
     {
+        public ExponentialDistribution() { }
+        public ExponentialDistribution(double lambda)
+        {
+            AddParameter(new Parameter(ParametreName.lambda, lambda));
+        }
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Exponential;
 

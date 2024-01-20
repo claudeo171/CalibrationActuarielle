@@ -11,7 +11,7 @@ elt.ActualData.IncludeTrunkatedDistributions = true;
 elt.ActualData.IsDiscreteDistribution = false;
 var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
-
+elt.ActualData.CalibrerMLI();
 FileService fs = new FileService();
 File.WriteAllBytes("test.docx", fs.ExportFileDocx(elt));
 elt.ToMsgPack();

@@ -16,12 +16,12 @@ namespace Stochastique.Enums
         k,qUp,qDown,
         p,lambda,r,N,a,b,d1,d2,
         theta,aCauchy,bCauchy,
-        Np
+        Np,xm
     }
 
     public enum MethodeCalibrationRetenue
     {
-        Vraisemblance, AIC, BIC, Manuelle
+        Vraisemblance, AIC, BIC, Manuelle, MachineLearningImage
     }
 
     public enum TypeOptimisation
@@ -48,6 +48,7 @@ namespace Stochastique.Enums
         Uniform=16,
         Weibull=17,
         LogNormal=18,
+        Pareto=19,
         Trunkated=1000,
         TrunkatedNormal = 1001,
         TrunkatedStudent = 1002, 
@@ -67,5 +68,6 @@ namespace Stochastique.Enums
         TrunkatedUniform = 1016,
         TrunkatedWeibull = 1017,
         TrunkatedLogNormal = 1018,
+        TrunkatedPareto = 1019
     }
 }

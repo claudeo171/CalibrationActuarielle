@@ -4,7 +4,12 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x86</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="tensorflow_inception_graph.pb" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
@@ -18,13 +23,21 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.JSInterop" Version="8.0.0" />
+    <PackageReference Include="Microsoft.ML" Version="3.0.0" />
+    <PackageReference Include="Microsoft.ML.CpuMath" Version="3.0.0" />
+    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="3.0.0" />
+    <PackageReference Include="Microsoft.ML.TensorFlow" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.6" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\GenerationImageDistribution\GenerationImageDistribution.csproj" />
     <ProjectReference Include="..\..\Stochastique\Stochastique.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="tensorflow_inception_graph.pb" />
   </ItemGroup>
 
   <ItemGroup>

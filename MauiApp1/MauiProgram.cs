@@ -20,8 +20,9 @@ namespace MauiApp1
 		builder.Services.AddBlazorWebViewDeveloperTools();
 		builder.Logging.AddDebug();
 #endif
+            OnlineCalibrator.Client.Environement.IsMAUI = true;
 
-            
+
 
             return builder.Build();
         }

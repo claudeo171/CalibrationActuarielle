@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using GenerationImageDistribution;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
@@ -32,11 +31,9 @@ namespace TransferLearningTF
             // </SnippetCreateMLContext>
 
             // <SnippetCallGenerateModel>
-            ITransformer model2 = GenerateModel(mlContext, "tagsCDF.tsv", "test-tagsCDF.tsv");
+            ITransformer model2 = GenerateModel(mlContext2, "tagsCDF.tsv", "test-tagsCDF.tsv");
             // </SnippetCallGenerateModel>
             mlContext.Model.Save(model,null, "model.zip");
-            Simulation.Random = new Random(1247685);
-            GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Simulation.SimulerNormale(1000, 0, 1), 100), $"test");
             // <SnippetCallClassifySingleImage>
             ClassifySingleImage(mlContext, model,"test.png");
             // </SnippetCallClassifySingleImage>

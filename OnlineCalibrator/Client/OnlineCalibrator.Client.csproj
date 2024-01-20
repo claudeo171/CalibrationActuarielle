@@ -1,9 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>AnyCPU;x86;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +25,7 @@
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.6" />
     <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="2.88.6" />
     <PackageReference Include="SkiaSharp.Views.Blazor" Version="2.88.6" />
+    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.2.38" />
   </ItemGroup>
 
   <ItemGroup>

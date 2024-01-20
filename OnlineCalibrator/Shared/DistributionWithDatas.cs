@@ -99,5 +99,8 @@ namespace OnlineCalibrator.Shared
         public List<TestStatistique> TestStatistiques { get; set; }
         [Key(11)]
         public Dictionary<TestStatistique, TypeDonnees> ResultatTest { get; set; }
+
+        [Key(12)]
+        public double ProbabiliteMachineLearningImage { get; set; }
     }
 }

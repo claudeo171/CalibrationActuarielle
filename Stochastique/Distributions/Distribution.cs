@@ -30,6 +30,7 @@ namespace Stochastique.Distributions
     [MessagePack.Union(16, typeof(NegativeBinomialDistribution))]
     [MessagePack.Union(17, typeof(PascalDistribution))]
     [MessagePack.Union(18, typeof(PoissonDistribution))]
+    [MessagePack.Union(19, typeof(ParetoDistribution))]
     public abstract class Distribution : IMessagePackSerializationCallbackReceiver
     {
         /// <summary>

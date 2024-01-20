@@ -28,96 +28,139 @@
     <div class="card-body">
         <div class="row">
             <div class="col-12">
-                <label class="btn btn-primary">
-                    Selectionner votre jeu de données
-                    <InputFile class="visually-hidden" OnChange="@LoadFiles"></InputFile>
-
-                </label>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">
-                    Format de l'import
-                </button>
-                <!-- Modal -->
-                <div class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;":"display: none;")" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLongTitle">Format du fichier d'import</h5>
-                                <button type="button" class="btn btn-close" data-dismiss="modal" @onclick="@ShowModal" aria-label="Close">
-                                </button>
-                            </div>
-                            <div class="modal-body">
-                                Le format du fichier d'import doit être le suivant soit un fichier que vous avez précédement télécharger dans l'outil ou bien un csv au format suivant (nom de la variable sur la première ligne) : <br />
-                                <img src="Content/Image/FormatImport.png" />
-                            </div>
-                        </div>
+                <div class="card">
+                    <div class="card-header">
+                        Selection de la donnée
                     </div>
-                </div>
-            </div>
-        </div>
+                    <div class="card-body">
+                        <label class="btn btn-primary">
+                            Selectionner votre jeu de données
+                            <InputFile class="visually-hidden" OnChange="@LoadFiles"></InputFile>
 
-
-
-
-        @if (DonneesImportes != null)
-        {
-            <div class="row">
-                <div class="col-12">
-                    <select @onchange="(ChangeEventArgs a)=>ChangeData(a)">
-                        @foreach (var forecast in DonneesImportes.Donnees)
-                        {
-                            <option value="@forecast.Name">@forecast.Name</option>
-                        }
-                    </select>
-                    <button class="btn btn-primary" @onclick="@CalibrerDonne">Calibrer la donnée</button>
-                    <button class="btn btn-danger" @onclick="@SupprimerDonnee">Supprimer Données</button>
-                    <button class="btn btn-outline-primary" @onclick="@SauvegarderDonnee">Sauvegarder Données</button>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <div class="accordion" id="accordionExample">
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                                <button @onclick="@ShowAcordion" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    Données importées
-                                </button>
-                            </h2>
-                            <div class="accordion-body">
-
-                                <div id="collapseOne" class="accordion-collapse collapse @(showAcordion?"show":"")" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                @foreach (var forecast in DonneesImportes.Donnees)
-                                                {
-                                                    <th>@forecast.Name</th>
-                                                }
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @for (int i = 0; i < (DonneesImportes.Donnees.FirstOrDefault()?.Values.Length ?? 0); i++)
-                                            {
-                                                <tr>
-                                                    @foreach (var forecast in DonneesImportes.Donnees)
-                                                    {
-                                                        <td>@forecast.Values[i]</td>
-                                                    }
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
+                        </label>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">
+                            Format de l'import
+                        </button>
+                        <!-- Modal -->
+                        <div class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;":"display: none;")" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">Format du fichier d'import</h5>
+                                        <button type="button" class="btn btn-close" data-dismiss="modal" @onclick="@ShowModal" aria-label="Close">
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Le format du fichier d'import doit être le suivant soit un fichier que vous avez précédement télécharger dans l'outil ou bien un csv au format suivant (nom de la variable sur la première ligne) : <br />
+                                        <img src="Content/Image/FormatImport.png" />
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
-        }
+
+
+            @if (DonneesImportes != null)
+            {
+
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Selection de la colonne à calibrer
+                        </div>
+                        <div class="card-body">
+                            <div class="row m-1">
+                                <label>Selectionnez la colonne à calibrer pour un calibration individuelle.</label>
+                                <select @onchange="(ChangeEventArgs a)=>ChangeData(a)">
+                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                    {
+                                        <option value="@forecast.Name" >@forecast.Name</option>
+                                    }
+                                </select>
+                                <button class="btn btn-primary" @onclick="@CalibrerDonne">Calibrer la donnée</button>
+                            </div>
+                            <div class="row m-1">
+                                <label>Selectionnez la colonne à calibrer pour un calibration conjointe.</label>
+                                <select @onchange="(ChangeEventArgs a)=>ChangeDataConjointe1(a)">
+                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                    {
+                                        <option value="@forecast.Name">@forecast.Name</option>
+                                    }
+                                </select>
+                                <select @onchange="(ChangeEventArgs a)=>ChangeDataConjointe2(a)">
+                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                    {
+                                        <option value="@forecast.Name">@forecast.Name</option>
+                                    }
+                                </select>
+                                <button class="btn btn-primary" @onclick="@CalibrerDonneConjointe">Calibrer la donnée de façon conjointe</button>
+                            </div>
+                            <div class="row m-1">
+                                <button class="btn btn-danger" @onclick="@SupprimerDonnee">Supprimer Données</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Sauvegarde et export
+                        </div>
+                        <div class="card-body">
+                            <button class="btn btn-outline-primary" @onclick="@SauvegarderDonnee">Sauvegarder Données</button>
+                            <button class="btn btn-outline-primary" @onclick="@ExporterWord">Rapport de calibration</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button @onclick="@ShowAcordion" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Données importées
+                                    </button>
+                                </h2>
+                                <div class="accordion-body">
+
+                                    <div id="collapseOne" class="accordion-collapse collapse @(showAcordion?"show":"")" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                                    {
+                                                        <th>@forecast.Name</th>
+                                                    }
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @for (int i = 0; i < (DonneesImportes.Donnees.FirstOrDefault()?.Values.Length ?? 0); i++)
+                                                {
+                                                    <tr>
+                                                        @foreach (var forecast in DonneesImportes.Donnees)
+                                                        {
+                                                            <td>@forecast.Values[i]</td>
+                                                        }
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
     </div>
 </div>
 <div class="toast-container position-absolute p-3 bottom-0 end-0">
-    @foreach(var error in Errors)
+    @foreach (var error in Errors)
     {
         <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
             <div class="toast-header">
@@ -148,10 +191,12 @@
         try
         {
             DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
+            DonneesImportes.NomDataConjointe1 = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+            DonneesImportes.NomDataConjointe2 = DonneesImportes.Donnees.Skip(1).FirstOrDefault()?.Name;
             donneeContainer.SetValue(DonneesImportes);
             StateHasChanged();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Errors.Add(ex.Message);
         }
@@ -161,7 +206,15 @@
 
     public void ChangeData(ChangeEventArgs e)
     {
-        DonneesImportes.NomData= e.Value.ToString();
+        DonneesImportes.NomData = e.Value.ToString();
+    }
+    public void ChangeDataConjointe1(ChangeEventArgs e)
+    {
+        DonneesImportes.NomDataConjointe1 = e.Value.ToString();
+    }
+    public void ChangeDataConjointe2(ChangeEventArgs e)
+    {
+        DonneesImportes.NomDataConjointe2 = e.Value.ToString();
     }
 
     protected override async void OnInitialized()
@@ -176,7 +229,14 @@
 
     private void CalibrerDonne()
     {
+        donneeContainer.SetValue(DonneesImportes);
         NavManager.NavigateTo("/CalibrateDistribution");
+    }
+
+    private void CalibrerDonneConjointe()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        NavManager.NavigateTo("/CalibrateDistributionConjointe");
     }
 
     private void ShowAcordion()
@@ -198,6 +258,14 @@
 
         var fileStream = new MemoryStream(DonneesImportes.ToMsgPack());
         var fileName = "test.data";
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+        await js.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    private async void ExporterWord()
+    {
+        var fileStream = new MemoryStream(new FileService().ExportFileDocx(DonneesImportes));
+        var fileName = "test.docx";
         using var streamRef = new DotNetStreamReference(stream: fileStream);
         await js.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
     }

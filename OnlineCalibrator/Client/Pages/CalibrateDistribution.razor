@@ -1,5 +1,6 @@
 ﻿@using LiveChartsCore.SkiaSharpView.Blazor;
 @using Newtonsoft.Json;
+@using OnlineCalibrator.Service
 @using OnlineCalibrator.Shared;
 @using System
 @using System.IO
@@ -18,7 +19,6 @@
         </ol>
     </nav>
 }
-
 
 <div class="card">
     <div class="card-header main-card-header">
@@ -63,10 +63,10 @@
                     </div>
                     <div class="card-body">
                         <ul>
-                            <li> Moyenne : @DonneesImportes.ActualData.Moyenne </li>
-                            <li> Variance : @DonneesImportes.ActualData.Variance </li>
-                            <li> Skewness : @DonneesImportes.ActualData.Skewness </li>
-                            <li> Kurtosis : @DonneesImportes.ActualData.Kurtosis </li>
+                            <li> Moyenne : @DonneesImportes.ActualData.Moyenne.ToBeautifulString() </li>
+                            <li> Variance : @DonneesImportes.ActualData.Variance.ToBeautifulString() </li>
+                            <li> Skewness : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
+                            <li> Kurtosis : @DonneesImportes.ActualData.Kurtosis.ToBeautifulString() </li>
                         </ul>
                     </div>
                 </div>
