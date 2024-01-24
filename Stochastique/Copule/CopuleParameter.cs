@@ -11,7 +11,7 @@ namespace Stochastique.Copule
 {
     public enum CopuleParameterName
     {
-        theta,rho
+        thetaClayton,thetaAMH, rho
     }
     [MessagePackObject]
     public class CopuleParameter
@@ -51,8 +51,10 @@ namespace Stochastique.Copule
                 {
                     case CopuleParameterName.rho:
                         return -1;
-                    case CopuleParameterName.theta:
-                        return double.MinValue;
+                    case CopuleParameterName.thetaClayton:
+                        return -1;
+                    case CopuleParameterName.thetaAMH:
+                        return -1;
                     default:
                         return double.MinValue;
                 }
@@ -68,8 +70,10 @@ namespace Stochastique.Copule
                 {
                     case CopuleParameterName.rho:
                         return 1;
-                    case CopuleParameterName.theta:
+                    case CopuleParameterName.thetaClayton:
                         return double.MaxValue;
+                    case CopuleParameterName.thetaAMH:
+                        return 1;
                     default:
                         return double.MinValue;
                 }

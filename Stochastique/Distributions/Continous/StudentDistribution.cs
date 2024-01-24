@@ -14,16 +14,16 @@ namespace Stochastique.Distributions.Continous
     public class StudentDistribution : Distribution
     {
         public StudentDistribution() { }
+        public StudentDistribution(int n)
+        {
+            AddParameter(new Parameter(ParametreName.n, n));
+        }
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Student;
 
         [Key(7)]
         public double n => GetParameter(ParametreName.n).Value;
 
-        public StudentDistribution(int n)
-        {
-            AddParameter(new Parameter(ParametreName.n, n));
-        }
 
         public override double CDF(double x)
         {

@@ -70,4 +70,9 @@ namespace Stochastique.Enums
         TrunkatedLogNormal = 1018,
         TrunkatedPareto = 1019
     }
+
+    public enum TypeCopule
+    {
+        Clayton,CopuleAMH
+    }
 }

@@ -19,43 +19,69 @@
             <li class="breadcrumb-item active">Calibration des données conjointe (@DonneesImportes.NomDataConjointe1 - @DonneesImportes.NomDataConjointe2)</li>
         </ol>
     </nav>
-}
 
-<div class="card">
-    <div class="card-header main-card-header">
-        Calibrer de la distribution conjointe de deux Variables Aléatoires
-    </div>
-    <div class="card-body row">
-        @if (ChartScatterPlot != null)
-        {
-            <div class="col-xl-6">
-                <div class="card ">
-                    <div class="card-header">
-                        Nuage de points
-                    </div>
-                    <div class="card-body divChart">
-                        <CartesianChart Series="ChartScatterPlot.Series" DrawMarginFrame="ChartScatterPlot.DrawMarginFrame">
-                        </CartesianChart>
+
+    <div class="card">
+        <div class="card-header main-card-header">
+            Calibrer de la distribution conjointe de deux Variables Aléatoires
+        </div>
+        <div class="card-body row">
+            @if (ChartScatterPlot != null)
+            {
+                <div class="col-xl-6">
+                    <div class="card ">
+                        <div class="card-header">
+                            Nuage de points
+                        </div>
+                        <div class="card-body divChart">
+                            <CartesianChart Series="ChartScatterPlot.Series" DrawMarginFrame="ChartScatterPlot.DrawMarginFrame">
+                            </CartesianChart>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-        @if (ChartScatterPlotRank != null)
-        {
-            <div class="col-xl-6">
+            }
+            @if (ChartScatterPlotRank != null)
+            {
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Nuage de points des rangs
+                        </div>
+                        <div class="card-body divChart">
+                            <CartesianChart Series="ChartScatterPlotRank.Series" DrawMarginFrame="ChartScatterPlotRank.DrawMarginFrame">
+                            </CartesianChart>
+                        </div>
+                    </div>
+                </div>
+            }
+            <div class="col-xl-6 col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        Nuage de points des rangs
+                        Caracteristiques Empiriques
                     </div>
-                    <div class="card-body divChart">
-                        <CartesianChart Series="ChartScatterPlotRank.Series" DrawMarginFrame="ChartScatterPlotRank.DrawMarginFrame">
-                        </CartesianChart>
+                    <div class="card-body">
+                        <ul>
+                            <li> Correlation : @DonneesImportes.ActualDonneesPourAnalyseConjointe.Correlation.ToBeautifulString() </li>
+                            <li> Correlation des rang : @DonneesImportes.ActualDonneesPourAnalyseConjointe.RankCorrelation.ToBeautifulString() </li>
+                            <li data-toggle="tooltip" data-html="true" title="Réalisation d'un test de fisher'"> P-Value Significativité correlation : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        }
+            <div class="col-xl-6 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        Etudes
+                    </div>
+                    <div class="card-body">
+                        <a class="btn btn-primary" href="/AnalyseCopula"> Etude de la dépendance via Copules </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
-</div>
+}
 
 @code {
     private ChartViewModelScatter ChartScatterPlot;
@@ -69,8 +95,8 @@
 
             if (DonneesImportes != null && DonneesImportes.ActualData != null)
             {
-                ChartScatterPlot = new ChartViewModelScatter(DonneesImportes.ScatterPlot);
-                ChartScatterPlotRank = new ChartViewModelScatter(DonneesImportes.ScatterPlotRank);
+                ChartScatterPlot = new ChartViewModelScatter(DonneesImportes.ActualDonneesPourAnalyseConjointe.ScatterPlot);
+                ChartScatterPlotRank = new ChartViewModelScatter(DonneesImportes.ActualDonneesPourAnalyseConjointe.ScatterPlotRank);
             }
             StateHasChanged();
         }

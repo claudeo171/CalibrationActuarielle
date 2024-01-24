@@ -12,7 +12,7 @@ namespace Stochastique.Copule
     {
         //C(u,v) = inverseGenerateur(generateur(u)+generateur(v))
         protected abstract double Generateur(double t);
-        protected abstract double GenerateurDerivate(double t, int ordre);
+        protected abstract double InverseGenerateurDerivate(double t, int ordre);
         protected abstract double InverseGenerateur(double t);
         //Loi dont la tranformée de Laplace est égale à la fonction "inverseGenerateur"
         protected Distribution distribution;
@@ -35,9 +35,14 @@ namespace Stochastique.Copule
         {
             return InverseGenerateur(u.Sum(a => Generateur(a)));
         }
-        public override double DensityCopula(List<double> u)
+        public override double DensityCopula(IEnumerable<double> u)
         {
-            return GenerateurDerivate(u.Sum(a => InverseGenerateur(a)), Dimension)/Math.Exp( u.Sum(a=>InverseGenerateur( GenerateurDerivate( Math.Log(a),1))));
+            var rst= InverseGenerateurDerivate(u.Sum(a => Generateur(a)), Dimension)/Math.Exp( u.Sum(a=>InverseGenerateur( InverseGenerateurDerivate( Math.Log(a),1))));
+            if(rst<0)
+            {
+                rst=0;
+            }
+            return rst;
         }
     }
 }

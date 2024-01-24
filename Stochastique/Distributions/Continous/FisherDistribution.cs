@@ -13,6 +13,14 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class FisherDistribution : Distribution
     {
+        public FisherDistribution(int d1, int d2)
+        {
+            AddParameter(new Parameter(ParametreName.d1, d1));
+            AddParameter(new Parameter(ParametreName.d2, d2));
+        }
+
+        public FisherDistribution() { }
+
         [Key(6)]
         public double D1 => GetParameter(ParametreName.d1).Value;
 

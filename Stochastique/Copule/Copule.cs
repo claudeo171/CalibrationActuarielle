@@ -1,7 +1,9 @@
-﻿using Stochastique.Enums;
+﻿using Stochastique.Distributions;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,10 +21,12 @@ namespace Stochastique.Copule
         /// <summary>
         /// Storing the list of parameter for serialization purpose. (MessagePack doesn't serialize dictionnary properly. Maybe because of me^^)
         /// </summary>
-        [MessagePack.Key(5)]
+        [MessagePack.Key(1)]
         public List<CopuleParameter> ParametersList { get; set; }
-        [MessagePack.Key(6)]
+        [MessagePack.Key(2)]
         public int Dimension { get; set; }
+        [MessagePack.Key(3)]
+        public TypeCopule Type { get; set; }
         public abstract List<List<double>> SimulerCopule(Random r,int nbSim);
 
         public virtual void AppliquerCopule(Random r, List<List<double>> variablesAleatoires)
@@ -87,6 +91,7 @@ namespace Stochastique.Copule
             }
         }
 
+
         public void AddParameter(CopuleParameter parameter)
         {
             if (ParametresParNom.ContainsKey(parameter.Name))
@@ -116,7 +121,126 @@ namespace Stochastique.Copule
             return ParametresParNom.Values;
         }
 
-        public abstract double DensityCopula(List<double> u);
+        public abstract double DensityCopula(IEnumerable<double> u);
         public abstract double CDFCopula(List<double> u);
+
+        public virtual void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
+        {
+            switch (typeCalibration)
+            {
+                case TypeCalibration.MaximumLikelyhood:
+                    Optim(value, typeCalibration);
+                    break;
+                case TypeCalibration.LeastSquare:
+                    Optim(value, typeCalibration);
+                    break;
+            }
+        }
+        public void Optim(IEnumerable<IEnumerable< double>> values, TypeCalibration typeCalibration)
+        {
+            var parameters = AllParameters().ToList();
+            double[] x = parameters.Select(p => p.Value).ToArray();
+            double[] s = Enumerable.Repeat(1.0, x.Length).ToArray();
+
+            alglib.minbleicstate state;
+            double epsg = 0;
+            double epsf = 0;
+            double epsx = 0;
+            int maxits = 1000;
+            double diffstep = 1.0e-6;
+
+            alglib.minbleiccreatef(x, diffstep, out state);
+            CreateConstraints(state);
+            alglib.minbleicsetscale(state, s);
+            alglib.minbleicsetcond(state, epsg, epsf, epsx, maxits);
+
+            alglib.minbleicoptguardsmoothness(state);
+
+            alglib.minbleicreport rep;
+            if (typeCalibration == TypeCalibration.LeastSquare)
+            {
+                var valueByPoint= values.IntervertDimention();
+                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetSquaredError(valueByPoint,valueByPoint.GetCDF(), xx, ref yy, zz), null, null);
+            }
+            else
+            {
+                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
+            }
+            alglib.minbleicresults(state, out x, out rep);
+
+            alglib.optguardreport ogrep;
+            alglib.minbleicoptguardresults(state, out ogrep);
+        }
+
+        private void CreateConstraints(alglib.minbleicstate state)
+        {
+            var parameters = AllParameters().ToList();
+            double[] bndl = parameters.Select(p => p.MinValue).ToArray();
+            double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
+            alglib.minbleicsetbc(state, bndl, bndu);
+        }
+        public void GetLogVraissemblanceOptim(IEnumerable<IEnumerable<double>> values, double[] x, ref double func, object obj)
+        {
+            SetParameter(x);
+            func = -GetLogLikelihood(values);
+            if (double.IsPositiveInfinity(func))
+            {
+                func = double.MaxValue;
+            }
+        }
+        public double GetLogLikelihood(IEnumerable<IEnumerable<double>> values)
+        {
+            double rst = 0;
+            foreach (var val in values)
+            {
+                rst += Math.Log(DensityCopula(val));
+            }
+            return rst;
+        }
+
+        public virtual void SetParameter(double[] values)
+        {
+            int i = 0;
+            var parameters = AllParameters();
+            foreach (var param in parameters)
+            {
+                param.Value = values[i];
+                i++;
+            }
+
+        }
+
+        private void GetSquaredError(List<List<double>> values,List<double> empiricalCDF, double[] xx, ref double func, object zz)
+        {
+            SetParameter(xx);
+            double increment = 1.0 / (values.Count() - 1);
+            double value = increment / 2;
+            int index = 0;
+            foreach (var val in values)
+            {
+                var cdf = CDFCopula(val);
+                func += (cdf - empiricalCDF[index]) * (cdf - empiricalCDF[index]);
+                value += increment;
+                index++;
+            }
+            if (double.IsPositiveInfinity(func))
+            {
+                func = double.MaxValue;
+            }
+        }
+
+        public static Copule CreateCopula(TypeCopule typeCopule)
+        {
+            switch( typeCopule)
+            {
+                case TypeCopule.Clayton:
+                    return new CopuleClayton();
+                case TypeCopule.CopuleAMH:
+                    return new CopuleAMH();
+                default:
+                    throw new Exception("Type de copule non reconnu");
+            }
+        }
+
     }
 }

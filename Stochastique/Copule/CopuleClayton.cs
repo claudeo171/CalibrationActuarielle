@@ -1,4 +1,5 @@
 ﻿using Stochastique.Distributions.Continous;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Stochastique.Copule
 {
     public class CopuleClayton:CopuleArchimedienne
     {
-        private double Theta => GetParameter(CopuleParameterName.theta).Value;
+        private double Theta => GetParameter(CopuleParameterName.thetaClayton).Value;
 
         public CopuleClayton(int dimension, double theta)
         {
@@ -23,6 +24,10 @@ namespace Stochastique.Copule
             Dimension = 2;
         }
 
+        public CopuleClayton()
+        {
+        }
+
         private void communConstructeurs(double theta)
         {
             if (theta < -1 || theta == 0)
@@ -30,7 +35,7 @@ namespace Stochastique.Copule
                 throw new Exception("Theta doit être supérieur ou égal à -1 et non nul");
             }
 
-            AddParameter(new CopuleParameter(CopuleParameterName.theta,theta));
+            AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton,theta));
             distribution = new GammaDistribution(1 / theta, theta);
         }
 
@@ -44,7 +49,7 @@ namespace Stochastique.Copule
             return Math.Pow(Theta * t + 1, -1 / Theta);
         }
 
-        public override double DensityCopula(List<double> u)
+        public override double DensityCopula(IEnumerable<double> u)
         {
             return (1+Theta)*Math.Pow(Math.Exp( u.Sum(a=>Math.Log(a))),-1-Theta)*Math.Pow(-1 + u.Sum(a => Math.Pow(a, -Theta)), -2 - 1 / Theta);
         }
@@ -54,9 +59,15 @@ namespace Stochastique.Copule
            return Math.Pow(Math.Max(0,u.Sum(a=>Math.Pow(a,-Theta))-1),-1/Theta);
         }
 
-        protected override double GenerateurDerivate(double t, int ordre)
+        protected override double InverseGenerateurDerivate(double t, int ordre)
         {
-            throw new NotImplementedException();
+            return -Math.Pow(Theta, ordre - 1) * Math.Pow(1 + Theta * t, -1 / Theta - ordre)*CopuleHelper.NegativeProd(ordre-1,1/Theta);
+        }
+        public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
+        {
+            double tau = value.First().TauKendall(value.Last());
+            AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton, 2 * tau / (1 - tau)));
+            base.Initialize(value, typeCalibration);
         }
     }
 }
