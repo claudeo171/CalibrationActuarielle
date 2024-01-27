@@ -126,6 +126,7 @@ namespace Stochastique.Copule
 
         public virtual void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
+            Dimension = value.Count();
             switch (typeCalibration)
             {
                 case TypeCalibration.MaximumLikelyhood:
@@ -141,7 +142,6 @@ namespace Stochastique.Copule
             var parameters = AllParameters().ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = Enumerable.Repeat(1.0, x.Length).ToArray();
-
             alglib.minbleicstate state;
             double epsg = 0;
             double epsf = 0;
@@ -164,7 +164,9 @@ namespace Stochastique.Copule
             }
             else
             {
-                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
+                int nb = values.First().Count();
+                var rankVal = values.Select(a => a.Rang().Select(b => (b + 0.5) / nb)).IntervertDimention();
+                alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(rankVal, xx, ref yy, zz), null, null);
             }
             alglib.minbleicresults(state, out x, out rep);
 

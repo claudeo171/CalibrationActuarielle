@@ -37,7 +37,10 @@ namespace Stochastique.Copule
         }
         public override double DensityCopula(IEnumerable<double> u)
         {
-            var rst= InverseGenerateurDerivate(u.Sum(a => Generateur(a)), Dimension)/Math.Exp( u.Sum(a=>InverseGenerateur( InverseGenerateurDerivate( Math.Log(a),1))));
+            var sumGenerator = u.Sum(a => Generateur(a));
+            var sumInverseGenerator = InverseGenerateurDerivate(sumGenerator, Dimension);
+            var dividende = u.Prod(a => InverseGenerateurDerivate(Generateur(a), 1));
+            var rst = sumInverseGenerator.Divide(dividende, 0);
             if(rst<0)
             {
                 rst=0;

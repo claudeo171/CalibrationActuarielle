@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
-    public enum CopuleParameterName
+    public enum CopuleParameterName:int
     {
         thetaClayton,thetaAMH, rho
     }
@@ -52,9 +52,9 @@ namespace Stochastique.Copule
                     case CopuleParameterName.rho:
                         return -1;
                     case CopuleParameterName.thetaClayton:
-                        return -1;
+                        return -1+Math.Pow(10,-10);
                     case CopuleParameterName.thetaAMH:
-                        return -1;
+                        return -1 + Math.Pow(10, -10);
                     default:
                         return double.MinValue;
                 }
@@ -73,7 +73,7 @@ namespace Stochastique.Copule
                     case CopuleParameterName.thetaClayton:
                         return double.MaxValue;
                     case CopuleParameterName.thetaAMH:
-                        return 1;
+                        return 1 - Math.Pow(10, -10);
                     default:
                         return double.MinValue;
                 }

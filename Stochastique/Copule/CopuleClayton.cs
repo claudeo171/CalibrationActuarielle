@@ -26,6 +26,7 @@ namespace Stochastique.Copule
 
         public CopuleClayton()
         {
+            Type = TypeCopule.Clayton;
         }
 
         private void communConstructeurs(double theta)
@@ -49,11 +50,6 @@ namespace Stochastique.Copule
             return Math.Pow(Theta * t + 1, -1 / Theta);
         }
 
-        public override double DensityCopula(IEnumerable<double> u)
-        {
-            return (1+Theta)*Math.Pow(Math.Exp( u.Sum(a=>Math.Log(a))),-1-Theta)*Math.Pow(-1 + u.Sum(a => Math.Pow(a, -Theta)), -2 - 1 / Theta);
-        }
-
         public override double CDFCopula(List<double> u)
         {
            return Math.Pow(Math.Max(0,u.Sum(a=>Math.Pow(a,-Theta))-1),-1/Theta);
@@ -61,7 +57,14 @@ namespace Stochastique.Copule
 
         protected override double InverseGenerateurDerivate(double t, int ordre)
         {
-            return -Math.Pow(Theta, ordre - 1) * Math.Pow(1 + Theta * t, -1 / Theta - ordre)*CopuleHelper.NegativeProd(ordre-1,1/Theta);
+            if (1 + Theta * t < 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return -Math.Pow(Theta, ordre - 1) * Math.Pow(1 + Theta * t, -1 / Theta - ordre) * CopuleHelper.NegativeProd(ordre - 1, 1 / Theta);
+            }
         }
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {

@@ -129,6 +129,24 @@ namespace Stochastique.Copule
             return rst;
         }
 
+        public static double Prod(this IEnumerable<double> values)
+        {
+            double rst = 1;
+            foreach (var value in values)
+            {
+                rst *= value;
+            }
+            return rst;
+        }
+        public static double Prod<T>(this IEnumerable<T> values,Func<T,double> func)
+        {
+            double rst = 1;
+            foreach (var value in values)
+            {
+                rst *= func(value);
+            }
+            return rst;
+        }
 
         public static double TauKendall(this IEnumerable<double> elt1, IEnumerable<double> elt2)
         {
@@ -288,6 +306,13 @@ namespace Stochastique.Copule
                 y = method(x);
             }
             return x;
+        }
+
+        public static double Divide(this double a, double b, double defaultValue)
+        {
+            if (b == 0)
+                return defaultValue;
+            return a / b;
         }
 
     }

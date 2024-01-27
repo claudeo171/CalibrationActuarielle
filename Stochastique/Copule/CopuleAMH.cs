@@ -28,6 +28,7 @@ namespace Stochastique.Copule
 
         public CopuleAMH()
         {
+            Type = TypeCopule.CopuleAMH;
         }
         private double FonctionTau(double tau,double theta)
         {
@@ -36,7 +37,7 @@ namespace Stochastique.Copule
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
             double tau = value.First().TauKendall(value.Last());
-            AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton, CopuleHelper.RechercheDichotomique(-0.9999, 0.9999,(a)=>FonctionTau(tau,a))));
+            AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, CopuleHelper.RechercheDichotomique(-0.9999, 0.9999,(a)=>FonctionTau(tau,a))));
             base.Initialize(value, typeCalibration);
         }
 
