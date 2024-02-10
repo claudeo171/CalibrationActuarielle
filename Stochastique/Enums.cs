@@ -21,7 +21,7 @@ namespace Stochastique.Enums
 
     public enum MethodeCalibrationRetenue
     {
-        Vraisemblance, AIC, BIC, Manuelle, MachineLearningImage
+        Vraisemblance, AIC, BIC, Manuelle, MachineLearningImage,KSTest
     }
 
     public enum TypeOptimisation

@@ -264,6 +264,10 @@ namespace OnlineCalibrator.Service
     {
         public static string ToBeautifulString(this double d)
         {
+            if(d==0)
+            {
+                return "0";
+            }
             if (Math.Abs(d) < 0.001)
             {
                 return d.ToString("E6");

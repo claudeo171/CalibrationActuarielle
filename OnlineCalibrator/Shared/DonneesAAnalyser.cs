@@ -187,6 +187,9 @@ namespace OnlineCalibrator.Shared
                     case MethodeCalibrationRetenue.MachineLearningImage:
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.ProbabiliteMachineLearningImage).First().Distribution;
                         break;
+                    case MethodeCalibrationRetenue.KSTest:
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.TestStatistiques.FirstOrDefault(a=>a.TypeTestStatistique==TypeTestStatistique.KolmogorovSmirnov)?.PValue??0)).OrderBy(a => -a.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue ?? 0).First().Distribution;
+                        break;
                 }
             }
 

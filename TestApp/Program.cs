@@ -9,7 +9,7 @@ var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents
 elt.NomDataConjointe1= "A";
 elt.NomDataConjointe2= "B";
 elt.ActualDonneesPourAnalyseConjointe.GetAllCopula();
-
+elt.ActualDonneesPourAnalyseConjointe.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
 elt.NomData= "A";
 elt.ActualData.IncludeTrunkatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();

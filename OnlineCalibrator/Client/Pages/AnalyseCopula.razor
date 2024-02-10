@@ -40,19 +40,19 @@
                     Selection de la loi
                 </div>
                 <div class="card-body">
-                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
+                    @if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null && DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule != null)
                     {
 
-                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
+                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration)" Value="@DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
                             @foreach (var item in AviableMethod)
                             {
                                 <option value="@item">@item</option>
                             }
                             )
                         </InputSelect>
-                        @if (DonneesImportes.ActualData.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
+                        @if (DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
                         {
-                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.CalibratedTypeDistribution)" Value="@DonneesImportes.ActualData.CalibratedTypeDistribution" ValueChanged="(TypeDistribution? s)=>{DonneesImportes.ActualData.CalibratedTypeDistribution=s; UpdateChart();}">
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType)" Value="@DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType" ValueChanged="(TypeCopule? s)=>{DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType=s; UpdateChart();}">
                                 @foreach (var item in DonneesImportes.ActualData.VisisbleData.Select(a => a.Distribution))
                                 {
                                     <option value="@item.Type">@item.Type</option>
@@ -61,10 +61,10 @@
                             </InputSelect>
                         }
                         <div>
-                            @DonneesImportes.ActualData.CalibratedDistribution?.Type
+                            @DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule?.Type
                         </div>
                         <ul>
-                            @foreach (var item in DonneesImportes.ActualData.CalibratedDistribution?.AllParameters())
+                            @foreach (var item in DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule?.AllParameters())
                             {
                                 <li>@item.Name : @item.Value</li>
                             }
@@ -89,7 +89,7 @@
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header">
-                    Tests stratistiques
+                    Copules
                 </div>
                 <div class="card-body">
                     <table class="table">

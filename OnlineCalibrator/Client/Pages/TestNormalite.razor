@@ -34,7 +34,7 @@
                         {
                             @foreach (var test in distribution.TestStatistiques)
                             {
-                                <li>@test.Name : pvalue : @(test?.PValue ?? 0) </li>
+                                <li>@test.TypeTestStatistique : pvalue : @(test?.PValue ?? 0) </li>
                             }
                         }
                     </ul>
@@ -105,7 +105,7 @@
                     @foreach(var test in distribution.ResultatTest)
                     {
                         <ul>
-                            <li>@test.Key.Name : Conclusion : @test.Value </li>
+                            <li>@test.Key.TypeTestStatistique : Conclusion : @test.Value </li>
                         </ul>
                     }
 

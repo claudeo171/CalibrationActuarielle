@@ -64,7 +64,7 @@ namespace Stochastique.Copule
         protected override double InverseGenerateurDerivate(double t, int ordre)
         {
             double rst = 0;
-            for(int i=1;i<ordre;i++)
+            for(int i=1;i<=ordre;i++)
             {
                 rst += Math.Exp(i * t) * Math.Pow(Math.Exp(t) - Theta, -ordre - 1) * B(ordre, i);
             }
@@ -76,7 +76,7 @@ namespace Stochastique.Copule
         {
             if(k==1)
             {
-                return 0;
+                return 1;
             }
             if(k>n)
             {

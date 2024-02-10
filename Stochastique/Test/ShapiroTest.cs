@@ -12,10 +12,11 @@ namespace OnlineCalibrator.Shared
     [MessagePackObject]
     public class ShapiroTest : TestStatistique, IMessagePackSerializationCallbackReceiver
     {
-        public ShapiroTest() { }
-        public ShapiroTest(double[] values)
+        public ShapiroTest()
+        { }
+        public ShapiroTest(double[] values):this()
         {
-            Name = "Shapiro-Wilk";
+            
             StateH0 = TypeDonnees.Normal;
             StateH1 = TypeDonnees.NotNormal;
             Values = values;

@@ -66,6 +66,20 @@ namespace OnlineCalibrator.Shared
         [Key(7)]
         public Copule CalibratedCopule { get; set; }
 
+        [Key(8)]
+        public TypeCopule? CalibratedCopuleType
+        {
+            get
+            {
+                return CalibratedCopule?.Type;
+            }
+            set
+            {
+                CalibratedCopule = Copules.FirstOrDefault(a => a.Copule.Type == value)?.Copule;
+
+            }
+        }
+
         public List<CopuleWithData> GetAllCopula()
         {
             var distributions = Enum.GetValues(typeof(TypeCopule)).Cast<TypeCopule>().Where(a => Copule.CreateCopula(a) != null).ToList();

@@ -1,5 +1,7 @@
 ﻿using MessagePack;
+using Stochastique.Distributions;
 using Stochastique.Enums;
+using Stochastique.Test;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +16,6 @@ namespace OnlineCalibrator.Shared
     
     public abstract class TestStatistique
     {
-        [Key(0)]
-        public string Name { get; set; }
         [Key(1)]
         public double PValue { get; set; }
         [Key(2)]
@@ -37,18 +37,17 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        public static List<TestStatistique> GetTestsDistribution(TypeDistribution typeDistribution, double[] datas)
+        public static List<TestStatistique> GetTestsDistribution(Distribution distribution, double[] datas)
         {
-            switch (typeDistribution)
+            var rst = new List<TestStatistique>() { new KolmogorovSmirnovTest(datas,distribution) };
+            switch (distribution.Type)
             {
                 case TypeDistribution.Normal:
-                    return new List<TestStatistique>
-                    {
-                        new ShapiroTest(datas),
-                        new JarqueBeraTest(datas)
-                    };
+                    rst.Add(new ShapiroTest(datas));
+                    rst.Add(new ShapiroTest(datas));
+                    break;
             }
-            return new List<TestStatistique>();
+            return rst;
         }
     }
 }

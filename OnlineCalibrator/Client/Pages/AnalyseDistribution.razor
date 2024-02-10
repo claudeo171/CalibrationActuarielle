@@ -102,50 +102,62 @@
 
     @if (distributions != null)
     {
-        <div class="col-xl-12">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     Tests stratistiques
                 </div>
-                <div class="card-body">
-                    <table class="table">
-                        <thead>
+                <div class="card-body" style="max-width:100%;">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
 
-                        <th>Loi</th>
-                        <th>LogLikelihood</th>
-                        <th>AIC</th>
-                        <th>BIC</th>
-                            @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
-                            {
-                            <th>Parametre @(i + 1)</th>
-                            }
-                        </thead>
-                        <tbody>
-                            @if (distributions != null)
-                            {
-                                @foreach (var test in distributions)
+                            <th>Loi</th>
+                            <th>LogLikelihood</th>
+                            <th>AIC</th>
+                            <th>BIC</th>
+                            <th>KS-Test P-Value</th>
+                                @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
                                 {
-                                    <tr>
-                                        <td>@test.Distribution.Type</td>
-                                        <td>@test.LogLikelihood.ToString("F4")</td>
-                                        <td>@test.AIC.ToString("F4")</td>
-                                        <td>@test.BIC.ToString("F4")</td>
-                                        @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
-                                        {
-                                            if (i < test.Distribution.AllParameters().Count())
-                                            {
-                                                <td>@test.Distribution.AllParameters().ElementAt(i).ToString()</td>
-                                            }
-                                            else
-                                            {
-                                                <td></td>
-                                            }
-                                        }
-                                    </tr>
+                                <th>Parametre @(i + 1)</th>
                                 }
-                            }
-                        </tbody>
-                    </table>
+                            <th>Esperance(%Ecart)</th>
+                            <th>Variance(%Ecart)</th>
+                            <th>Aplatissement(%Ecart)</th>
+                            <th>Kurtosis(%Ecart)</th>
+                            </thead>
+                            <tbody>
+                                @if (distributions != null)
+                                {
+                                    @foreach (var distrib in distributions)
+                                    {
+                                        <tr>
+                                            <td>@distrib.Distribution.Type</td>
+                                            <td>@distrib.LogLikelihood.ToBeautifulString()</td>
+                                            <td>@distrib.AIC.ToBeautifulString()</td>
+                                            <td>@distrib.BIC.ToBeautifulString()</td>
+                                            <td>@distrib.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue.ToBeautifulString()</td>
+                                            @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
+                                            {
+                                                if (i < distrib.Distribution.AllParameters().Count())
+                                                {
+                                                    <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString()</td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) * 2 / (DonneesImportes.ActualData.Moyenne + @distrib.Distribution.ExpextedValue())).ToBeautifulString()))</td>
+                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) * 2 / (DonneesImportes.ActualData.Variance + @distrib.Distribution.Variance())).ToBeautifulString()))</td>
+                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) * 2 / (DonneesImportes.ActualData.Skewness + @distrib.Distribution.Skewness())).ToBeautifulString()))</td>
+                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) * 2 / (DonneesImportes.ActualData.Kurtosis + @distrib.Distribution.Kurtosis())).ToBeautifulString()))</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -171,7 +183,7 @@
 
 @code {
     private bool isInit;
-    private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.Manuelle };
+    private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.KSTest, MethodeCalibrationRetenue.Manuelle };
     private List<DistributionWithDatas>? distributions;
     private DonneesImportes? DonneesImportes;
     private ChartViewModelLine? QQPlot;

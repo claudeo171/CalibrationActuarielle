@@ -15,10 +15,12 @@ namespace OnlineCalibrator.Shared
     [MessagePackObject]
     public class JarqueBeraTest : TestStatistique
     {
-        public JarqueBeraTest() { }
-        public JarqueBeraTest(double[] values)
+        public JarqueBeraTest() {
+            TypeTestStatistique = TypeTestStatistique.JarqueBera;
+        }
+        public JarqueBeraTest(double[] values):this()
         {
-            Name = "Jarque Bera";
+
             StateH0 = TypeDonnees.Normal;
             StateH1 = TypeDonnees.NotNormal;
             PValue = CalculatePValue(values);

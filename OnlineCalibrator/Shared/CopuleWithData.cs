@@ -19,7 +19,8 @@ namespace OnlineCalibrator.Shared
         public CopuleWithData(Copule distribution, IEnumerable<IEnumerable<double>> data)
         {
             Copule = distribution;
-            LogLikelihood = distribution.GetLogLikelihood(data);
+            int nb = data.First().Count();
+            LogLikelihood = distribution.GetLogLikelihood(data.Select(a => a.Rang().Select(b => (b + 0.5) / nb)).IntervertDimention());
             N = data.First().Count();
         }
 

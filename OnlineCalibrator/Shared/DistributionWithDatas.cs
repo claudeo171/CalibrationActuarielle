@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using Accord.Statistics.Testing;
+using MessagePack;
 using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
@@ -20,7 +21,7 @@ namespace OnlineCalibrator.Shared
         public DistributionWithDatas(Distribution distribution, double[] data)
         {
             Distribution = distribution;
-            TestStatistiques = TestStatistique.GetTestsDistribution(Distribution.Type, data);
+            TestStatistiques = TestStatistique.GetTestsDistribution(Distribution, data);
             ResultatTest = new Dictionary<TestStatistique, TypeDonnees>();
             foreach (var v in TestStatistiques)
             {
@@ -74,6 +75,7 @@ namespace OnlineCalibrator.Shared
         public double SeuilAlpha { get; set; } = 0.05;
         [Key(9)]
         public string? Comment { get; set; }
+
         public void UpdateTest()
         {
             if (TestStatistiques != null)

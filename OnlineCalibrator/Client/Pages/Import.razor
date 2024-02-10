@@ -33,14 +33,19 @@
                         Selection de la donnée
                     </div>
                     <div class="card-body">
-                        <label class="btn btn-primary">
+                        <label class="btn btn-primary  mx-0">
                             Selectionner votre jeu de données
                             <InputFile class="visually-hidden" OnChange="@LoadFiles"></InputFile>
 
                         </label>
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">
+                        <button type="button" class="btn btn-info mx-1" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">
                             Format de l'import
                         </button>
+                        @if (DonneesImportes != null)
+                        {
+                            <button class="btn btn-danger mx-1" @onclick="@SupprimerDonnee">Supprimer Données</button>
+                        }
+
                         <!-- Modal -->
                         <div class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;":"display: none;")" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -69,37 +74,42 @@
                 <div class="col-lg-6">
                     <div class="card">
                         <div class="card-header">
-                            Selection de la colonne à calibrer
+                            Calibration de la distribution
                         </div>
                         <div class="card-body">
                             <div class="row m-1">
                                 <label>Selectionnez la colonne à calibrer pour un calibration individuelle.</label>
-                                <select @onchange="(ChangeEventArgs a)=>ChangeData(a)">
-                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeData(a)">
+                                    @foreach (var donnee in DonneesImportes.Donnees)
                                     {
-                                        <option value="@forecast.Name" >@forecast.Name</option>
+                                        <option value="@donnee.Name">@donnee.Name</option>
                                     }
                                 </select>
-                                <button class="btn btn-primary" @onclick="@CalibrerDonne">Calibrer la donnée</button>
+                                <button class="btn btn-primary mt-1" @onclick="@CalibrerDonne">Calibrer la donnée</button>
                             </div>
+
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            Calibration des dépendances
+                        </div>
+                        <div class="card-body">
                             <div class="row m-1">
-                                <label>Selectionnez la colonne à calibrer pour un calibration conjointe.</label>
-                                <select @onchange="(ChangeEventArgs a)=>ChangeDataConjointe1(a)">
-                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                <label>Selectionnez les colonnes à calibrer pour la calibration des dépendances entre variables.</label>
+                                <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe1(a)">
+                                    @foreach (var donnee in DonneesImportes.Donnees)
                                     {
-                                        <option value="@forecast.Name">@forecast.Name</option>
+                                        <option value="@donnee.Name">@donnee.Name</option>
                                     }
                                 </select>
-                                <select @onchange="(ChangeEventArgs a)=>ChangeDataConjointe2(a)">
-                                    @foreach (var forecast in DonneesImportes.Donnees)
+                                <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe2(a)">
+                                    @foreach (var donnee in DonneesImportes.Donnees)
                                     {
-                                        <option value="@forecast.Name">@forecast.Name</option>
+                                        <option value="@donnee.Name">@donnee.Name</option>
                                     }
                                 </select>
-                                <button class="btn btn-primary" @onclick="@CalibrerDonneConjointe">Calibrer la donnée de façon conjointe</button>
-                            </div>
-                            <div class="row m-1">
-                                <button class="btn btn-danger" @onclick="@SupprimerDonnee">Supprimer Données</button>
+                                <button class="btn btn-primary mt-1" @onclick="@CalibrerDonneConjointe">Calibrer la dépendance entre les données</button>
                             </div>
                         </div>
                     </div>
