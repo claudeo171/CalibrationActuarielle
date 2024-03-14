@@ -47,17 +47,27 @@ namespace Stochastique.Distributions.Continous
             double sigma = 0;
             mu = value.Sum(a => Math.Log(a)) / value.Count();
             sigma = Math.Sqrt(value.Sum(a => Math.Log(a) * Math.Log(a)) / value.Count() - mu * mu);
-            AddParameter(new Parameter(ParametreName.mu, mu));
-            AddParameter(new Parameter(ParametreName.sigma, sigma));
-            switch (typeCalibration)
+            if (value.Any(a => a < 0))
             {
-                case TypeCalibration.MaximumLikelyhood:
-                    Optim(value, typeCalibration);
-                    break;
-                case TypeCalibration.LeastSquare:
-                    Optim(value, typeCalibration);
-                    break;
+                AddParameter(new Parameter(ParametreName.mu, 0));
+                AddParameter(new Parameter(ParametreName.sigma, 1));
             }
+            else
+            {
+                AddParameter(new Parameter(ParametreName.mu, mu));
+                AddParameter(new Parameter(ParametreName.sigma, sigma));
+
+                switch (typeCalibration)
+                {
+                    case TypeCalibration.MaximumLikelyhood:
+                        Optim(value, typeCalibration);
+                        break;
+                    case TypeCalibration.LeastSquare:
+                        Optim(value, typeCalibration);
+                        break;
+                }
+            }
+
             IntervaleForDisplay = new Intervale(0,Math.Exp( mu + 5 * sigma));
 
         }

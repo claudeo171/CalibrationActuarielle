@@ -4,7 +4,7 @@ using OnlineCalibrator.Shared;
 
 Console.WriteLine("Hello, World!");
 //DonneesImportes.FromMsgPack(File.ReadAllBytes("C:\\Users\\Claude\\Downloads\\log (3).data"));
-var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents\\data.csv", FileMode.Open), "data.csv");
+var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents\\NormaleCorrelle.csv", FileMode.Open), "NormaleCorrelle.csv");
 
 elt.NomDataConjointe1= "A";
 elt.NomDataConjointe2= "B";
@@ -14,8 +14,9 @@ elt.NomData= "A";
 elt.ActualData.IncludeTrunkatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
-var toto = elt.ActualData.GetAllDistributions();
+var toto = elt.ActualData.GetAllDistributions(); 
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
+DonneesImportes.FromMsgPack(elt.ToMsgPack());
 elt.ActualData.CalibrerMLI();
 FileService fs = new FileService();
 File.WriteAllBytes("test.docx", fs.ExportFileDocx(elt));

@@ -55,9 +55,6 @@ namespace OnlineCalibrator.Shared
         [Key(3)]
         public double RankCorrelation => Statistics.Covariance(DonneesAAnalyser1.Values.Rang().Select(a=>a*1.0), DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0)) / Math.Sqrt(DonneesAAnalyser1.Values.Rang().Select(a => a * 1.0).Variance() * DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0).Variance());
 
-        [Key(4)]
-        public double PValue => new FisherDistribution(1,DonneesAAnalyser1.Values.Length-2).InverseCDF((DonneesAAnalyser1.Values.Length - 2)*Correlation/(1-Correlation));
-
         [Key(5)]
         public List<CopuleWithData> Copules { get; set; } = new List<CopuleWithData>();
         [Key(6)]

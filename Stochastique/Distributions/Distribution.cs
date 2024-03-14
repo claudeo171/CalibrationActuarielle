@@ -31,6 +31,9 @@ namespace Stochastique.Distributions
     [MessagePack.Union(17, typeof(PascalDistribution))]
     [MessagePack.Union(18, typeof(PoissonDistribution))]
     [MessagePack.Union(19, typeof(ParetoDistribution))]
+    [MessagePack.Union(20, typeof(TrunkatedDistribution))]
+    [MessagePack.Union(21, typeof(LoiAfine))]
+    [MessagePack.Union(22, typeof(MixtureDistribution))]
     public abstract class Distribution : IMessagePackSerializationCallbackReceiver
     {
         /// <summary>

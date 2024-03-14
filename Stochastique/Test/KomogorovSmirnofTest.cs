@@ -24,7 +24,7 @@ namespace Stochastique.Test
         {
             Values = values;
             Distribution = d;
-            Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values,values.Select((x,i)=> d.CDF((i+0.5)/values.Length)).ToArray());
+            Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values,values.Select((x,i)=> Distribution.CDF((i+0.5)/values.Length)).ToArray());
             switch(Distribution.Type)
             {
                 case Enums.TypeDistribution.Normal:

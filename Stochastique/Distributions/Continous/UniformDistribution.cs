@@ -93,8 +93,15 @@ namespace Stochastique.Distributions.Continous
                 AddParameter(new Parameter(ParametreName.b, value.Max()));
                 AddParameter(new Parameter(ParametreName.a, value.Min()));
             }
-
-            base.Initialize(value, typeCalibration);
+            if (typeCalibration == TypeCalibration.MaximumLikelyhood)
+            {
+                GetParameter(ParametreName.a).Value = value.Min();
+                GetParameter(ParametreName.b).Value = value.Max();
+            }
+            else
+            {
+                base.Initialize(value, typeCalibration);
+            }
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
 

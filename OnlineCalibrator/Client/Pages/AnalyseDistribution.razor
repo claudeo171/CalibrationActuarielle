@@ -20,14 +20,21 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
-        <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@DonneesImportes.NomData)</a></li>
+        @if (DonneesImportes != null)
+        {
+            <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données (@DonneesImportes.NomData)</a></li>
+        }
+        else
+        {
+            <li class="breadcrumb-item"><a href="/CalibrateDistribution">Calibration des données </a></li>
+        }
         <li class="breadcrumb-item active">Identification de la loi</li>
     </ol>
 </nav>
 <div class="row">
     @if (DonneesImportes != null)
     {
-        <div class="col-6 col-sm-12 col-xl-6">
+        <div class="col-6 col-sm-12 col-xl-6 align-items-stretch">
             <div class="card">
                 <div class="card-header">
                     Paramétrage de la calibration
@@ -45,19 +52,8 @@
                             Distributions discrètes?
                         </label>
                     </div>
-
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-sm-12 col-xl-6">
-            <div class="card">
-                <div class="card-header">
-                    Selection de la loi
-                </div>
-                <div class="card-body">
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-
                         <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
                             @foreach (var item in AviableMethod)
                             {
@@ -84,16 +80,38 @@
                                 <li>@item.Name : @item.Value</li>
                             }
                         </ul>
+                    }
+
+                    <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Simulation de la loi calibré (csv)
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-check-label">Nombre de ligne</label>
+                        <InputNumber  @bind-Value="@NbRow" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label">Nombre de colonne</label>
+                        <InputNumber  @bind-Value="@NbCol" />
+                    </div>
+                    <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-12 col-xl-6 align-items-stretch">
+            <div class="card">
+                <div class="card-header">
+                    Analyse de la loi sélectionnée
+                </div>
+                <div class="card-body">
+                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
+                    {
                         <div> QQPlot </div>
                         <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
-                        <label>Nombre de ligne</label>
-                        <InputNumber @bind-Value="@NbRow" />
-                        <label>Nombre de colonne</label>
-                        <InputNumber @bind-Value="@NbCol" />
-                        <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
-
-                        <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
-
                     }
                 </div>
             </div>
@@ -105,26 +123,26 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    Tests stratistiques
+                    Métriques des lois calibrés
                 </div>
                 <div class="card-body" style="max-width:100%;">
-                    <div class="table-responsive">
+                    <div class="table-responsive text-nowrap">
                         <table class="table">
                             <thead>
 
-                            <th>Loi</th>
-                            <th>LogLikelihood</th>
-                            <th>AIC</th>
-                            <th>BIC</th>
-                            <th>KS-Test P-Value</th>
+                            <th class="text-center">Loi</th>
+                            <th class="text-center">LogLikelihood</th>
+                            <th class="text-center">AIC</th>
+                            <th class="text-center">BIC</th>
+                            <th class="text-center">KS-Test P-Value</th>
                                 @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
                                 {
-                                <th>Parametre @(i + 1)</th>
+                                <th class="text-center">Parametre @(i + 1)</th>
                                 }
-                            <th>Esperance(%Ecart)</th>
-                            <th>Variance(%Ecart)</th>
-                            <th>Aplatissement(%Ecart)</th>
-                            <th>Kurtosis(%Ecart)</th>
+                            <th class="text-center">Esperance(%Ecart)</th>
+                            <th class="text-center">Variance(%Ecart)</th>
+                            <th class="text-center">Aplatissement(%Ecart)</th>
+                            <th class="text-center">Kurtosis(%Ecart)</th>
                             </thead>
                             <tbody>
                                 @if (distributions != null)
@@ -132,7 +150,7 @@
                                     @foreach (var distrib in distributions)
                                     {
                                         <tr>
-                                            <td>@distrib.Distribution.Type</td>
+                                            <td class="text-center">@distrib.Distribution.Type</td>
                                             <td>@distrib.LogLikelihood.ToBeautifulString()</td>
                                             <td>@distrib.AIC.ToBeautifulString()</td>
                                             <td>@distrib.BIC.ToBeautifulString()</td>
@@ -148,10 +166,10 @@
                                                     <td></td>
                                                 }
                                             }
-                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) * 2 / (DonneesImportes.ActualData.Moyenne + @distrib.Distribution.ExpextedValue())).ToBeautifulString()))</td>
-                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) * 2 / (DonneesImportes.ActualData.Variance + @distrib.Distribution.Variance())).ToBeautifulString()))</td>
-                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) * 2 / (DonneesImportes.ActualData.Skewness + @distrib.Distribution.Skewness())).ToBeautifulString()))</td>
-                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) * 2 / (DonneesImportes.ActualData.Kurtosis + @distrib.Distribution.Kurtosis())).ToBeautifulString()))</td>
+                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(DonneesImportes.ActualData.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) / Math.Max(DonneesImportes.ActualData.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) / Math.Max(DonneesImportes.ActualData.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(DonneesImportes.ActualData.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
                                         </tr>
                                     }
                                 }
@@ -192,16 +210,30 @@
     private int NbCol = 10;
     protected override async void OnInitialized()
     {
-
-        DonneesImportes = donneeContainer.Value;
+        if (donneeContainer.Value != null)
+        {
+            DonneesImportes = donneeContainer.Value;
+        }
+        else
+        {
+            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+        }
         if (DonneesImportes.ActualData != null)
         {
             distributions = DonneesImportes.ActualData?.GetAllDistributions();
             isInit = true;
             ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration);
-            donneeContainer.SetValue(DonneesImportes);
+            SaveData();
             StateHasChanged();
         }
+    }
+
+    private async void SaveData()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        var data = DonneesImportes.ToMsgPack();
+        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(data));
     }
 
     protected void UpdateCalibration(ChangeEventArgs e, bool isTrunkated)
@@ -219,7 +251,7 @@
             distributions = DonneesImportes.ActualData?.GetAllDistributions();
             ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration);
             UpdateChart();
-            donneeContainer.SetValue(DonneesImportes);
+            SaveData();
 
         }
     }
@@ -228,7 +260,7 @@
     {
         DonneesImportes.ActualData?.ChangeSelectionMethod(m);
         UpdateChart();
-        donneeContainer.SetValue(DonneesImportes);
+        SaveData();
 
     }
     public async void UpdateChart()
@@ -236,7 +268,7 @@
 
         QQPlot = new ChartViewModelLine(
         DonneesImportes.ActualData?.GetQQPlot(),
-        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
         new List<Paint>() { null, null });
         StateHasChanged();
     }
@@ -270,5 +302,4 @@
     {
         Notifications.Remove(notif);
     }
-
 }

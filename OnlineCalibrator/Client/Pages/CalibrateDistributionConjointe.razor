@@ -91,7 +91,15 @@
     {
         try
         {
-            DonneesImportes = donneeContainer.Value;
+            if (donneeContainer.Value != null)
+            {
+                DonneesImportes = donneeContainer.Value;
+            }
+            else
+            {
+                var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
+                DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+            }
 
             if (DonneesImportes != null && DonneesImportes.ActualData != null)
             {

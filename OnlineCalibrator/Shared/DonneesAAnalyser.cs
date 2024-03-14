@@ -63,7 +63,7 @@ namespace OnlineCalibrator.Shared
         [Key(12)]
         public Distribution CalibratedDistribution { get; set; }
 
-        [Key(15)]
+        [IgnoreMember]
         public TypeDistribution? CalibratedTypeDistribution
         {
             get

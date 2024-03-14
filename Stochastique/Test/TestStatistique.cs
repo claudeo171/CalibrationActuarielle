@@ -13,7 +13,8 @@ namespace OnlineCalibrator.Shared
     [MessagePackObject]
     [Union(0, typeof(ShapiroTest))]
     [Union(1, typeof(JarqueBeraTest))]
-    
+    [Union(2, typeof(KolmogorovSmirnovTest))]
+
     public abstract class TestStatistique
     {
         [Key(1)]

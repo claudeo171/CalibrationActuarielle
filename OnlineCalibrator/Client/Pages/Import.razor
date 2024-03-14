@@ -27,7 +27,7 @@
     </div>
     <div class="card-body">
         <div class="row">
-            <div class="col-12">
+            <div class="@(DonneesImportes == null?"col-12":"col-lg-6")">
                 <div class="card">
                     <div class="card-header">
                         Selection de la donnée
@@ -64,7 +64,18 @@
                         </div>
                     </div>
                 </div>
-
+                @if (DonneesImportes != null)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            Sauvegarde et export
+                        </div>
+                        <div class="card-body">
+                            <button class="btn btn-outline-primary" @onclick="@SauvegarderDonnee">Sauvegarder Données</button>
+                            <button class="btn btn-outline-primary" @onclick="@ExporterWord">Rapport de calibration</button>
+                        </div>
+                    </div>
+                }
             </div>
 
 
@@ -114,17 +125,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="card">
-                        <div class="card-header">
-                            Sauvegarde et export
-                        </div>
-                        <div class="card-body">
-                            <button class="btn btn-outline-primary" @onclick="@SauvegarderDonnee">Sauvegarder Données</button>
-                            <button class="btn btn-outline-primary" @onclick="@ExporterWord">Rapport de calibration</button>
-                        </div>
-                    </div>
-                </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="accordion" id="accordionExample">
@@ -137,28 +137,29 @@
                                 <div class="accordion-body">
 
                                     <div id="collapseOne" class="accordion-collapse collapse @(showAcordion?"show":"")" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-
-                                        <table class="table">
-                                            <thead>
-                                                <tr>
-                                                    @foreach (var forecast in DonneesImportes.Donnees)
-                                                    {
-                                                        <th>@forecast.Name</th>
-                                                    }
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @for (int i = 0; i < (DonneesImportes.Donnees.FirstOrDefault()?.Values.Length ?? 0); i++)
-                                                {
+                                        <div class="table-responsive text-nowrap">
+                                            <table class="table">
+                                                <thead>
                                                     <tr>
                                                         @foreach (var forecast in DonneesImportes.Donnees)
                                                         {
-                                                            <td>@forecast.Values[i]</td>
+                                                            <th>@forecast.Name</th>
                                                         }
                                                     </tr>
-                                                }
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody>
+                                                    @for (int i = 0; i < (DonneesImportes.Donnees.FirstOrDefault()?.Values.Length ?? 0); i++)
+                                                    {
+                                                        <tr>
+                                                            @foreach (var forecast in DonneesImportes.Donnees)
+                                                            {
+                                                                <td>@forecast.Values[i]</td>
+                                                            }
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +204,7 @@
             DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
             DonneesImportes.NomDataConjointe1 = DonneesImportes.Donnees.FirstOrDefault()?.Name;
             DonneesImportes.NomDataConjointe2 = DonneesImportes.Donnees.Skip(1).FirstOrDefault()?.Name;
-            donneeContainer.SetValue(DonneesImportes);
+            SaveData();
             StateHasChanged();
         }
         catch (Exception ex)
@@ -233,19 +234,30 @@
         {
             DonneesImportes = donneeContainer.Value;
         }
+        else if (await sessionStorage.ContainKeyAsync("donneesImportes"))
+        {
+
+            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+        }
         StateHasChanged();
     }
 
+    private async void SaveData()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(DonneesImportes.ToMsgPack()));
+    }
 
     private void CalibrerDonne()
     {
-        donneeContainer.SetValue(DonneesImportes);
+        SaveData();
         NavManager.NavigateTo("/CalibrateDistribution");
     }
 
     private void CalibrerDonneConjointe()
     {
-        donneeContainer.SetValue(DonneesImportes);
+        SaveData();
         NavManager.NavigateTo("/CalibrateDistributionConjointe");
     }
 

@@ -165,13 +165,21 @@
     protected override async void OnInitialized()
     {
 
-        DonneesImportes = donneeContainer.Value;
+        if (donneeContainer.Value != null)
+        {
+            DonneesImportes = donneeContainer.Value;
+        }
+        else
+        {
+            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+        }
         if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null)
         {
             copules = DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetAllCopula();
             isInit = true;
             ChangeSelectionMethod(DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration);
-            donneeContainer.SetValue(DonneesImportes);
+            SaveData();
             StateHasChanged();
         }
     }
@@ -180,8 +188,14 @@
     {
         DonneesImportes.ActualDonneesPourAnalyseConjointe?.ChangeSelectionMethod(m);
         UpdateChart();
-        donneeContainer.SetValue(DonneesImportes);
+        SaveData();
 
+    }
+
+    private async void SaveData()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(DonneesImportes.ToMsgPack()));
     }
     public async void UpdateChart()
     {

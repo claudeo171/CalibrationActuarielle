@@ -62,10 +62,18 @@ namespace Stochastique.Distributions.Continous
         {
             double k = 0;
             k = value.Sum() / value.Count();
-            AddParameter(new Parameter(ParametreName.k, k));
-            base.Initialize(value, typeCalibration);
+            
+            if(value.Any(a=>a<0))
+            {
+                AddParameter(new Parameter(ParametreName.k, 1));
+            }
+            else
+            {
+                AddParameter(new Parameter(ParametreName.k, k));
+                base.Initialize(value, typeCalibration);
+            }
+            
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
-            base.Initialize(value, typeCalibration);
         }
     }
 }

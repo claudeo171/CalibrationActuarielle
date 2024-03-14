@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
+    [MessagePack.Union(0, typeof(CopuleAMH))]
+    [MessagePack.Union(1, typeof(CopuleClayton))]
     [MessagePack.MessagePackObject]
     public abstract class Copule
     {
