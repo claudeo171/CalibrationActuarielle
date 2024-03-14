@@ -13,6 +13,7 @@ namespace Stochastique.Distributions
     [MessagePackObject]
     public class TrunkatedDistribution : Distribution
     {
+        
         public TrunkatedDistribution() { }
         public TrunkatedDistribution(Distribution distrib)
         {
@@ -46,7 +47,10 @@ namespace Stochastique.Distributions
 
         [Key(12)]
         public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
-
+        [IgnoreMember]
+        public override double InconditionnalMaximumPossibleValue => BaseDistribution.InconditionnalMaximumPossibleValue;
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => BaseDistribution.InconditionnalMinimumPossibleValue;
         public override double CDF(double x)
         {
             double baseCDF = BaseDistribution.CDF(x);

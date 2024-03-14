@@ -1,4 +1,5 @@
-﻿using Stochastique.Enums;
+﻿using MessagePack;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,8 @@ namespace Stochastique.Distributions.Continous
 
         public double K => GetParameter(ParametreName.k).Value;
         public double XM => GetParameter(ParametreName.xm).Value;
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)
         {

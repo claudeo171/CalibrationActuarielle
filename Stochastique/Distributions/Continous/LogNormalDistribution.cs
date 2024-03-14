@@ -21,6 +21,9 @@ namespace Stochastique.Distributions.Continous
         [Key(8)]
         public double sigma => GetParameter(ParametreName.sigma).Value;
 
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
+
         public override double CDF(double x)
         {
             return 0.5 + 0.5 * SpecialFunctions.Erf((Math.Log(x) - mu) / (sigma * Constants.Sqrt2));
@@ -47,16 +50,12 @@ namespace Stochastique.Distributions.Continous
             double sigma = 0;
             mu = value.Sum(a => Math.Log(a)) / value.Count();
             sigma = Math.Sqrt(value.Sum(a => Math.Log(a) * Math.Log(a)) / value.Count() - mu * mu);
-            if (value.Any(a => a < 0))
-            {
-                AddParameter(new Parameter(ParametreName.mu, 0));
-                AddParameter(new Parameter(ParametreName.sigma, 1));
-            }
-            else
-            {
-                AddParameter(new Parameter(ParametreName.mu, mu));
-                AddParameter(new Parameter(ParametreName.sigma, sigma));
 
+
+            AddParameter(new Parameter(ParametreName.mu, mu));
+            AddParameter(new Parameter(ParametreName.sigma, sigma));
+            if (IsInInconditionnalSupport(value))
+            {
                 switch (typeCalibration)
                 {
                     case TypeCalibration.MaximumLikelyhood:
@@ -67,26 +66,26 @@ namespace Stochastique.Distributions.Continous
                         break;
                 }
             }
-
-            IntervaleForDisplay = new Intervale(0,Math.Exp( mu + 5 * sigma));
+            VerifyParameterValue();
+            IntervaleForDisplay = new Intervale(0, Math.Exp(mu + 5 * sigma));
 
         }
         public override double Simulate(Random r)
         {
-            return Math.Exp( base.Simulate(r));
+            return Math.Exp(base.Simulate(r));
         }
         public override double[] Simulate(Random r, int n)
         {
-            return base.Simulate(r, n).Select(a=>Math.Exp(a)).ToArray();
+            return base.Simulate(r, n).Select(a => Math.Exp(a)).ToArray();
         }
         public override double Skewness()
         {
-            return (Math.Exp(sigma*sigma)+2)*Math.Sqrt(Math.Exp(sigma*sigma)-1);
+            return (Math.Exp(sigma * sigma) + 2) * Math.Sqrt(Math.Exp(sigma * sigma) - 1);
         }
 
         public override double Kurtosis()
         {
-            return Math.Exp(4*sigma * sigma)+2* Math.Exp(3 * sigma * sigma)+ 3 * Math.Exp(2 * sigma * sigma)-6;
+            return Math.Exp(4 * sigma * sigma) + 2 * Math.Exp(3 * sigma * sigma) + 3 * Math.Exp(2 * sigma * sigma) - 6;
         }
     }
 }

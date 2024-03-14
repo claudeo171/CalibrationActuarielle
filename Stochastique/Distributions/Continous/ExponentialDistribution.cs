@@ -22,6 +22,8 @@ namespace Stochastique.Distributions.Continous
 
         [Key(7)]
         public double Labda => GetParameter(ParametreName.lambda).Value;
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
         public override double CDF(double x)
         {
             return x < 0 ? 0 : 1 - Math.Exp(-Labda * x);

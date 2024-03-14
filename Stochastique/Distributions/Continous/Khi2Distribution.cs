@@ -21,13 +21,16 @@ namespace Stochastique.Distributions.Continous
         [Key(7)]
         public double K => GetParameter(ParametreName.k).Value;
 
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
+
         public Khi2Distribution(int k) : base()
         {
             AddParameter(new Parameter(ParametreName.k, k));
         }
         public override double CDF(double x)
         {
-            if(x<0)
+            if (x < 0)
             {
                 return 0;
             }
@@ -50,29 +53,22 @@ namespace Stochastique.Distributions.Continous
         }
         public override double Skewness()
         {
-            return Math.Sqrt(8.0/K);
+            return Math.Sqrt(8.0 / K);
         }
 
         public override double Kurtosis()
         {
-            return 12.0/K;
+            return 12.0 / K;
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             double k = 0;
             k = value.Sum() / value.Count();
-            
-            if(value.Any(a=>a<0))
-            {
-                AddParameter(new Parameter(ParametreName.k, 1));
-            }
-            else
-            {
-                AddParameter(new Parameter(ParametreName.k, k));
-                base.Initialize(value, typeCalibration);
-            }
-            
+
+            AddParameter(new Parameter(ParametreName.k, k));
+            base.Initialize(value, typeCalibration);
+
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
         }
     }

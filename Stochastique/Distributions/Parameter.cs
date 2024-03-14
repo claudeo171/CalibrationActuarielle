@@ -135,6 +135,8 @@ namespace Stochastique.Distributions
                         return double.MaxValue;
                     case ParametreName.r:
                         return double.MaxValue;
+                    case ParametreName.theta:
+                        return double.MaxValue;
                     default:
                         return 0;
                 }

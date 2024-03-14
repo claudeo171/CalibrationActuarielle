@@ -21,6 +21,10 @@ namespace Stochastique.Distributions.Continous
 
         [Key(8)]
         public double B => GetParameter(ParametreName.b).Value;
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
+        [IgnoreMember]
+        public override double InconditionnalMaximumPossibleValue => 1;
 
         public override double CDF(double x)
         {

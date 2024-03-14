@@ -29,6 +29,8 @@ namespace Stochastique.Distributions.Continous
 
         [Key(8)]
         public override TypeDistribution Type => TypeDistribution.Fisher;
+        [IgnoreMember]
+        public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)
         {

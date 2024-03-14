@@ -62,11 +62,22 @@ namespace Stochastique.Distributions
         /// </summary>
         [IgnoreMember]
         public virtual bool IsTrunkable => true;
+
+        [IgnoreMember]
+        public virtual double InconditionnalMinimumPossibleValue => double.MinValue;
+
+        [IgnoreMember]
+        public virtual double InconditionnalMaximumPossibleValue => double.MaxValue;
+
         /// <summary>
         /// Create a distribution with the type of the distribution.
         /// </summary>
         /// <param name="typeDistribution">The type of distribution that will be created</param>
         /// <returns>A distribution of the asked type </returns>
+        /// 
+
+
+
         public static Distribution CreateDistribution(TypeDistribution typeDistribution)
         {
             switch (typeDistribution)
@@ -159,15 +170,41 @@ namespace Stochastique.Distributions
         /// </param>
         public virtual void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            switch (typeCalibration)
+            if (IsInInconditionnalSupport(value))
             {
-                case TypeCalibration.MaximumLikelyhood:
-                    Optim(value, typeCalibration);
-                    break;
-                case TypeCalibration.LeastSquare:
-                    Optim(value, typeCalibration);
-                    break;
+                switch (typeCalibration)
+                {
+                    case TypeCalibration.MaximumLikelyhood:
+                        Optim(value, typeCalibration);
+                        break;
+                    case TypeCalibration.LeastSquare:
+                        Optim(value, typeCalibration);
+                        break;
+                }
             }
+            VerifyParameterValue();
+        }
+        protected void VerifyParameterValue()
+        {
+            foreach (var v in ParametresParNom)
+            {
+                if (v.Value.Value < v.Value.MinValue)
+                {
+                    v.Value.Value = v.Value.MinValue + Math.Pow(10,-10);
+                }
+                if (v.Value.Value > v.Value.MaxValue)
+                {
+                    v.Value.Value = v.Value.MaxValue - Math.Pow(10, -10);
+                }
+                if(double.IsNaN(v.Value.Value))
+                {
+                    v.Value.Value = v.Value.MinValue + Math.Pow(10, -10);
+                }
+            }
+        }
+        protected bool IsInInconditionnalSupport(IEnumerable<double> values)
+        {
+            return values.All(a => a > InconditionnalMinimumPossibleValue && a < InconditionnalMaximumPossibleValue);
         }
         /// <summary>
         /// Compute the value of the PDF for a given value
@@ -222,7 +259,7 @@ namespace Stochastique.Distributions
 
             while (CDF(min) > x)
             {
-                if(min>0)
+                if (min > 0)
                 {
                     min = -1;
                 }
@@ -238,7 +275,7 @@ namespace Stochastique.Distributions
             }
             while (CDF(max) < x)
             {
-                if(max < 0)
+                if (max < 0)
                 {
                     max = 1;
                 }
@@ -309,7 +346,7 @@ namespace Stochastique.Distributions
         /// <returns>The parameter</returns>
         public virtual Parameter GetParameter(ParametreName nomParametre)
         {
-            return  ParametresParNom[nomParametre];
+            return ParametresParNom[nomParametre];
         }
         /// <summary>
         /// Return all parameters of the distribution
@@ -341,7 +378,7 @@ namespace Stochastique.Distributions
         {
             int i = 0;
             var parameters = AllParameters();
-            foreach(var param in parameters)
+            foreach (var param in parameters)
             {
                 param.Value = values[i];
                 i++;
@@ -407,7 +444,7 @@ namespace Stochastique.Distributions
         private void CreateConstraints(alglib.minbleicstate state)
         {
 
-            var parameters= AllParameters().ToList();
+            var parameters = AllParameters().ToList();
             double[] bndl = parameters.Select(p => p.MinValue).ToArray();
             double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
             alglib.minbleicsetbc(state, bndl, bndu);
@@ -417,24 +454,24 @@ namespace Stochastique.Distributions
                 int x = parameters.Count * 2 + constraint.Count;
                 int y = parameters.Count + 1;
                 double[,] c = (double[,])Array.CreateInstance(typeof(double), x, y);
-                for(int i = 0; i < parameters.Count; i++)
+                for (int i = 0; i < parameters.Count; i++)
                 {
                     c[i, i] = 1;
-                    c[i,parameters.Count] = parameters[i].MinValue;
+                    c[i, parameters.Count] = parameters[i].MinValue;
                     c[i + parameters.Count, i] = -1;
                     c[i + parameters.Count, parameters.Count] = -parameters[i].MaxValue;
                 }
-                foreach(var contrainte in constraint)
+                foreach (var contrainte in constraint)
                 {
                     int i = 0;
-                    foreach(var param in parameters)
+                    foreach (var param in parameters)
                     {
-                        int indice =contrainte.Parametres.IndexOf(param.Name);
-                        if (indice!=-1)
+                        int indice = contrainte.Parametres.IndexOf(param.Name);
+                        if (indice != -1)
                         {
                             c[i + parameters.Count * 2, indice] = contrainte.Multiplier[indice];
                         }
-                        
+
                     }
                     c[i + parameters.Count * 2, parameters.Count] = contrainte.Value;
                     i++;
@@ -454,8 +491,8 @@ namespace Stochastique.Distributions
         {
             var parameters = AllParameters().ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
-            double[] s = Enumerable.Repeat(1.0, x.Length).ToArray() ;
-            if(this is TrunkatedDistribution)
+            double[] s = Enumerable.Repeat(1.0, x.Length).ToArray();
+            if (this is TrunkatedDistribution)
             {
                 s[0] = 0.1;
                 s[1] = 0.1;
@@ -496,14 +533,14 @@ namespace Stochastique.Distributions
         /// </summary>
         public void OnBeforeSerialize()
         {
-            ParametersList= AllParameters()?.ToList();
+            ParametersList = AllParameters()?.ToList();
         }
         /// <summary>
         /// Fuction called after deserialization to store parameters in a dictionnary
         /// </summary>
         public void OnAfterDeserialize()
         {
-            ParametresParNom= ParametersList.ToDictionary(a=>a.Name, a=>a);
+            ParametresParNom = ParametersList.ToDictionary(a => a.Name, a => a);
         }
         /// <summary>
         /// Function that simulate a sample of the distribution from a random generator
