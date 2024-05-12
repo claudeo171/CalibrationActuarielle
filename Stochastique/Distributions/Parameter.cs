@@ -26,7 +26,7 @@ namespace Stochastique.Distributions
 
         public override string ToString()
         {
-            return Name + " : " + Value.ToString("F5");
+            return Name + " : " + Value.ToBeautifulString();
         }
 
         [Key(0)]

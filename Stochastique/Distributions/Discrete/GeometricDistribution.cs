@@ -17,10 +17,10 @@ namespace Stochastique.Distributions.Discrete
         {
             AddParameter(new Parameter(ParametreName.p, p));
         }
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Geometric;
 
         public override double ExpextedValue()
@@ -45,7 +45,7 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int k)
         {
-            return P * Math.Pow(1 - P, k);
+            return k>0?P * Math.Pow(1 - P, k-1):0;
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {

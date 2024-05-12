@@ -13,13 +13,13 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class NegativeBinomialDistribution : DiscreteDistribution
     {
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.NegativeBinomial;
 
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [Key(13)]
+        [MessagePack.IgnoreMember]
         private double R => GetParameter(ParametreName.r).Value;
 
         public override double ExpextedValue()

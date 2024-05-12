@@ -13,13 +13,13 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class PascalDistribution : DiscreteDistribution
     {
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Pascal;
 
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         public double P => GetParameter(ParametreName.p).Value;
 
-        [Key(13)]
+        [MessagePack.IgnoreMember]
         public double R => GetParameter(ParametreName.r).Value;
 
         public override double ExpextedValue()

@@ -13,13 +13,13 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class PoissonDistribution : DiscreteDistribution
     {
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Poisson;
 
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
 
-        [Key(13)]
+        [MessagePack.IgnoreMember]
         protected override double MaxValue => int.MaxValue;
 
         public override double ExpextedValue()

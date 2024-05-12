@@ -26,9 +26,7 @@
     <PackageReference Include="Microsoft.ML" Version="3.0.0" />
     <PackageReference Include="Microsoft.ML.CpuMath" Version="3.0.0" />
     <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="3.0.0" />
-    <PackageReference Include="Microsoft.ML.TensorFlow" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
     <PackageReference Include="SkiaSharp" Version="2.88.6" />
   </ItemGroup>
 

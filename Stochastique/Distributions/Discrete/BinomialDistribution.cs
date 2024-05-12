@@ -13,16 +13,16 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class BinomialDistribution : DiscreteDistribution
     {
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         private double N => GetParameter(ParametreName.n).Value;
 
-        [Key(13)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Binomial;
 
-        [Key(14)]
+        [MessagePack.IgnoreMember]
         protected override double MaxValue => N;
 
         public override double ExpextedValue()

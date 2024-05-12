@@ -197,6 +197,7 @@ namespace OnlineCalibrator.Shared
 
         public void CalibrerMLI()
         {
+            /*
             var rand=MersenneTwister.MTRandom.Create(15376869);
             DateTime date=DateTime.Now;
             StringBuilder sbTags = new StringBuilder();
@@ -248,6 +249,7 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
+            */
         }
 
 

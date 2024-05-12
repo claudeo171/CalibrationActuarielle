@@ -93,7 +93,14 @@
                                 <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeData(a)">
                                     @foreach (var donnee in DonneesImportes.Donnees)
                                     {
-                                        <option value="@donnee.Name">@donnee.Name</option>
+                                        @if (DonneesImportes.NomData!="" && donnee.Name == DonneesImportes.NomData)
+                                        {
+                                            <option selected value="@donnee.Name">@donnee.Name</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@donnee.Name">@donnee.Name</option>
+                                        }
                                     }
                                 </select>
                                 <button class="btn btn-primary mt-1" @onclick="@CalibrerDonne">Calibrer la donnée</button>
@@ -101,29 +108,46 @@
 
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header">
-                            Calibration des dépendances
-                        </div>
-                        <div class="card-body">
-                            <div class="row m-1">
-                                <label>Selectionnez les colonnes à calibrer pour la calibration des dépendances entre variables.</label>
-                                <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe1(a)">
-                                    @foreach (var donnee in DonneesImportes.Donnees)
-                                    {
-                                        <option value="@donnee.Name">@donnee.Name</option>
-                                    }
-                                </select>
-                                <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe2(a)">
-                                    @foreach (var donnee in DonneesImportes.Donnees)
-                                    {
-                                        <option value="@donnee.Name">@donnee.Name</option>
-                                    }
-                                </select>
-                                <button class="btn btn-primary mt-1" @onclick="@CalibrerDonneConjointe">Calibrer la dépendance entre les données</button>
+                    @if (DonneesImportes.Donnees.Count > 1)
+                    {
+                        <div class="card">
+                            <div class="card-header">
+                                Calibration des dépendances
+                            </div>
+                            <div class="card-body">
+                                <div class="row m-1">
+                                    <label>Selectionnez les colonnes à calibrer pour la calibration des dépendances entre variables.</label>
+                                    <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe1(a)">
+                                        @foreach (var donnee in DonneesImportes.Donnees)
+                                        {
+                                            @if (DonneesImportes.NomDataConjointe1 != "" && donnee.Name == DonneesImportes.NomDataConjointe1)
+                                            {
+                                                <option selected value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                    <select class="mt-1" @onchange="(ChangeEventArgs a)=>ChangeDataConjointe2(a)">
+                                        @foreach (var donnee in DonneesImportes.Donnees)
+                                        {
+                                            @if (DonneesImportes.NomDataConjointe2 != "" && donnee.Name == DonneesImportes.NomDataConjointe2 || DonneesImportes.NomDataConjointe2=="" && donnee==DonneesImportes.Donnees[1] )
+                                            {
+                                                <option selected value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                    <button class="btn btn-primary mt-1" @onclick="@CalibrerDonneConjointe">Calibrer la dépendance entre les données</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 </div>
                 <div class="row">
                     <div class="col-12">

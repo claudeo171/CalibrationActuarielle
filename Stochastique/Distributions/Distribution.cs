@@ -251,7 +251,7 @@ namespace Stochastique.Distributions
             }
             double min = -1;
             double max = 1;
-            if (CanComputeExpectedValueEasily && !double.IsNaN(ExpextedValue()) && !double.IsNaN(Variance()))
+            if (CanComputeExpectedValueEasily && !double.IsNaN(ExpextedValue()) && !double.IsNaN(StandardDeviation()))
             {
                 min = ExpextedValue() - StandardDeviation() * 10;
                 max = ExpextedValue() + StandardDeviation() * 10;

@@ -10,6 +10,7 @@ namespace OnlineCalibrator.Shared.MachineLearning
 {
     public static class MachineLearningHelper
     {
+        /*
         public static ITransformer GenerateModel(MLContext mlContext, string tag, string tagTest, string imagesFolder)
         {
             string _trainTagsTsv = Path.Combine(imagesFolder, tag);
@@ -76,7 +77,7 @@ namespace OnlineCalibrator.Shared.MachineLearning
             return model;
             // </SnippetReturnModel>
         }
-
+        */
         public static ImagePrediction ClassifySingleImage(MLContext mlContext, ITransformer model, string path)
         {
             // load the fully qualified image file name into ImageData

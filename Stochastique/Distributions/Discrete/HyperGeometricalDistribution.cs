@@ -20,24 +20,24 @@ namespace Stochastique.Distributions.Discrete
         /// <summary>
         /// p parameter value
         /// </summary>
-        [Key(11)]
+        [MessagePack.IgnoreMember]
         public double NP => GetParameter(ParametreName.Np).Value;
 
         /// <summary>
         /// n parameter value
         /// </summary>
-        [Key(12)]
+        [MessagePack.IgnoreMember]
         public double n => GetParameter(ParametreName.n).Value;
 
         /// <summary>
         /// N parameter value
         /// </summary>
-        [Key(13)]
+        [MessagePack.IgnoreMember]
         public double N => GetParameter(ParametreName.N).Value;
         [IgnoreMember]
         public double P => NP / N;
 
-        [Key(14)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Hypergeometrical;
 
         public override double ExpextedValue()

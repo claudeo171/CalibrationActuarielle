@@ -71,6 +71,7 @@ namespace Stochastique.Copule
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton, 2 * tau / (1 - tau)));
             base.Initialize(value, typeCalibration);
+            distribution = new GammaDistribution(1 / GetParameter(CopuleParameterName.thetaClayton).Value, GetParameter(CopuleParameterName.thetaClayton).Value);
         }
     }
 }

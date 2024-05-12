@@ -37,15 +37,16 @@ namespace Stochastique.Copule
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
             double tau = value.First().TauKendall(value.Last());
-            AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, CopuleHelper.RechercheDichotomique(-0.9999, 0.9999,(a)=>FonctionTau(tau,a))));
+            AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, CopuleHelper.RechercheDichotomique(0, 0.99999,(a)=>FonctionTau(tau,a))));
             base.Initialize(value, typeCalibration);
+            distribution = new GeometricDistribution(1 - GetParameter(CopuleParameterName.thetaAMH).Value);
         }
 
         private void communConstructeurs(double theta)
         {
-            if (theta < -1 || theta == 0)
+            if (theta < 0 || theta > 1)
             {
-                throw new Exception("Theta doit être supérieur ou égal à -1 et non nul");
+                throw new Exception("Theta doit être compris entre 0 et 1");
             }
 
             AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, theta));

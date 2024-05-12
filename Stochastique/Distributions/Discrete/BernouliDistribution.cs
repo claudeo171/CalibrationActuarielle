@@ -13,13 +13,13 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class BernouliDistribution : DiscreteDistribution
     {
-        [Key(6)]
+        [MessagePack.IgnoreMember]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [Key(7)]
+        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Bernouli;
 
-        [Key(8)]
+        [MessagePack.IgnoreMember]
         protected override double MaxValue => 1;
 
         public override double ExpextedValue()

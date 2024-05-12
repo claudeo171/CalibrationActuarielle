@@ -54,7 +54,7 @@ namespace Stochastique.Copule
                     case CopuleParameterName.thetaClayton:
                         return -1+Math.Pow(10,-10);
                     case CopuleParameterName.thetaAMH:
-                        return -1 + Math.Pow(10, -10);
+                        return 0;
                     default:
                         return double.MinValue;
                 }

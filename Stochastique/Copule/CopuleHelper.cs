@@ -289,7 +289,9 @@ namespace Stochastique.Copule
             double yMin = method(min);
             double yMax = method(max);
             if (yMin * yMax > 0)
-                throw new Exception("Erreur de méthode");
+            {
+                return Math.Abs(yMin)> Math.Abs(yMax)? max:min;
+            }    
             while (Math.Abs(y) > 0.0001)
             {
                 if (y * yMin > 0)

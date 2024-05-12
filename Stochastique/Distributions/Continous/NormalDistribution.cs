@@ -13,7 +13,7 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class NormalDistribution : Distribution
     {
-        [Key(6)]
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Normal;
         public NormalDistribution()
         {
