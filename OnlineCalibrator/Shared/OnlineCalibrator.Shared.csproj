@@ -8,10 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="tensorflow_inception_graph.pb" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
     <PackageReference Include="Accord.Statistics" Version="3.8.0" />
     <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
@@ -32,10 +28,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Stochastique\Stochastique.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="tensorflow_inception_graph.pb" />
   </ItemGroup>
 
   <ItemGroup>

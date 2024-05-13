@@ -45,7 +45,6 @@ namespace OnlineCalibrator.Shared
             {
                 case TypeDistribution.Normal:
                     rst.Add(new ShapiroTest(datas));
-                    rst.Add(new ShapiroTest(datas));
                     break;
             }
             return rst;

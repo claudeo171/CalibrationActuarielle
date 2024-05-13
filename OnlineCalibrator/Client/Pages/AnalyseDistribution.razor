@@ -9,6 +9,7 @@
 @using Microsoft.Extensions.Logging
 @using SkiaSharp;
 @using SpawnDev.BlazorJS.WebWorkers
+@using Stochastique.Distributions
 @using Stochastique.Enums;
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
@@ -82,7 +83,7 @@
                         </ul>
                     }
 
-                    <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                    <!--A réactiver quand je ferais le ml en full js <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>-->
                 </div>
             </div>
             <div class="card">
@@ -166,10 +167,20 @@
                                                     <td></td>
                                                 }
                                             }
-                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(DonneesImportes.ActualData.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
-                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) / Math.Max(DonneesImportes.ActualData.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
-                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) / Math.Max(DonneesImportes.ActualData.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
-                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(DonneesImportes.ActualData.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
+                                            @if(distrib.Distribution is TrunkatedDistribution)
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                            }
+                                            else
+                                            {
+                                                <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(DonneesImportes.ActualData.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
+                                                <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) / Math.Max(DonneesImportes.ActualData.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
+                                                <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) / Math.Max(DonneesImportes.ActualData.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
+                                                <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(DonneesImportes.ActualData.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
+                                            }
                                         </tr>
                                     }
                                 }

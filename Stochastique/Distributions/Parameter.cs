@@ -60,6 +60,8 @@ namespace Stochastique.Distributions
                         return Math.Pow(10, -14);
                     case ParametreName.n:
                         return 0;
+                    case ParametreName.nStudent:
+                        return 1;
                     case ParametreName.a:
                          return Math.Pow(10, -10);
                     case ParametreName.b:
@@ -119,6 +121,8 @@ namespace Stochastique.Distributions
                         return double.MaxValue;
                     case ParametreName.b:
                         return double.MaxValue;
+                    case ParametreName.nStudent:
+                        return 100000;
                     case ParametreName.aCauchy:
                         return double.MaxValue;
                     case ParametreName.bCauchy:

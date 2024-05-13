@@ -286,7 +286,7 @@
     }
     public async void CalibrateMLI()
     {
-        Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{(Environement.IsMAUI ? "" : " Ne fermez pas longlet avant la fin du calcul")}");
+        Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{(OnlineCalibrator.Client.Environement.IsMAUI ? "" : " Ne fermez pas longlet avant la fin du calcul")}");
         StateHasChanged();
         var service = new MLService();
         await service.Train(DonneesImportes.ActualData, () =>

@@ -1,6 +1,7 @@
 ﻿using LiveChartsCore.Defaults;
 using MathNet.Numerics;
 using MessagePack;
+using Newtonsoft.Json.Linq;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,12 @@ namespace Stochastique.Distributions.Continous
         public NormalDistribution()
         {
         }
+        public NormalDistribution(double mu,double sigma)
+        {
+            AddParameter(new Parameter(ParametreName.mu, mu));
+            AddParameter(new Parameter(ParametreName.sigma, sigma));
+        }
+
 
         public override double CDF(double x)
         {

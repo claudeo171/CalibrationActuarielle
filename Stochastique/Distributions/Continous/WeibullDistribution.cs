@@ -27,6 +27,10 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
+            if (x <= 0)
+            {
+                return 0;
+            }
             return 1- Math.Exp(-Math.Pow((x/Lambda),K));
         }
 

@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics;
+﻿using Accord.Math;
+using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
 using MessagePack;
 using Stochastique.Enums;
@@ -16,19 +17,21 @@ namespace Stochastique.Distributions.Continous
         public StudentDistribution() { }
         public StudentDistribution(int n)
         {
-            AddParameter(new Parameter(ParametreName.n, n));
+            AddParameter(new Parameter(ParametreName.nStudent, n));
         }
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Student;
 
         [Key(7)]
-        public double n => GetParameter(ParametreName.n).Value;
+        public double n => GetParameter(ParametreName.nStudent).Value;
 
 
         public override double CDF(double x)
         {
-            //TODO int à la place du du double???
-            return 0.5 + x * SpecialFunctions.Gamma((n + 1) / 2) * SpecialFunctions.GeneralizedHypergeometric(new double[] { 0.5, (n + 1) / 2 }, new double[] { 1.5 }, (int)(-x * x / n));
+            double sqrt = Math.Sqrt(x * x + n);
+            double u = (x + sqrt) / (2 * sqrt);
+            return Beta.Incomplete(n / 2.0, n / 2.0, u);
+
         }
 
 
@@ -64,7 +67,7 @@ namespace Stochastique.Distributions.Continous
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             var variance = value.Variance();
-            AddParameter(new Parameter(ParametreName.n,Math.Max(3, 2* variance/(variance-1))));
+            AddParameter(new Parameter(ParametreName.nStudent, Math.Max(3, 2* variance/(variance-1))));
             base.Initialize(value, typeCalibration);    
         }
         public override double Skewness()
@@ -89,6 +92,19 @@ namespace Stochastique.Distributions.Continous
             {
                 return double.NaN;
             }
+        }
+
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            var distributionNormal=new NormalDistribution(0, 1);
+            var distributionGamma =new GammaDistribution(n / 2, 2);
+            var x = distributionNormal.Simulate(r, nbSimulations);
+            var y = distributionGamma.Simulate(r, nbSimulations);
+            for (int i = 0; i < nbSimulations; i++)
+            {
+                x[i] = x[i] * Math.Sqrt(n / y[i]);
+            }
+            return x;
         }
     }
 }

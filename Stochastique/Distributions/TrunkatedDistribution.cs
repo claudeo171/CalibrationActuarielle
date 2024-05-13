@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.Integration;
+﻿using Accord.Statistics;
+using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
 using MessagePack;
 using Stochastique.Enums;
@@ -13,7 +14,7 @@ namespace Stochastique.Distributions
     [MessagePackObject]
     public class TrunkatedDistribution : Distribution
     {
-        
+
         public TrunkatedDistribution() { }
         public TrunkatedDistribution(Distribution distrib)
         {
@@ -69,7 +70,29 @@ namespace Stochastique.Distributions
         }
 
         [Key(13)]
-        private double MinValue => Bisection.FindRoot((a) => CDF(a) - 1e-10, GetMin(), GetMax(), maxIterations: 1000);
+        private double MinValue
+        {
+            get
+            {
+                if (Type == TypeDistribution.TrunkatedBeta)
+                {
+                    return 0;
+                }
+                else
+                {
+                    double root = 0;
+                    var rst= Bisection.TryFindRoot((a) => CDF(a) - 1e-10, GetMin(), GetMax(), accuracy: 1e-8, maxIterations: 1000,out root);
+                    if (rst)
+                    {
+                        return root;
+                    }
+                    else
+                    {
+                        return GetMin();
+                    }
+                }
+            }
+        }
 
         private double GetMin()
         {
@@ -92,19 +115,46 @@ namespace Stochastique.Distributions
         }
 
         [Key(14)]
-        private double MaxValue => Bisection.FindRoot((a) => 1 - CDF(a) - 1e-10, GetMin(), GetMax(), maxIterations: 1000);
+        private double MaxValue
+        {
+            get
+            {
+                if (Type == TypeDistribution.TrunkatedBeta)
+                {
+                    return 1;
+                }
+                else
+                {
+                    double root = 0;
+                    var rst=Bisection.TryFindRoot((a) => 1 - CDF(a) - 1e-10, GetMin(), GetMax(), accuracy: 1e-8, maxIterations: 1000,out root);
+                    if (rst)
+                    {
+                        return root;
+                    }
+                    else
+                    {
+                        return GetMax();
+                    }
+                }
+            }
+        }
         [Key(15)]
         private double? ComptedSkewness { get; set; }
         [Key(16)]
         private double? ComputedKurtosis { get; set; }
+
+        private double[] SimulatedValue { get; set; }
+        public void SimulateValue()
+        {
+            if (SimulatedValue == null)
+            {
+                SimulatedValue = Simulate(new Random(3433), 100000);
+            }
+        }
         public override double ExpextedValue()
         {
-            if (ComputedExpectedValue == null)
-            {
-                var rst = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => x * PDF(x), MinValue, MaxValue, 1e-2);
-                ComputedExpectedValue = rst;
-            }
-            return ComputedExpectedValue.Value;
+            SimulateValue();
+            return SimulatedValue.Mean();
 
         }
 
@@ -123,27 +173,18 @@ namespace Stochastique.Distributions
 
         public override double Variance()
         {
-            if (ComputedVariance == null)
-            {
-                ComputedVariance = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => x * x * PDF(x), MinValue, MaxValue, 1e-2) - ExpextedValue() * ExpextedValue();
-            }
-            return ComputedVariance.Value;
+            SimulateValue();
+            return SimulatedValue.Variance();
         }
         public override double Skewness()
         {
-            if (ComptedSkewness == null)
-            {
-                ComptedSkewness = NewtonCotesTrapeziumRule.IntegrateAdaptive(x =>Math.Pow( x - ExpextedValue(),3)  * PDF(x), MinValue, MaxValue, 1e-2)/ Variance() * Math.Sqrt(Variance());
-            }
-            return ComptedSkewness.Value;
+            SimulateValue();
+            return SimulatedValue.Skewness();
         }
         public override double Kurtosis()
         {
-            if (ComputedKurtosis == null)
-            {
-                ComputedKurtosis = NewtonCotesTrapeziumRule.IntegrateAdaptive(x => Math.Pow(x - ExpextedValue(), 4) * PDF(x), MinValue, MaxValue, 1e-2) / Variance() * Variance();
-            }
-            return ComputedKurtosis.Value;
+            SimulateValue();
+            return SimulatedValue.Kurtosis();
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
@@ -175,13 +216,15 @@ namespace Stochastique.Distributions
                 ll.Add(GetLogLikelihood(value));
                 param.Add(AllParameters().Select(a => a.Value).ToList());
             }
-            var newParam = param[ll.IndexOf(ll.Max())];
-            var allParam = AllParameters().ToList();
-            for (int i = 0; i < allParam.Count; i++)
+            if (param.Count > 0)
             {
-                allParam[i].Value = newParam[i];
+                var newParam = param[ll.IndexOf(ll.Max())];
+                var allParam = AllParameters().ToList();
+                for (int i = 0; i < allParam.Count; i++)
+                {
+                    allParam[i].Value = newParam[i];
+                }
             }
-
         }
 
         public override Parameter GetParameter(ParametreName nomParametre)

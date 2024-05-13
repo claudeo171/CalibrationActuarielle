@@ -26,6 +26,10 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
+            if(x<0)
+            {
+                return 0;
+            }
             return 0.5 + 0.5 * SpecialFunctions.Erf((Math.Log(x) - mu) / (sigma * Constants.Sqrt2));
         }
 

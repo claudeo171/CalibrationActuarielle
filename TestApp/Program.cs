@@ -19,7 +19,14 @@ elt.NomData= "A";
 elt.ActualData.IncludeTrunkatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
-var toto = elt.ActualData.GetAllDistributions(); 
+var toto = elt.ActualData.GetAllDistributions();
+foreach(var v in toto)
+{
+    v.Distribution.ExpextedValue();
+    v.Distribution.Variance();
+    v.Distribution.Kurtosis();
+    v.Distribution.Skewness();
+}
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
 DonneesImportes.FromMsgPack(elt.ToMsgPack());
 elt.ActualData.CalibrerMLI();
