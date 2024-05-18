@@ -227,6 +227,15 @@ namespace Stochastique.Distributions
             }
         }
 
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            var min = QuantileDown==0? double.MinValue : BaseDistribution.InverseCDF(QuantileDown);
+            var max = QuantileUp == 1 ? double.MaxValue : BaseDistribution.InverseCDF(QuantileUp);
+            var baseSimulated = BaseDistribution.Simulate(r,(int)( nbSimulations/(QuantileUp-QuantileDown)*1.4));
+            return  baseSimulated.Where(a => a >= min && a <= max).Take(nbSimulations).ToArray();
+
+        }
+
         public override Parameter GetParameter(ParametreName nomParametre)
         {
             if (ParametresParNom.ContainsKey(nomParametre))

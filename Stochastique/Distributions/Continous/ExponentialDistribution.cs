@@ -21,28 +21,28 @@ namespace Stochastique.Distributions.Continous
         public override TypeDistribution Type => TypeDistribution.Exponential;
 
         [Key(7)]
-        public double Labda => GetParameter(ParametreName.lambda).Value;
+        public double Lambda => GetParameter(ParametreName.lambda).Value;
         [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
         public override double CDF(double x)
         {
-            return x < 0 ? 0 : 1 - Math.Exp(-Labda * x);
+            return x < 0 ? 0 : 1 - Math.Exp(-Lambda * x);
         }
 
         public override double ExpextedValue()
         {
-            return 1 / Labda;
+            return 1 / Lambda;
         }
 
         public override double PDF(double x)
         {
 
-            return x < 0 ? 0 : Labda * Math.Exp(-Labda * x);
+            return x < 0 ? 0 : Lambda * Math.Exp(-Lambda * x);
         }
 
         public override double Variance()
         {
-            return 1 / (Labda * Labda);
+            return 1 / (Lambda * Lambda);
         }
         public override double Skewness()
         {
@@ -61,6 +61,10 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.lambda, (1/ev + Math.Sqrt( 1/variance))/2));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10*ev);
+        }
+        public override double Simulate(Random r)
+        {
+            return -Math.Log(r.NextDouble()) / Lambda;
         }
     }
 }

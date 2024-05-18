@@ -73,5 +73,20 @@ namespace Stochastique.Distributions.Continous
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * ev);
         }
+
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            
+            double[] x = new GammaDistribution(D1 / 2.0,2).Simulate(r,nbSimulations);
+            double[] y = new GammaDistribution(D2 / 2.0, 2).Simulate(r, nbSimulations);
+
+            for (int i = 0; i < x.Length; i++)
+                x[i] /= y[i];
+            return x;
+        }
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
+        }
     }
 }

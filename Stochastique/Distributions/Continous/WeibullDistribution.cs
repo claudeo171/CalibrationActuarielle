@@ -84,5 +84,18 @@ namespace Stochastique.Distributions.Continous
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
 
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            double[] result = new double[nbSimulations];
+            for (int i = 0; i < nbSimulations; i++)
+                result[i] = K * Math.Pow(-Math.Log(r.NextDouble()), Lambda);
+            return result;
+        }
+
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
+        }
+
     }
 }

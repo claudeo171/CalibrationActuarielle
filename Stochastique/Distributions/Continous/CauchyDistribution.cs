@@ -60,5 +60,15 @@ namespace Stochastique.Distributions.Continous
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(Math.Max(0, B - 100 * A), B + 100 * A);
         }
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            var normal1= new NormalDistribution(0,1).Simulate(r, nbSimulations);
+            var normal2 = new NormalDistribution(0, 1).Simulate(r, nbSimulations);
+            return normal1.Select((a,i)=> a / normal2[i]).ToArray();
+        }
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
+        }
     }
 }

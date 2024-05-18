@@ -1,4 +1,5 @@
-﻿using MessagePack;
+﻿using Accord.Statistics.Distributions.Univariate;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -89,6 +90,18 @@ namespace Stochastique.Distributions.Continous
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(XM, XM + 15 * Math.Sqrt(Variance()));
 
+        }
+
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            double[] result = new double[nbSimulations];
+            for (int i = 0; i < nbSimulations; i++)
+                result[i] = XM / Math.Pow(r.NextDouble(), 1.0 / K);
+            return result;
+        }
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
         }
     }
 }

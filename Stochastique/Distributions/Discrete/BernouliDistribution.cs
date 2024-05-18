@@ -66,5 +66,10 @@ namespace Stochastique.Distributions.Discrete
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
         }
+
+        public override double Simulate(Random r)
+        {
+            return r.NextDouble()>0.5?0:1;
+        }
     }
 }

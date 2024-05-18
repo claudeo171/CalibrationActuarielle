@@ -77,5 +77,68 @@ namespace Stochastique.Distributions.Continous
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
+        }
+        public override double[] Simulate(Random r,int samples)
+        {
+            var shape = 1/GetParameter(ParametreName.theta).Value;
+            var normal=new NormalDistribution();
+            var result = new double[samples];
+            if (shape < 1)
+            {
+                double d = shape + 1.0 - 1.0 / 3.0;
+                double c = (1.0 / 3.0) / Math.Sqrt(d);
+
+                for (int i = 0; i < samples; i++)
+                    result[i] = K * Marsaglia(d, c,r, normal) * Math.Pow(r.NextDouble(), 1.0 / shape);
+            }
+            else
+            {
+                double d = shape - 1.0 / 3.0;
+                double c = (1.0 / 3.0) / Math.Sqrt(d);
+
+                for (int i = 0; i < samples; i++)
+                    result[i] = K * Marsaglia(d, c,r, normal);
+            }
+
+            return result;
+        }
+        public static double Marsaglia(double d, double c, Random r, NormalDistribution source)
+        {
+            // References:
+            //
+            // - Marsaglia, G. A Simple Method for Generating Gamma Variables, 2000
+            //
+
+            while (true)
+            {
+                // 2. Generate v = (1+cx)^3 with x normal
+                double x, t, v;
+
+                do
+                {
+                    x = source.Simulate(r);
+                    t = (1.0 + c * x);
+                    v = t * t * t;
+                } while (v <= 0);
+
+
+                // 3. Generate uniform U
+                double U = r.NextDouble();
+
+                // 4. If U < 1-0.0331*x^4 return d*v.
+                double x2 = x * x;
+                if (U < 1 - 0.0331 * x2 * x2)
+                    return d * v;
+
+                // 5. If log(U) < 0.5*x^2 + d*(1-v+log(v)) return d*v.
+                if (Math.Log(U) < 0.5 * x2 + d * (1.0 - v + Math.Log(v)))
+                    return d * v;
+
+                // 6. Goto step 2
+            }
+        }
     }
 }

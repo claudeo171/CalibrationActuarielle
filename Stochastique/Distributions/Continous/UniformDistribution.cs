@@ -105,5 +105,10 @@ namespace Stochastique.Distributions.Continous
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
         }
 
+        public override double Simulate(Random r)
+        {
+            return r.NextDouble() * (B - A) + A;
+        }
+
     }
 }

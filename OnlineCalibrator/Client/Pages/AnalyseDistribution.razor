@@ -93,11 +93,11 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label class="form-check-label">Nombre de ligne</label>
-                        <InputNumber  @bind-Value="@NbRow" />
+                        <InputNumber @bind-Value="@NbRow" />
                     </div>
                     <div class="form-group">
                         <label class="form-check-label">Nombre de colonne</label>
-                        <InputNumber  @bind-Value="@NbCol" />
+                        <InputNumber @bind-Value="@NbCol" />
                     </div>
                     <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
                 </div>
@@ -167,20 +167,12 @@
                                                     <td></td>
                                                 }
                                             }
-                                            @if(distrib.Distribution is TrunkatedDistribution)
-                                            {
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                                <td></td>
-                                            }
-                                            else
-                                            {
-                                                <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(DonneesImportes.ActualData.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
-                                                <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) / Math.Max(DonneesImportes.ActualData.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
-                                                <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) / Math.Max(DonneesImportes.ActualData.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
-                                                <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(DonneesImportes.ActualData.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
-                                            }
+
+                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((DonneesImportes.ActualData.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(DonneesImportes.ActualData.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((DonneesImportes.ActualData.Variance - @distrib.Distribution.Variance()) / Math.Max(DonneesImportes.ActualData.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((DonneesImportes.ActualData.Skewness - @distrib.Distribution.Skewness()) / Math.Max(DonneesImportes.ActualData.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((DonneesImportes.ActualData.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(DonneesImportes.ActualData.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
+
                                         </tr>
                                     }
                                 }

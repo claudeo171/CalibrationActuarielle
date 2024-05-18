@@ -71,5 +71,13 @@ namespace Stochastique.Distributions.Continous
 
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
         }
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            return new GammaDistribution(2,K/2.0).Simulate(r,nbSimulations);
+        }
+        public override double Simulate(Random r)
+        {
+            return base.Simulate(r, 1)[0];
+        }
     }
 }
