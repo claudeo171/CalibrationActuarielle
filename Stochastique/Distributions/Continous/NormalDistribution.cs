@@ -1,4 +1,5 @@
-﻿using LiveChartsCore.Defaults;
+﻿using Accord.Math;
+using LiveChartsCore.Defaults;
 using MathNet.Numerics;
 using MessagePack;
 using Newtonsoft.Json.Linq;
@@ -24,16 +25,21 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.mu, mu));
             AddParameter(new Parameter(ParametreName.sigma, sigma));
         }
-
+        [IgnoreMember]
+        public double Mu => GetParameter(ParametreName.mu).Value;
+        [IgnoreMember]
+        public double Sigma => GetParameter(ParametreName.sigma).Value;
 
         public override double CDF(double x)
         {
-            return 0.5 * (1 + SpecialFunctions.Erf((x - GetParameter(ParametreName.mu).Value) / (GetParameter(ParametreName.sigma).Value * Constants.Sqrt2)));
+            return 0.5 * (1 + SpecialFunctions.Erf((x - GetParameter(ParametreName.mu).Value) / (GetParameter(ParametreName.sigma).Value * MathNet.Numerics.Constants.Sqrt2)));
         }
 
         public override double InverseCDF(double x)
         {
-            return SpecialFunctions.ErfInv(2 * x - 1) * GetParameter(ParametreName.sigma).Value * Constants.Sqrt2 + GetParameter(ParametreName.mu).Value;
+            double inv = Normal.Inverse(x);
+
+            return Mu + Sigma * inv;
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)

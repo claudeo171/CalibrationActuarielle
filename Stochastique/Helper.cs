@@ -8,6 +8,14 @@ namespace Stochastique
 {
     public static class Helper
     {
+        public static double Divide(this double a, double b,double c)
+        {
+            if (b == 0)
+            {
+                return c;
+            }
+            return a / b;
+        }
         public static string ToBeautifulString(this double d, bool isPercent = false)
         {
             string format = isPercent ? "P" : "N";

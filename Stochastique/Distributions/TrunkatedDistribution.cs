@@ -1,4 +1,5 @@
-﻿using Accord.Statistics;
+﻿using Accord.Math;
+using Accord.Statistics;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
 using MessagePack;
@@ -8,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static alglib;
 
 namespace Stochastique.Distributions
 {
@@ -65,7 +67,7 @@ namespace Stochastique.Distributions
             }
             else
             {
-                return (baseCDF - QuantileDown) / (QuantileUp - QuantileDown);
+                return (baseCDF - QuantileDown).Divide(QuantileUp - QuantileDown,1);
             }
         }
 
@@ -216,7 +218,7 @@ namespace Stochastique.Distributions
                 ll.Add(GetLogLikelihood(value));
                 param.Add(AllParameters().Select(a => a.Value).ToList());
             }
-            if (param.Count > 0)
+            if (param.Count > 0 && ll.Any(a => !double.IsNaN(a)))
             {
                 var newParam = param[ll.IndexOf(ll.Max())];
                 var allParam = AllParameters().ToList();
@@ -225,6 +227,17 @@ namespace Stochastique.Distributions
                     allParam[i].Value = newParam[i];
                 }
             }
+            else
+            {
+                GetParameter(ParametreName.qUp).Value = 1;
+                GetParameter(ParametreName.qDown).Value = 0;
+                var parametres = BaseDistribution.AllParameters().ToList();
+                for (int i = 0; i < parametres.Count; i++)
+                {
+                    parametres[i].Value = initialParameters[i];
+                }
+            }
+
         }
 
         public override double[] Simulate(Random r, int nbSimulations)

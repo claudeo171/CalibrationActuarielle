@@ -108,16 +108,9 @@ namespace OnlineCalibrator.Shared
             int i = 0;
             foreach(var elts in Values.Order())
             {
-                double x = elts;
-                double y = loi.InverseCDF((i+0.5)/Values.Length);
-                if (i<Values.Length/2)
-                {
-                    rst[1][i] = new Point() { X = Math.Min(x,y), Y= Math.Min(x, y) };
-                }
-                else
-                {
-                    rst[1][i] = new Point() { X = Math.Max(x, y), Y = Math.Max(x, y) };
-                }
+                double x = (i + 0.5) / Values.Length;
+                double y = loi.CDF(elts);
+                rst[1][i] = new Point() { X = x, Y = x };
                 rst[0][i]=new Point() { X = x, Y = y };
                 i++;
             }

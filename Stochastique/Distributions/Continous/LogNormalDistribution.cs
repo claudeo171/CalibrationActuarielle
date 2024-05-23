@@ -50,7 +50,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double InverseCDF(double x)
         {
-            return base.InverseCDF(Math.Log(x));
+            return Math.Exp(base.InverseCDF(x));
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
