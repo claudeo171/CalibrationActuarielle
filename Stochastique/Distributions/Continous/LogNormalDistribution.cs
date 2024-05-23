@@ -48,6 +48,11 @@ namespace Stochastique.Distributions.Continous
             return (Math.Exp(sigma * sigma) - 1) * Math.Exp(2 * mu + sigma * sigma);
         }
 
+        public override double InverseCDF(double x)
+        {
+            return base.InverseCDF(Math.Log(x));
+        }
+
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             double mu = 0;

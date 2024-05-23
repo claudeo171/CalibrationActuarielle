@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics;
+﻿using Accord.Math;
+using MathNet.Numerics;
 using MessagePack;
 using Stochastique.Enums;
 using System;
@@ -34,12 +35,17 @@ namespace Stochastique.Distributions.Continous
             {
                 return 0;
             }
-            return SpecialFunctions.GammaLowerIncomplete(GetParameter(ParametreName.k).Value / 2, x) / SpecialFunctions.Gamma(GetParameter(ParametreName.k).Value / 2);
+            return Gamma.LowerIncomplete(GetParameter(ParametreName.k).Value / 2, x);
+        }
+
+        public override double InverseCDF(double p)
+        {
+            return Gamma.InverseLowerIncomplete(GetParameter(ParametreName.k).Value / 2, p);
         }
 
         public override double PDF(double x)
         {
-            return Math.Pow(0.5, K / 2) / SpecialFunctions.Gamma(K / 2) * Math.Pow(x, K / 2 - 1) * Math.Exp(-x / 2);
+            return Math.Exp(Math.Log(0.5) * K / 2 - SpecialFunctions.GammaLn(K / 2) * Math.Log(x) * (K / 2 - 1)  -x / 2);
         }
 
         public override double ExpextedValue()
