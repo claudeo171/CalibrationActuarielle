@@ -5,10 +5,12 @@ using MessagePack;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OnlineCalibrator.Shared.MachineLearning;
 using Stochastique;
 using Stochastique.Distributions;
 using Stochastique.Enums;
+using Stochastique.Test;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -76,6 +78,8 @@ namespace OnlineCalibrator.Shared
 
             }
         }
+        [IgnoreMember]
+        public DistributionWithDatas CurrentDistribution => Distributions.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution);
 
         public DonneesAAnalyser() { }
         public void Initialize() 
@@ -89,7 +93,77 @@ namespace OnlineCalibrator.Shared
         {
 
         }
+        public List<Point[]> GetPPPlot(TypeDistribution? typeDistribution = null)
+        {
+            List<Point[]> rst = new List<Point[]>();
+            rst.Add(new Point[Values.Length]);
+            rst.Add(new Point[Values.Length]);
+            Distribution loi;
+            if (typeDistribution == null)
+            {
+                loi = CalibratedDistribution;
+            }
+            else
+            {
+                loi = GetDistribution(typeDistribution.GetValueOrDefault(), null).Distribution;
+            }
 
+            int i = 0;
+            foreach (var elts in Values.Order())
+            {
+                double x = (i + 0.5) / Values.Length;
+                double y = loi.CDF(elts);
+                rst[1][i] = new Point() { X = x, Y = x };
+                rst[0][i] = new Point() { X = x, Y = y };
+                i++;
+            }
+            return rst;
+        }
+        public List<Point[]> GetCDFPDF(TypeDistribution? typeDistribution = null)
+        {
+            List<Point[]> rst = new List<Point[]>();
+            rst.Add(new Point[101]);
+            rst.Add(new Point[101]);
+            Distribution loi;
+            if (typeDistribution == null)
+            {
+                loi = CalibratedDistribution;
+            }
+            else
+            {
+                loi = GetDistribution(typeDistribution.GetValueOrDefault(), null).Distribution;
+            }
+
+            double min = Values.Min();
+            double max = Values.Max();
+
+            for(int i=0;i<=100; i++)
+            {
+                double x = min + i * (max - min) / 100;
+                rst[1][i] = new Point() { X = x, Y = loi.PDF(x) };
+                rst[0][i] = new Point() { X = x, Y = loi.CDF(x) };
+            }
+
+            return rst;
+        }
+
+        public List<Point[]> GetQuantilePlot()
+        {
+            List<Point[]> rst = new List<Point[]>();
+            rst.Add(new Point[Values.Length]);
+            rst.Add(new Point[Values.Length]);
+            rst.Add(new Point[Values.Length]);
+            rst.Add(new Point[Values.Length]);
+            Distribution loi;
+            for(int i=0;i<Values.Length;i++)
+            {
+                rst[3][i] = new Point() { X = i, Y =  0.5 - Math.Abs(CurrentDistribution.CarloQuantileTest.PValues[i]-0.5) };
+                rst[0][i] = new Point() { X = i, Y = 0.05 };
+                rst[1][i] = new Point() { X = i, Y = 0.025 };
+                rst[2][i] = new Point() { X = i, Y = 0.005 };
+            }
+            return rst;
+        }
         public List<Point[]> GetQQPlot(TypeDistribution? typeDistribution=null)
         {
             List<Point[]> rst = new List<Point[]>();
@@ -108,14 +182,23 @@ namespace OnlineCalibrator.Shared
             int i = 0;
             foreach(var elts in Values.Order())
             {
-                double x = (i + 0.5) / Values.Length;
-                double y = loi.CDF(elts);
-                rst[1][i] = new Point() { X = x, Y = x };
+                double x = elts;
+                double y = loi.InverseCDF((i + 0.5) / Values.Length);
+
+                rst[1][i] =i< Values.Length/2? new Point() { X = Math.Min(x, y), Y = Math.Min(x, y) } : new Point() { X = Math.Max(x,y), Y = Math.Max(x, y) };
                 rst[0][i]=new Point() { X = x, Y = y };
                 i++;
             }
             return rst;
         }
+
+        public void AddMonteCarloTest()
+        {
+            if(CalibratedDistribution!=null)
+            {
+                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new MonteCarloQuantileTest( Values,CalibratedDistribution,0.995));
+            }
+        }    
 
         [Key(14)]
         public List<DistributionWithDatas> VisisbleData { get; set; }

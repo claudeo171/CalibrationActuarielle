@@ -2,6 +2,7 @@
 using MessagePack;
 using Stochastique.Distributions;
 using Stochastique.Enums;
+using Stochastique.Test;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -104,5 +105,7 @@ namespace OnlineCalibrator.Shared
 
         [Key(12)]
         public double ProbabiliteMachineLearningImage { get; set; }
+        [IgnoreMember]
+        public MonteCarloQuantileTest CarloQuantileTest => TestStatistiques?.FirstOrDefault(a => a is MonteCarloQuantileTest) as MonteCarloQuantileTest;
     }
 }

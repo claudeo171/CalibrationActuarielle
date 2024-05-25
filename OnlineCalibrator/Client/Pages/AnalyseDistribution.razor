@@ -13,6 +13,7 @@
 @using Stochastique.Enums;
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
+@using Stochastique.Test
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -32,6 +33,34 @@
         <li class="breadcrumb-item active">Identification de la loi</li>
     </ol>
 </nav>
+<!-- Modal -->
+<div @onclick="HideModal" class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;background:#555555AA;":"display: none;")" id="exampleModalLong" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:100vw">
+        <div class="modal-content" style="height:90vh;width:90vw;position:absolute;top:5vh;left:5vw; display:block" >
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Graphique </h5>
+                <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close" @onclick="HideModal">
+                </button>
+            </div>
+            <div class="modal-body" style="height:80vh;width:90vw" >
+                @if (CurrentFullSizeChart != null)
+                {
+                    if (CurrentFullSizeChart.YAxes != null)
+                    {
+
+                        <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" YAxes="CurrentFullSizeChart.YAxes" />
+                    }
+                    else
+                    {
+                        <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" />
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="row">
     @if (DonneesImportes != null)
     {
@@ -72,8 +101,10 @@
                                 )
                             </InputSelect>
                         }
-                        <div>
-                            @DonneesImportes.ActualData.CalibratedDistribution?.Type
+                        <div class="pt-3">
+                            <h5 class="fw-bold">
+                                @DonneesImportes.ActualData.CalibratedDistribution?.Type
+                            </h5>
                         </div>
                         <ul>
                             @foreach (var item in DonneesImportes.ActualData.CalibratedDistribution?.AllParameters())
@@ -82,6 +113,28 @@
                             }
                         </ul>
                     }
+                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
+                    {
+                        <div class="pt-3" @onclick="()=>ShowFullScreen(PDFCDF)">
+                            <h5> PDF + CDF </h5>
+                            <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
+                        </div>
+                        @if (DonneesImportes.ActualData.CurrentDistribution.CarloQuantileTest == null)
+                        {
+                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter un test basés sur les quantiles simulés</button>
+                        }
+                        else
+                        {
+                            <InputNumber class="form-control" @bind-Value="DonneesImportes.ActualData.CurrentDistribution.CarloQuantileTest.Alpha" />
+                            <div class="pt-3" @onclick="()=>ShowFullScreen(Quantile)">
+                                <h5>Quantile Plot</h5>
+                                <CartesianChart Series="Quantile.Series" DrawMarginFrame="Quantile.DrawMarginFrame" />
+                            </div>
+                        }
+
+                    }
+
+
 
                     <!--A réactiver quand je ferais le ml en full js <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>-->
                 </div>
@@ -111,8 +164,17 @@
                 <div class="card-body">
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-                        <div> QQPlot </div>
-                        <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
+                        <div @onclick="()=>ShowFullScreen(QQPlot)">
+                            QQPlot
+                            <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame"  />
+                        </div>
+                    }
+                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
+                    {
+                        <div @onclick="()=>ShowFullScreen(PPPlot)">
+                            PPPlot
+                            <CartesianChart Series="PPPlot.Series" DrawMarginFrame="PPPlot.DrawMarginFrame" />
+                        </div>
                     }
                 </div>
             </div>
@@ -202,12 +264,20 @@
 </div>
 
 
+
+
 @code {
     private bool isInit;
     private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.KSTest, MethodeCalibrationRetenue.Manuelle };
     private List<DistributionWithDatas>? distributions;
     private DonneesImportes? DonneesImportes;
     private ChartViewModelLine? QQPlot;
+    private ChartViewModelLine? PPPlot;
+    private ChartViewModelLine? PDFCDF;
+    private ChartViewModelLine? Quantile;
+
+    private ChartViewModelLine? CurrentFullSizeChart;
+    private bool showModal;
     private List<string> Notifications = new List<string>();
     private int NbRow = 1000;
     private int NbCol = 10;
@@ -272,7 +342,28 @@
         QQPlot = new ChartViewModelLine(
         DonneesImportes.ActualData?.GetQQPlot(),
         new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
-        new List<Paint>() { null, null });
+        new List<Paint>() { null, null },
+        new List<double>() { 0, 0 }, new List<Paint>() { null, null });
+        PPPlot = new ChartViewModelLine(
+        DonneesImportes.ActualData?.GetPPPlot(),
+        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+        new List<Paint>() { null, null },
+        new List<double>() { 0, 0 }, new List<Paint>() { null, null });
+        PDFCDF = new ChartViewModelLine(
+            DonneesImportes.ActualData?.GetCDFPDF(),
+            new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<Paint>() { null, null },
+        new List<double>() { 0, 0 }, new List<Paint>() { null, null }, true
+        );
+        if (DonneesImportes.ActualData?.CurrentDistribution?.CarloQuantileTest != null)
+        {
+            Quantile = new ChartViewModelLine(
+                DonneesImportes.ActualData?.GetQuantilePlot(),
+                new List<Paint>() { null, null, null, null },
+                new List<Paint>() { new SolidColorPaint(new SKColor(0xFFFFFF55)), new SolidColorPaint(new SKColor(0xFFFFA555)), new SolidColorPaint(new SKColor(0xFFFF0055)), null },
+                new List<double>() { 0, 0, 0, 10 }, new List<Paint>() { null, null, null,  new SolidColorPaint( ) { Color= SKColors.Blue, IsFill=true  } }
+            );
+        }
         StateHasChanged();
     }
     public async void ExportSample()
@@ -286,6 +377,12 @@
             sb.AppendLine(string.Join(";", sample.Select(a => a.ToString())));
         }
         await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+    }
+    public async void AddMonteCarlo()
+    {
+        DonneesImportes?.ActualData?.AddMonteCarloTest();
+        UpdateChart();
+        SaveData();
     }
     public async void CalibrateMLI()
     {
@@ -304,5 +401,15 @@
     public void SuppressionNotification(string notif)
     {
         Notifications.Remove(notif);
+    }
+
+    public async void ShowFullScreen(ChartViewModelLine chartViewModelLine)
+    {
+        CurrentFullSizeChart = chartViewModelLine;
+        showModal = true;
+    }
+    public void HideModal()
+    {
+        showModal = false;
     }
 }

@@ -9,10 +9,11 @@ namespace OnlineCalibrator.Shared
     public enum TypeTestStatistique
     {
         ShapiroWilk, JarqueBera,
-        KolmogorovSmirnov
+        KolmogorovSmirnov,
+        MonteCarloQuantile
     }
     public enum TypeDonnees
     {
-        Normal,NotNormal,NA
+        Normal,NotNormal,NA,FollowDistribution,NotFollowDistribution
     }
 }

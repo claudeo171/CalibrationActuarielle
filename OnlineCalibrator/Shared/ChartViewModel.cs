@@ -2,6 +2,8 @@
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.SkiaSharpView;
+using LiveChartsCore.SkiaSharpView.Drawing;
+using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MathNet.Numerics;
 using MessagePack;
@@ -21,18 +23,26 @@ namespace OnlineCalibrator.Shared
         public ChartViewModelLine(Point[] valeurs)
         {
             Series = new ISeries[0];
-            AddSerie(valeurs, null, new SolidColorPaint(SKColors.CornflowerBlue));
+            AddSerie(valeurs, null, new SolidColorPaint(SKColors.CornflowerBlue),0,0,null,false);
         }
-        public ChartViewModelLine(List<Point[]> valeurs, List<Paint> stroke,List<Paint> fill)
+        public ChartViewModelLine(List<Point[]> valeurs, List<Paint> stroke,List<Paint> fill,List<double> size,List<Paint> color,bool differentAxes = false)
         {
             Series = new ISeries[0];
+            if(differentAxes)
+            {
+                YAxes = new Axis[valeurs.Count];
+            }
             for (int i=0;i<valeurs.Count;i++)
             {
-                AddSerie(valeurs[i], stroke[i], fill[i]);
+                AddSerie(valeurs[i], stroke[i], fill[i], i, size[i], color[i],differentAxes);
+                if (differentAxes)
+                {
+                    YAxes[i] = new Axis();
+                }
             }
         }
 
-        public void AddSerie(Point[] valeurs, Paint? stroke, Paint? fill)
+        public void AddSerie(Point[] valeurs, Paint? stroke, Paint? fill, int indice, double size, Paint color,bool differentAxes)
         {
             var serieAsList=Series.ToList();
             serieAsList.Add(new LineSeries<ObservablePoint>
@@ -40,9 +50,15 @@ namespace OnlineCalibrator.Shared
                 Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
                 Fill = fill, // mark
                 Stroke = stroke,
-                GeometryFill = null,
-                GeometryStroke = null
+                GeometryFill = color,
+                GeometryStroke = color,
+                GeometrySize = size
+               
             });
+            if (differentAxes )
+            {
+                (serieAsList.Last() as LineSeries<ObservablePoint>).ScalesYAt = indice;
+            }
             Series= serieAsList.ToArray();
         }
 
@@ -57,6 +73,10 @@ namespace OnlineCalibrator.Shared
             Fill = new SolidColorPaint(new SKColor(220, 220, 220)),
             Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
         };
+
+        [Key(2)]
+        public Axis[] YAxes { get; set; }
+
     }
 
     [MessagePackObject]

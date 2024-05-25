@@ -17,10 +17,10 @@ namespace Stochastique.Distributions.Continous
         public override TypeDistribution Type => TypeDistribution.Beta;
 
         [Key(7)]
-        public double A => GetParameter(ParametreName.a).Value;
+        public double A => GetParameter(ParametreName.aBeta).Value;
 
         [Key(8)]
-        public double B => GetParameter(ParametreName.b).Value;
+        public double B => GetParameter(ParametreName.bBeta).Value;
         [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
         [IgnoreMember]
@@ -28,9 +28,21 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
-            if(x<0) return 0;
-            if(x>1) return 1;
-            return SpecialFunctions.BetaIncomplete(A, B, x) / SpecialFunctions.Beta(A, B);
+            if(x<=0) return 0;
+            if(x>=1) return 1;
+            return Accord.Math.Beta.Incomplete(A, B, x);
+        }
+
+        public override double InverseCDF(double x)
+        {
+            try
+            {
+                return Accord.Math.Beta.IncompleteInverse(A, B, x);
+            }
+            catch(Exception e)
+            {
+                return 0;
+            }
         }
 
         public override double ExpextedValue()
@@ -66,8 +78,8 @@ namespace Stochastique.Distributions.Continous
             var repot = new alglib.polynomialsolver.polynomialsolverreport();
             alglib.xparams xparams = new alglib.xparams(1);
             alglib.polynomialsolver.polynomialsolve(new double[4] { 0, 0, variance/ev -1 + ev, variance/ev/ev }, 3,ref rst, repot, xparams);
-            AddParameter(new Parameter(ParametreName.a, rst.Where(a => a.y == 0 && a.x!=0).Min(a => a.x)));
-            AddParameter(new Parameter(ParametreName.b, A*(1-ev)/ev));
+            AddParameter(new Parameter(ParametreName.aBeta, Math.Max(1e-6, rst.Where(a => a.y == 0 && a.x!=0).Min(a => a.x))));
+            AddParameter(new Parameter(ParametreName.bBeta, Math.Max(1e-6, A *(1-ev)/ev)));
 
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);

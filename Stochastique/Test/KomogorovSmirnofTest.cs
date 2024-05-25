@@ -31,6 +31,10 @@ namespace Stochastique.Test
                     StateH0 = TypeDonnees.Normal;
                     StateH1 = TypeDonnees.NotNormal;
                     break;
+                default: 
+                    StateH0 = TypeDonnees.FollowDistribution;
+                    StateH1 = TypeDonnees.NotFollowDistribution;
+                    break;
                     //TODO A completer
             }
             PValue = Test.PValue;

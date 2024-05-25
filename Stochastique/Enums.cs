@@ -16,7 +16,7 @@ namespace Stochastique.Enums
         k,qUp,qDown,
         p,lambda,r,N,a,b,d1,d2,
         theta,aCauchy,bCauchy,
-        Np,xm
+        Np,xm,aBeta,bBeta
     }
 
     public enum MethodeCalibrationRetenue
