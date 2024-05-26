@@ -297,6 +297,7 @@
     private void SupprimerDonnee()
     {
         DonneesImportes = null;
+        sessionStorage.RemoveItemAsync("donneesImportes");
     }
 
     private async void SauvegarderDonnee()
