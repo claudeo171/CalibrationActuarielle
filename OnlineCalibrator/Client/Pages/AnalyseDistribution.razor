@@ -71,13 +71,13 @@
                 </div>
                 <div class="card-body">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,true)" value="@DonneesImportes.ActualData.IncludeTrunkatedDistributions" id="flexCheckDefault">
+                        <input class="form-check-input" type="checkbox" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,true)" checked=@(DonneesImportes.ActualData.IncludeTrunkatedDistributions) id="flexCheckDefault" />
                         <label class="form-check-label" for="flexCheckDefault">
                             Inclure les distributions tronqués
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,false)" value="@DonneesImportes.ActualData.IsDiscreteDistribution">
+                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,false)" checked=@(DonneesImportes.ActualData.IsDiscreteDistribution) />
                         <label class="form-check-label" for="flexCheckDefault">
                             Distributions discrètes?
                         </label>
