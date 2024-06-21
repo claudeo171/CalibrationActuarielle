@@ -70,12 +70,19 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            AddParameters(CalibrateWithMoment(value));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Statistics.Variance(value)));
+        }
+
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
-            AddParameter(new Parameter(ParametreName.theta, variance/ev));
-            AddParameter(new Parameter(ParametreName.k, ev*ev / variance));
-            base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
+            result.Add(new Parameter(ParametreName.theta, variance / ev));
+            result.Add(new Parameter(ParametreName.k, ev * ev / variance));
+            return result;
         }
         public override double Simulate(Random r)
         {

@@ -69,5 +69,12 @@ namespace Stochastique.Distributions
         {
             return LoiBase.Kurtosis();
         }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
+        {
+            var param = LoiBase.CalibrateWithMoment(values).ToList();
+            param.Add(new Parameter(ParametreName.aAfine, 1));
+            param.Add(new Parameter(ParametreName.bAfine, 0));
+            return param;
+        }
     }
 }

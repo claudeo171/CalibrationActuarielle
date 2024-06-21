@@ -83,14 +83,21 @@ namespace Stochastique.Distributions.Discrete
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            AddParameters(CalibrateWithMoment(value));
+
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
+        }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
             //We take the hypothesis of NP = 0,5 * N
-            AddParameter(new Parameter(ParametreName.n, Math.Max(1, (int)(ev * 2))));
-            AddParameter(new Parameter(ParametreName.N, Math.Max(1, (int)(-2 * ev + 2 * variance / ev) / (2 * variance / ev - 1))));
-            AddParameter(new Parameter(ParametreName.Np, (int)N * 0 / 5));
-            base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
+            result.Add(new Parameter(ParametreName.n, Math.Max(1, (int)(ev * 2))));
+            result.Add(new Parameter(ParametreName.N, Math.Max(1, (int)(-2 * ev + 2 * variance / ev) / (2 * variance / ev - 1))));
+            result.Add(new Parameter(ParametreName.Np, (int)result[1].Value * 0 / 5));
+            return result;
         }
     }
 }

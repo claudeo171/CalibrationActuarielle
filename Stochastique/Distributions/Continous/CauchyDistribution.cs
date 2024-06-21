@@ -53,12 +53,19 @@ namespace Stochastique.Distributions.Continous
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             double k = 0;
-            var ev = Statistics.Mean(value);
-
-            AddParameter(new Parameter(ParametreName.aCauchy, 1));
-            AddParameter(new Parameter(ParametreName.bCauchy, ev));
+            AddParameters(CalibrateWithMoment(value));
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(Math.Max(0, B - 100 * A), B + 100 * A);
+        }
+
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
+            var ev = Statistics.Mean(value);
+
+            result.Add(new Parameter(ParametreName.aCauchy, 1));
+            result.Add(new Parameter(ParametreName.bCauchy, ev));
+            return result;
         }
         public override double[] Simulate(Random r, int nbSimulations)
         {

@@ -2,6 +2,7 @@
 using Accord.Statistics;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
+using MathNet.Numerics.Statistics;
 using MessagePack;
 using Stochastique.Enums;
 using System;
@@ -191,21 +192,31 @@ namespace Stochastique.Distributions
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             List<double> ll = new List<double>();
+            var mean = value.Mean();
             List<List<double>> param = new List<List<double>>();
             BaseDistribution.Initialize(value, typeCalibration);
             var initialParameters = BaseDistribution.AllParameters().Select(a => a.Value).ToList();
-            List<double> ratios = new List<double>() { 1, 0.1, 0.5, 0.9, 1.1, 1.5, 2, 10 };
+            List<(double, double, double, double)> ratios = new List<(double, double, double, double)>() 
+            { 
+                (-mean/2,5,0,0.5),
+                (mean/2,5,0.5,1),
+                (mean/5,5,0.3,0.8),
+                (0,5,0.2,0.8),
+                (0,5,0.3,0.7),
+                (-mean/2,5,0.1,0.6),
+                (mean/2,5,0.4,0.9),
+            };
             AddParameter(new Parameter(ParametreName.qUp, 1));
             AddParameter(new Parameter(ParametreName.qDown, 0));
             foreach (var ratio in ratios)
             {
-                var parametres = BaseDistribution.AllParameters().ToList();
-                for (int i = 0; i < parametres.Count; i++)
+                var parametres = BaseDistribution.GetParameterValues(value,ratio.Item1,ratio.Item2);
+                for (int i = 0; i < parametres.Length; i++)
                 {
-                    parametres[i].Value = initialParameters[i] * ratio;
+                    BaseDistribution.AllParameters().ElementAt(i).Value = parametres[i];
                 }
-                GetParameter(ParametreName.qUp).Value = 1;
-                GetParameter(ParametreName.qDown).Value = 0;
+                GetParameter(ParametreName.qDown).Value = ratio.Item3;
+                GetParameter(ParametreName.qUp).Value = ratio.Item4;
                 try
                 {
                     base.Initialize(value, typeCalibration);
@@ -280,6 +291,12 @@ namespace Stochastique.Distributions
             return base.AllParameters().Concat(BaseDistribution.AllParameters());
         }
 
-
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
+        {
+            var param=BaseDistribution.CalibrateWithMoment(values).ToList();
+            param.Add(new Parameter(ParametreName.qUp, 1));
+            param.Add(new Parameter(ParametreName.qDown, 0));
+            return param;
+        }
     }
 }

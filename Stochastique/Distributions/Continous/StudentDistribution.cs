@@ -66,10 +66,18 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            var variance = value.Variance();
-            AddParameter(new Parameter(ParametreName.nStudent, Math.Max(3, 2* variance/(variance-1))));
+            AddParameters(CalibrateWithMoment(value));
+
             base.Initialize(value, typeCalibration);    
         }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
+            var variance = value.Variance();
+            result.Add(new Parameter(ParametreName.nStudent, Math.Max(3, 2 * variance / (variance - 1))));
+            return result;
+        }
+
         public override double Skewness()
         {
             if (n > 3)

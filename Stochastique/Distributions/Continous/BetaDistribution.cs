@@ -72,17 +72,24 @@ namespace Stochastique.Distributions.Continous
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             double k = 0;
+
+            AddParameters( CalibrateWithMoment(value));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
+        }
+
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
             alglib.complex[] rst = new alglib.complex[3];
             var repot = new alglib.polynomialsolver.polynomialsolverreport();
             alglib.xparams xparams = new alglib.xparams(1);
-            alglib.polynomialsolver.polynomialsolve(new double[4] { 0, 0, variance/ev -1 + ev, variance/ev/ev }, 3,ref rst, repot, xparams);
-            AddParameter(new Parameter(ParametreName.aBeta, Math.Max(1e-6, rst.Where(a => a.y == 0 && a.x!=0).Min(a => a.x))));
-            AddParameter(new Parameter(ParametreName.bBeta, Math.Max(1e-6, A *(1-ev)/ev)));
-
-            base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
+            alglib.polynomialsolver.polynomialsolve(new double[4] { 0, 0, variance / ev - 1 + ev, variance / ev / ev }, 3, ref rst, repot, xparams);
+            result.Add(new Parameter(ParametreName.aBeta, Math.Max(1e-6, rst.Where(a => a.y == 0 && a.x != 0).Min(a => a.x))));
+            result.Add(new Parameter(ParametreName.bBeta, Math.Max(1e-6, result[0].Value * (1 - ev) / ev)));
+            return result;
         }
 
         public override double[] Simulate(Random r, int nbSimulations)

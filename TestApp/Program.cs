@@ -7,11 +7,11 @@ var d = Double.MinValue;
 
 Console.WriteLine(d.ToBeautifulString());
 //DonneesImportes.FromMsgPack(File.ReadAllBytes("C:\\Users\\Claude\\Downloads\\log (3).data"));
-var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents\\data.csv", FileMode.Open,FileAccess.Read), "abcd.csv");
+var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\Documents\\testLoiTronque.csv", FileMode.Open,FileAccess.Read), "abcd.csv");
 
 
 elt.NomData= elt.Donnees.First().Name;
-elt.ActualData.IncludeTrunkatedDistributions = false;
+elt.ActualData.IncludeTrunkatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
 
@@ -22,7 +22,7 @@ elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationReten
 elt.ActualData.GetQQPlot();
 elt.ActualData.AddMonteCarloTest();
 var toto2 = elt.ActualData.CurrentDistribution.CarloQuantileTest.Alpha;
-elt.ActualData.GetQuantilePlot();
+elt.ActualData.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Manuelle);
 foreach (var v in toto)
 {
     v.Distribution.ExpextedValue();

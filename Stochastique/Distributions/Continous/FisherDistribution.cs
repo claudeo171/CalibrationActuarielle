@@ -66,12 +66,9 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            var ev = Statistics.Mean(value);
-            var variance = Statistics.Variance(value);
-            AddParameter(new Parameter(ParametreName.d2,Math.Max(5, (int)(2*ev/ev-1))));
-            AddParameter(new Parameter(ParametreName.d1,(int)(2*D2 * D2 * D2-4 * D2 * D2/(variance*(D2-2)*(D2-2)*(D2-4)-2*D2))));
+            AddParameters(CalibrateWithMoment(value));
             base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(0, 10 * ev);
+            IntervaleForDisplay = new Intervale(0, 10 * Statistics.Mean(value));
         }
 
         public override double[] Simulate(Random r, int nbSimulations)
@@ -87,6 +84,16 @@ namespace Stochastique.Distributions.Continous
         public override double Simulate(Random r)
         {
             return base.Simulate(r, 1)[0];
+        }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
+            var ev = Statistics.Mean(value);
+            var variance = Statistics.Variance(value);
+            result.Add(new Parameter(ParametreName.d2, Math.Max(5, (int)(2 * ev / ev - 1))));
+            var d2 = result[0].Value;
+            result.Add(new Parameter(ParametreName.d1, (int)(2 * d2 * d2 * d2 - 4 * d2 * d2 / (variance * (d2 - 2) * (d2 - 2) * (d2 - 4) - 2 * d2))));
+            return result;
         }
     }
 }

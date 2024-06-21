@@ -55,14 +55,7 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            double mu = 0;
-            double sigma = 0;
-            mu = value.Sum(a => Math.Log(a)) / value.Count();
-            sigma = Math.Sqrt(value.Sum(a => Math.Log(a) * Math.Log(a)) / value.Count() - mu * mu);
-
-
-            AddParameter(new Parameter(ParametreName.mu, mu));
-            AddParameter(new Parameter(ParametreName.sigma, sigma));
+            AddParameters(CalibrateWithMoment(value));
             if (IsInInconditionnalSupport(value))
             {
                 switch (typeCalibration)
@@ -78,6 +71,20 @@ namespace Stochastique.Distributions.Continous
             VerifyParameterValue();
             IntervaleForDisplay = new Intervale(0, Math.Exp(mu + 5 * sigma));
 
+        }
+
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
+            double mu = 0;
+            double sigma = 0;
+            mu = value.Sum(a => Math.Log(a)) / value.Count();
+            sigma = Math.Sqrt(value.Sum(a => Math.Log(a) * Math.Log(a)) / value.Count() - mu * mu);
+
+
+            result.Add(new Parameter(ParametreName.mu, mu));
+            result.Add(new Parameter(ParametreName.sigma, sigma));
+            return result;
         }
         public override double Simulate(Random r)
         {

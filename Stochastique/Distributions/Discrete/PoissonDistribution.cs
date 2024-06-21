@@ -47,11 +47,18 @@ namespace Stochastique.Distributions.Discrete
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            AddParameters(CalibrateWithMoment(value));
+
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
+        }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
-            AddParameter(new Parameter(ParametreName.lambda, (ev + variance)/2));
-            base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(variance));
+            result.Add(new Parameter(ParametreName.lambda, (ev + variance) / 2));
+            return result;
         }
     }
 }

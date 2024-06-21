@@ -35,7 +35,7 @@
                     <div class="card-body">
                         <label class="btn btn-primary  mx-0">
                             Selectionner votre jeu de données
-                            <InputFile class="visually-hidden" OnChange="@LoadFiles"></InputFile>
+                            <InputFile class="visually-hidden" accept=".csv" OnChange="@LoadFiles"></InputFile>
 
                         </label>
                         <button type="button" class="btn btn-info mx-1" data-toggle="modal" data-target="#exampleModalLong" @onclick="@ShowModal">

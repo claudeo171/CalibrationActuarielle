@@ -44,15 +44,21 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            AddParameters(CalibrateWithMoment(value));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(Mu - 5 * Sigma, Mu + 5 * Sigma);
+
+        }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             double mu = 0;
             double sigma = 0;
             mu = value.Sum() / value.Count();
             sigma = Math.Sqrt(value.Sum(a => a * a) / value.Count() - mu * mu);
-            AddParameter(new Parameter(ParametreName.mu, mu));
-            AddParameter(new Parameter(ParametreName.sigma, sigma));
-            base.Initialize(value, typeCalibration);
-            IntervaleForDisplay = new Intervale(mu - 5 * sigma, mu + 5 * sigma);
-
+            result.Add(new Parameter(ParametreName.mu, mu));
+            result.Add(new Parameter(ParametreName.sigma, sigma));
+            return result;
         }
 
         public override double PDF(double x)

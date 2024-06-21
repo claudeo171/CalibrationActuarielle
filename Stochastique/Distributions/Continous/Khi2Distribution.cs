@@ -1,5 +1,6 @@
 ﻿using Accord.Math;
 using MathNet.Numerics;
+using MathNet.Numerics.Statistics;
 using MessagePack;
 using Stochastique.Enums;
 using System;
@@ -69,13 +70,19 @@ namespace Stochastique.Distributions.Continous
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            AddParameters(CalibrateWithMoment(value));
+            base.Initialize(value, typeCalibration);
+
+            IntervaleForDisplay = new Intervale(Math.Max(0, K - 10 * K), K + 10 * K);
+        }
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
+        {
+            List<Parameter> result = new List<Parameter>();
             double k = 0;
             k = value.Sum() / value.Count();
 
-            AddParameter(new Parameter(ParametreName.k, k));
-            base.Initialize(value, typeCalibration);
-
-            IntervaleForDisplay = new Intervale(Math.Max(0, k - 10 * k), k + 10 * k);
+            result.Add(new Parameter(ParametreName.k, k));
+            return result;
         }
         public override double[] Simulate(Random r, int nbSimulations)
         {

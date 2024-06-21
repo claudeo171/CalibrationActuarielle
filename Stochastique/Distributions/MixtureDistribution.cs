@@ -11,6 +11,11 @@ namespace Stochastique.Distributions
     {
         public override TypeDistribution Type => throw new NotImplementedException();
 
+        public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
+        {
+            throw new NotImplementedException();
+        }
+
         public override double CDF(double x)
         {
             throw new NotImplementedException();

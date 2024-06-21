@@ -339,6 +339,13 @@ namespace Stochastique.Distributions
                 ParametresParNom.Add(parameter.Name, parameter);
             }
         }
+        public void AddParameters(IEnumerable<Parameter> parameter)
+        {
+            foreach (var param in parameter)
+            {
+                AddParameter(param);
+            }
+        }
         /// <summary>
         /// Get a parameter by its name
         /// </summary>
@@ -565,6 +572,11 @@ namespace Stochastique.Distributions
         public abstract double Skewness();
 
         public abstract double Kurtosis();
+        public abstract IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values);
+        public double[] GetParameterValues(IEnumerable<double> values, double decalage, double ratio)
+        {
+            return CalibrateWithMoment(values.Select(a=>a*ratio+decalage)).Select(a=> a.Value).ToArray();
+        }
     }
 
 }
