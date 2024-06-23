@@ -31,7 +31,7 @@ namespace Stochastique.Distributions
 
         public override double PDF(double x)
         {
-            throw new NotImplementedException();
+            return LoiBase.PDF((x - GetParameter(ParametreName.bAfine).Value) / GetParameter(ParametreName.aAfine).Value) / GetParameter(ParametreName.aAfine).Value;
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
@@ -42,12 +42,12 @@ namespace Stochastique.Distributions
 
         public override double CDF(double x)
         {
-            throw new NotImplementedException();
+            return LoiBase.CDF((x - GetParameter(ParametreName.bAfine).Value) / GetParameter(ParametreName.aAfine).Value);
         }
 
         public override double InverseCDF(double x)
         {
-            throw new NotImplementedException();
+            return LoiBase.InverseCDF(x) * GetParameter(ParametreName.aAfine).Value + GetParameter(ParametreName.bAfine).Value;
         }
 
         public override double ExpextedValue()
