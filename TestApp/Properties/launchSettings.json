@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "TestApp": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Claude\\Downloads\\test (3).data\" A 1000"
+    }
+  }
+}

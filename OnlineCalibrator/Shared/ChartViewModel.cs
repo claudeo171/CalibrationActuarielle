@@ -50,8 +50,8 @@ namespace OnlineCalibrator.Shared
                 Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
                 Fill = fill, // mark
                 Stroke = stroke,
-                GeometryFill = color,
-                GeometryStroke = color,
+                GeometryFill = color==null? null: new SolidColorPaint(color.Color),
+                GeometryStroke = color == null ? null : new SolidColorPaint(color.Color) { StrokeThickness=2},
                 GeometrySize = size
                
             });

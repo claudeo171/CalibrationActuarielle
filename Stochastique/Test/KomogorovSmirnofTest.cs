@@ -24,7 +24,14 @@ namespace Stochastique.Test
         {
             Values = values;
             Distribution = d;
-            Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values,values.Select((x,i)=> Distribution.CDF((i+0.5)/values.Length)).ToArray());
+            try
+            {
+                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values, values.Select((x, i) => Distribution.CDF((i + 0.5) / values.Length)).ToArray());
+            }
+            catch (Exception e)
+            {
+                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values, values.Select((x, i) => Double.IsNaN(Distribution.CDF((i + 0.5) / values.Length))? Distribution.CDF((i + 0.5) / values.Length) : 0).ToArray());
+            }
             switch(Distribution.Type)
             {
                 case Enums.TypeDistribution.Normal:

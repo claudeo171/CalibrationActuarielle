@@ -11,7 +11,7 @@
     <PackageReference Include="Accord" Version="3.8.0" />
     <PackageReference Include="Accord.Statistics" Version="3.8.0" />
     <PackageReference Include="alglib.net" Version="3.19.0" />
-    <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
+    <PackageReference Include="LiveChartsCore" Version="2.0.0-rc2" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="MersenneTwister" Version="1.0.6" />
     <PackageReference Include="MessagePack" Version="2.5.129" />

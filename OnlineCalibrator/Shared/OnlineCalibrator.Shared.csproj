@@ -10,8 +10,8 @@
   <ItemGroup>
     <PackageReference Include="Accord" Version="3.8.0" />
     <PackageReference Include="Accord.Statistics" Version="3.8.0" />
-    <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.710" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.710" />
+    <PackageReference Include="LiveChartsCore" Version="2.0.0-rc2" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc2" />
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     <PackageReference Include="MessagePack" Version="2.5.129" />
     <PackageReference Include="MessagePackAnalyzer" Version="2.5.129">
@@ -23,7 +23,6 @@
     <PackageReference Include="Microsoft.ML.CpuMath" Version="3.0.0" />
     <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="3.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SkiaSharp" Version="2.88.6" />
   </ItemGroup>
 
   <ItemGroup>

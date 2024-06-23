@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "OnlineCalibrator.Batch": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Claude\\Downloads\\test (3).data\" A 1000"
+    }
+  }
+}
