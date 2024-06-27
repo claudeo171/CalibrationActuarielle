@@ -2,6 +2,7 @@
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
+using MathNet.Symbolics;
 using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Distributions.Discrete;
@@ -339,6 +340,28 @@ namespace Stochastique.Distributions
                 ParametresParNom.Add(parameter.Name, parameter);
             }
         }
+        public virtual double[] GetMomentList(int nb)
+        {
+            var rst=new double[nb];
+            var fct= FonctionGenerateurDesMoment();
+            var variable = SymbolicExpression.Variable("t");
+            var values= new Dictionary<string,FloatingPoint>();
+            values.Add("t",0);
+            foreach(var v in AllParameters())
+            {
+                values.Add(v.Name.ToString(), v.Value);
+            }
+            for (int i=0;i<nb;i++)
+            {
+                fct=fct.Differentiate(variable);
+                rst[i] = fct.Evaluate(values).RealValue;
+            }
+            return rst;
+        }
+        public virtual SymbolicExpression FonctionGenerateurDesMoment()
+        {
+            return SymbolicExpression.E;
+        }
         public void AddParameters(IEnumerable<Parameter> parameter)
         {
             foreach (var param in parameter)
@@ -576,6 +599,11 @@ namespace Stochastique.Distributions
         public double[] GetParameterValues(IEnumerable<double> values, double decalage, double ratio)
         {
             return CalibrateWithMoment(values.Select(a=>a*ratio+decalage)).Select(a=> a.Value).ToArray();
+        }
+
+        public override string ToString()
+        {
+            return Type +"("+string.Concat(AllParameters().Select(a=>a.Name +":"+a.Value))+")";
         }
     }
 

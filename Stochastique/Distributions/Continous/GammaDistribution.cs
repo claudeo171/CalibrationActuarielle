@@ -13,8 +13,6 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class GammaDistribution : Distribution
     {
-        private double v;
-        private double theta;
         public GammaDistribution()
         {
 
@@ -90,8 +88,8 @@ namespace Stochastique.Distributions.Continous
         }
         public override double[] Simulate(Random r,int samples)
         {
-            var shape = 1/GetParameter(ParametreName.theta).Value;
-            var normal=new NormalDistribution();
+            var shape = K;
+            var normal=new NormalDistribution(0,1);
             var result = new double[samples];
             if (shape < 1)
             {
@@ -99,7 +97,7 @@ namespace Stochastique.Distributions.Continous
                 double c = (1.0 / 3.0) / Math.Sqrt(d);
 
                 for (int i = 0; i < samples; i++)
-                    result[i] = K * Marsaglia(d, c,r, normal) * Math.Pow(r.NextDouble(), 1.0 / shape);
+                    result[i] = Theta * Marsaglia(d, c,r, normal) * Math.Pow(r.NextDouble(), 1.0 / shape);
             }
             else
             {
@@ -107,7 +105,7 @@ namespace Stochastique.Distributions.Continous
                 double c = (1.0 / 3.0) / Math.Sqrt(d);
 
                 for (int i = 0; i < samples; i++)
-                    result[i] = K * Marsaglia(d, c,r, normal);
+                    result[i] = Theta * Marsaglia(d, c,r, normal);
             }
 
             return result;

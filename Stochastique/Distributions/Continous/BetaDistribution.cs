@@ -25,7 +25,14 @@ namespace Stochastique.Distributions.Continous
         public override double InconditionnalMinimumPossibleValue => 0;
         [IgnoreMember]
         public override double InconditionnalMaximumPossibleValue => 1;
-
+        public BetaDistribution()
+        {
+            
+        }
+        public BetaDistribution(double a, double b)
+        {
+            AddParameters(new List<Parameter> { new Parameter(ParametreName.aBeta, a), new Parameter(ParametreName.bBeta, b) });
+        }
         public override double CDF(double x)
         {
             if(x<=0) return 0;

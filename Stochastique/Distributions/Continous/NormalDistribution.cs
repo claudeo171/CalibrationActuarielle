@@ -1,6 +1,7 @@
 ﻿using Accord.Math;
 using LiveChartsCore.Defaults;
 using MathNet.Numerics;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 using MessagePack;
 using Newtonsoft.Json.Linq;
 using Stochastique.Enums;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Stochastique.Distributions.Continous
 {
@@ -95,7 +97,7 @@ namespace Stochastique.Distributions.Continous
                     result[2 * i + 1] = Math.Sqrt(-2 * Math.Log(u1)) * Math.Sin(2 * Math.PI * u2);
                 }
             }
-            return result;
+            return result.Select(a=>Mu + a*Sigma).ToArray();
         }
 
         public override double Skewness()
@@ -106,6 +108,13 @@ namespace Stochastique.Distributions.Continous
         public override double Kurtosis()
         {
             return 0;
+        }
+        public override Expr FonctionGenerateurDesMoment()
+        {
+            var mu = Expr.Variable("mu");
+            var sigma = Expr.Variable("sigma");
+            var t = Expr.Variable("t");
+            return Expr.E.Pow(t*mu+0.5*sigma.Pow(2)*t.Pow(2));
         }
     }
 }

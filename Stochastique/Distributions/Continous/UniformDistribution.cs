@@ -19,6 +19,11 @@ namespace Stochastique.Distributions.Continous
         {
 
         }
+        public UniformDistribution(double a,double b)
+        {
+            AddParameter(new Parameter(ParametreName.a, a));
+            AddParameter(new Parameter(ParametreName.b, b));
+        }
 
         [Key(6)]
         public double A => GetParameter(ParametreName.a).Value;
