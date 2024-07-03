@@ -12,6 +12,15 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class LogNormalDistribution : NormalDistribution
     {
+        public LogNormalDistribution()
+        {
+
+        }
+        public LogNormalDistribution(double mu, double sigma)
+        {
+            AddParameter(new Parameter(ParametreName.mu, mu));
+            AddParameter(new Parameter(ParametreName.sigma, sigma));
+        }
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.LogNormal;
 

@@ -23,6 +23,12 @@ namespace Stochastique.Distributions
         {
             BaseDistribution = distrib;
         }
+        public TrunkatedDistribution(Distribution d, double qDown,double qUp)
+        {
+            BaseDistribution = d;
+            AddParameter(new Parameter(ParametreName.qDown, qDown));
+            AddParameter(new Parameter(ParametreName.qUp, qUp));
+        }
 
         [Key(6)]
         public override bool CanComputeExpectedValueEasily => false;
@@ -146,6 +152,7 @@ namespace Stochastique.Distributions
         [Key(16)]
         private double? ComputedKurtosis { get; set; }
 
+
         private double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {
@@ -156,8 +163,16 @@ namespace Stochastique.Distributions
         }
         public override double ExpextedValue()
         {
-            SimulateValue();
-            return SimulatedValue.Mean();
+            if (ComputedExpectedValue.HasValue)
+            {
+                return ComputedExpectedValue.Value;
+            }
+            else
+            {
+                SimulateValue();
+                ComputedExpectedValue=SimulatedValue.Mean();
+                return ComputedExpectedValue.Value;
+            }
 
         }
 
@@ -176,8 +191,16 @@ namespace Stochastique.Distributions
 
         public override double Variance()
         {
-            SimulateValue();
-            return SimulatedValue.Variance();
+            if(ComputedVariance.HasValue)
+            {                
+                return ComputedVariance.Value;
+            }
+            else
+            {
+                SimulateValue();
+                ComputedVariance = SimulatedValue.Variance();
+                return ComputedVariance.Value;
+            }
         }
         public override double Skewness()
         {
@@ -213,10 +236,12 @@ namespace Stochastique.Distributions
                 var parametres = BaseDistribution.GetParameterValues(value,ratio.Item1,ratio.Item2);
                 for (int i = 0; i < parametres.Length; i++)
                 {
-                    BaseDistribution.AllParameters().ElementAt(i).Value = parametres[i];
+                    BaseDistribution.AllParameters().ElementAt(i).SetValue( parametres[i]);
                 }
-                GetParameter(ParametreName.qDown).Value = ratio.Item3;
-                GetParameter(ParametreName.qUp).Value = ratio.Item4;
+                GetParameter(ParametreName.qDown).SetValue(ratio.Item3);
+                GetParameter(ParametreName.qUp).SetValue( ratio.Item4);
+                RAZComputedMoment();
+
                 try
                 {
                     base.Initialize(value, typeCalibration);
@@ -235,20 +260,29 @@ namespace Stochastique.Distributions
                 var allParam = AllParameters().ToList();
                 for (int i = 0; i < allParam.Count; i++)
                 {
-                    allParam[i].Value = newParam[i];
+                    allParam[i].SetValue( newParam[i]);
                 }
             }
             else
             {
-                GetParameter(ParametreName.qUp).Value = 1;
-                GetParameter(ParametreName.qDown).Value = 0;
+                GetParameter(ParametreName.qUp).SetValue(1);
+                GetParameter(ParametreName.qDown).SetValue(0);
                 var parametres = BaseDistribution.AllParameters().ToList();
                 for (int i = 0; i < parametres.Count; i++)
                 {
-                    parametres[i].Value = initialParameters[i];
+                    parametres[i].SetValue(initialParameters[i]);
                 }
             }
+            RAZComputedMoment();
+        }
 
+        private void RAZComputedMoment()
+        {
+            SimulatedValue = null;
+            ComptedSkewness = null;
+            ComputedExpectedValue = null;
+            ComputedKurtosis = null;
+            ComputedVariance = null;
         }
 
         public override double[] Simulate(Random r, int nbSimulations)
@@ -277,13 +311,10 @@ namespace Stochastique.Distributions
         {
             for (int i = 0; i < ParametresParNom.Count; i++)
             {
-                ParametresParNom.ElementAt(i).Value.Value = values[i];
+                ParametresParNom.ElementAt(i).Value.SetValue(values[i]);
             }
             BaseDistribution.SetParameter(values.Skip(ParametresParNom.Count).ToArray());
-            ComputedExpectedValue = null;
-            ComputedVariance = null;
-            ComptedSkewness = null;
-            ComputedKurtosis = null;
+            RAZComputedMoment();
         }
 
         public override IEnumerable<Parameter> AllParameters()

@@ -191,15 +191,15 @@ namespace Stochastique.Distributions
             {
                 if (v.Value.Value < v.Value.MinValue)
                 {
-                    v.Value.Value = v.Value.MinValue + Math.Pow(10,-10);
+                    v.Value.SetValue(v.Value.MinValue + Math.Pow(10, -10));
                 }
                 if (v.Value.Value > v.Value.MaxValue)
                 {
-                    v.Value.Value = v.Value.MaxValue - Math.Pow(10, -10);
+                    v.Value.SetValue(v.Value.MaxValue - Math.Pow(10, -10));
                 }
                 if(double.IsNaN(v.Value.Value))
                 {
-                    v.Value.Value = v.Value.MinValue + Math.Pow(10, -10);
+                    v.Value.SetValue(v.Value.MinValue + Math.Pow(10, -10));
                 }
             }
         }
@@ -410,7 +410,7 @@ namespace Stochastique.Distributions
             var parameters = AllParameters();
             foreach (var param in parameters)
             {
-                param.Value = values[i];
+                param.SetValue(values[i]);
                 i++;
             }
 

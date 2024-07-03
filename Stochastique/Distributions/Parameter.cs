@@ -29,8 +29,13 @@ namespace Stochastique.Distributions
             return Name + " : " + Value.ToBeautifulString();
         }
 
+        public void SetValue(double v)
+        {
+            Value = v;
+        }
+
         [Key(0)]
-        public double Value { get; set; }
+        public double Value { get; private set; }
         [Key(1)]
         public Distribution? Estimateur { get; set; }
 

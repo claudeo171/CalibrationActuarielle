@@ -89,8 +89,8 @@ namespace Stochastique.Distributions.Continous
             AddParameters(CalibrateWithMoment(value));
             if (typeCalibration == TypeCalibration.MaximumLikelyhood)
             {
-                GetParameter(ParametreName.a).Value = value.Min();
-                GetParameter(ParametreName.b).Value = value.Max();
+                GetParameter(ParametreName.a).SetValue(value.Min());
+                GetParameter(ParametreName.b).SetValue(value.Max());
             }
             else
             {

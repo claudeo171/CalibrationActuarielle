@@ -14,6 +14,12 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class WeibullDistribution : Distribution
     {
+        public WeibullDistribution() { }
+        public WeibullDistribution(double k,double lambda)
+        {
+            AddParameter(new Parameter(ParametreName.lambda, lambda));
+            AddParameter(new Parameter(ParametreName.k, k));
+        }
         [Key(6)]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
 

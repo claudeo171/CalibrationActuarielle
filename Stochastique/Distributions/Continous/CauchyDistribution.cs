@@ -13,6 +13,13 @@ namespace Stochastique.Distributions.Continous
     [MessagePackObject]
     public class CauchyDistribution : Distribution
     {
+        public CauchyDistribution(double a, double b)
+        {
+            AddParameter(new Parameter(ParametreName.aCauchy, a));
+            AddParameter(new Parameter(ParametreName.bCauchy, b));
+        }
+        public CauchyDistribution() { }
+
         [Key(6)]
         public double A => GetParameter(ParametreName.aCauchy).Value;
 
@@ -71,7 +78,7 @@ namespace Stochastique.Distributions.Continous
         {
             var normal1= new NormalDistribution(0,1).Simulate(r, nbSimulations);
             var normal2 = new NormalDistribution(0, 1).Simulate(r, nbSimulations);
-            return normal1.Select((a,i)=> a / normal2[i]).ToArray();
+            return  normal1.Select((a,i)=> B + a / normal2[i]).ToArray();
         }
         public override double Simulate(Random r)
         {

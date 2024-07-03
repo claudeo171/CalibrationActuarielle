@@ -16,7 +16,7 @@ namespace Stochastique.Enums
         k,qUp,qDown,
         p,lambda,r,N,a,b,d1,d2,
         theta,aCauchy,bCauchy,
-        Np,xm,aBeta,bBeta
+        Np,xm,aBeta,bBeta,beta,s
     }
 
     public enum MethodeCalibrationRetenue
@@ -49,6 +49,10 @@ namespace Stochastique.Enums
         Weibull=17,
         LogNormal=18,
         Pareto=19,
+        Gumbel=20,
+        Logistic=21,
+        Laplace=22,
+        Tukey=23,
         Trunkated=1000,
         TrunkatedNormal = 1001,
         TrunkatedStudent = 1002, 
