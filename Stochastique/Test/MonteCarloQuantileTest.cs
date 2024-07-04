@@ -78,20 +78,22 @@ namespace Stochastique.Test
             ValueList = new List<List<double>>();
             for (int i = 0; i < Values.Length; i++)
             {
-                ValueList.Add(element.Select(x => x[i]).Order().ToList());
+                var mean = Distribution.InverseCDF((0.5 + i )/ Values.Length);
+                ValueList.Add(element.Select(x =>  x[i]-mean).Order().ToList());
             }
             
         }
         private void ComputePValues()
         {
             PValues=new List<double>();
-            for(int i = 0; i < Values.Length; i++)
+            var val = Values.Select((a, i) => a - Distribution.InverseCDF((0.5 + i) / Values.Length)).ToArray();
+            for(int i = 0; i < val.Length; i++)
             {
-                if (ValueList[i][0] > Values[i])
+                if (ValueList[i][0] > val[i])
                 {
                     PValues.Add(0);
                 }
-                else if (ValueList[i][ValueList[i].Count-1]< Values[i])
+                else if (ValueList[i][ValueList[i].Count-1]< val[i])
                 {
                     PValues.Add(1);
                 }
@@ -99,10 +101,10 @@ namespace Stochastique.Test
                 {
                     int indexMin = 0;
                     int indexMax = ValueList[i].Count-1;
-                    while (!(ValueList[i][indexMin] <= Values[i] && ValueList[i][indexMin+1] >= Values[i]))
+                    while (!(ValueList[i][indexMin] <= val[i] && ValueList[i][indexMin+1] >= val[i]))
                     {
                         int indiceMoy=(indexMin+indexMax)/2;
-                        if(ValueList[i][indiceMoy] < Values[i])
+                        if(ValueList[i][indiceMoy] < val[i])
                         {
                             indexMin = indiceMoy;
                         }
@@ -111,7 +113,7 @@ namespace Stochastique.Test
                             indexMax = indiceMoy;
                         }
                     }
-                    PValues.Add((indexMin+0.5) / ValueList[i].Count);
+                    PValues.Add(1-(indexMin+0.5) / ValueList[i].Count);
                 }
             }
         }

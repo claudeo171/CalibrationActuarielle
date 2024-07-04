@@ -147,20 +147,15 @@ namespace OnlineCalibrator.Shared
             return rst;
         }
 
-        public List<Point[]> GetQuantilePlot()
+        public Point[] GetQuantilePlot()
         {
-            List<Point[]> rst = new List<Point[]>();
-            rst.Add(new Point[Values.Length]);
-            rst.Add(new Point[Values.Length]);
-            rst.Add(new Point[Values.Length]);
-            rst.Add(new Point[Values.Length]);
+            Point[] rst =new Point[Values.Length];
             Distribution loi;
-            for(int i=0;i<Values.Length;i++)
+            var values = Values.Order().ToArray();
+            for (int i=0;i<Values.Length;i++)
             {
-                rst[3][i] = new Point() { X = i, Y =  0.5 - Math.Abs(CurrentDistribution.CarloQuantileTest.PValues[i]-0.5) };
-                rst[0][i] = new Point() { X = i, Y = 0.05 };
-                rst[1][i] = new Point() { X = i, Y = 0.025 };
-                rst[2][i] = new Point() { X = i, Y = 0.005 };
+                rst[i] = new Point() { X = values[i], Y = CurrentDistribution.CarloQuantileTest.PValues[i] };
+
             }
             return rst;
         }

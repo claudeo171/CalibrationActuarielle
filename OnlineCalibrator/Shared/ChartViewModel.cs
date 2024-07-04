@@ -1,4 +1,5 @@
 ﻿using LiveChartsCore;
+using LiveChartsCore.ConditionalDraw;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
 using LiveChartsCore.SkiaSharpView;
@@ -23,53 +24,138 @@ namespace OnlineCalibrator.Shared
         public ChartViewModelLine(Point[] valeurs)
         {
             Series = new ISeries[0];
-            AddSerie(valeurs, null, new SolidColorPaint(SKColors.CornflowerBlue),0,0,null,false);
+            AddSerie(valeurs, null, new SolidColorPaint(SKColors.CornflowerBlue), 0, 0, null, false);
         }
-        public ChartViewModelLine(List<Point[]> valeurs, List<Paint> stroke,List<Paint> fill,List<double> size,List<Paint> color,bool differentAxes = false)
+        public ChartViewModelLine(List<Point[]> valeurs, List<Paint> stroke, List<Paint> fill, List<double> size, List<Paint> color, bool differentAxes = false, bool rectangularSections = false)
         {
             Series = new ISeries[0];
-            if(differentAxes)
+            if (differentAxes)
             {
                 YAxes = new Axis[valeurs.Count];
             }
-            for (int i=0;i<valeurs.Count;i++)
+            for (int i = 0; i < valeurs.Count; i++)
             {
-                AddSerie(valeurs[i], stroke[i], fill[i], i, size[i], color[i],differentAxes);
+                AddSerie(valeurs[i], stroke[i], fill[i], i, size[i], color[i], differentAxes);
                 if (differentAxes)
                 {
                     YAxes[i] = new Axis();
                 }
             }
         }
-
-        public void AddSerie(Point[] valeurs, Paint? stroke, Paint? fill, int indice, double size, Paint color,bool differentAxes)
+        public ChartViewModelLine()
         {
-            var serieAsList=Series.ToList();
+
+        }
+        public ChartViewModelLine InitialiseQuantile(Point[] valeurs)
+        {
+            Series = new ISeries[]{
+            new LineSeries<ObservablePoint>
+            {
+                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
+                Name = "Quantile",
+                GeometryFill= new SolidColorPaint(SKColors.CornflowerBlue),
+                GeometryStroke = new SolidColorPaint(SKColors.CornflowerBlue),
+                GeometrySize = 5,
+                Fill=null,
+                Stroke=null
+            }.OnPointMeasured(point =>
+            {
+                if (point.Visual is null) return;
+
+                if(point.Model is null) return;
+
+                if(point.Model.Y<0.005 || point.Model.Y > 0.995)
+                {
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Red);
+                    point.Visual.Fill = new SolidColorPaint(SKColors.Red);
+                }
+                else if (point.Model.Y < 0.025 || point.Model.Y > 0.975)
+                {
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Orange);
+                    point.Visual.Fill = new SolidColorPaint(SKColors.Orange);
+                }
+                else if (point.Model.Y < 0.05 || point.Model.Y > 0.95)
+                {
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Yellow);
+                    point.Visual.Fill = new SolidColorPaint(SKColors.Yellow);
+                }
+            })
+            };
+            AddRectangularSection();
+            return this;
+        }
+
+        public void AddRectangularSection()
+        {
+            RectangularSection = new RectangularSection[]{
+                new RectangularSection
+                {
+                    Yj = 0.005,
+                    Yi = 0,
+                    Fill = new SolidColorPaint(SKColors.Red.WithAlpha(85))
+                },
+                new RectangularSection
+                {
+                    Yj = 0.025,
+                    Yi = 0.005,
+                    Fill = new SolidColorPaint(SKColors.Orange.WithAlpha(85))
+                },
+                new RectangularSection
+                {
+                    Yj = 0.05,
+                    Yi = 0.025,
+                    Fill = new SolidColorPaint(SKColors.Yellow.WithAlpha(85))
+                },
+                new RectangularSection
+                {
+                    Yj = 1,
+                    Yi = 0.995,
+                    Fill = new SolidColorPaint(SKColors.Red.WithAlpha(85))
+                },
+                new RectangularSection
+                {
+                    Yj = 0.995,
+                    Yi = 0.975,
+                    Fill = new SolidColorPaint(SKColors.Orange.WithAlpha(85))
+                },
+                new RectangularSection
+                {
+                    Yj = 0.975,
+                    Yi = 0.95,
+                    Fill = new SolidColorPaint(SKColors.Yellow.WithAlpha(85))
+                },
+            };
+        }
+        public void AddSerie(Point[] valeurs, Paint? stroke, Paint? fill, int indice, double size, Paint color, bool differentAxes)
+        {
+            var serieAsList = Series.ToList();
             serieAsList.Add(new LineSeries<ObservablePoint>
             {
                 Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
                 Fill = fill, // mark
                 Stroke = stroke,
-                GeometryFill = color==null? null: new SolidColorPaint(color.Color),
-                GeometryStroke = color == null ? null : new SolidColorPaint(color.Color) { StrokeThickness=2},
+                GeometryFill = color == null ? null : new SolidColorPaint(color.Color),
+                GeometryStroke = color == null ? null : new SolidColorPaint(color.Color) { StrokeThickness = 2 },
                 GeometrySize = size
-               
+
             });
-            if (differentAxes )
+            if (differentAxes)
             {
                 (serieAsList.Last() as LineSeries<ObservablePoint>).ScalesYAt = indice;
             }
-            Series= serieAsList.ToArray();
+            Series = serieAsList.ToArray();
         }
 
         [Key(0)]
         public ISeries[] Series { get; set; }
+        [Key(3)]
+        public RectangularSection[] RectangularSection { get; set; }
 
         // Creates a gray background and border in the draw margin.
         [Key(1)]
         public DrawMarginFrame DrawMarginFrame => new()
         {
-            
+
             Fill = new SolidColorPaint(new SKColor(220, 220, 220)),
             Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
         };
@@ -78,6 +164,7 @@ namespace OnlineCalibrator.Shared
         public Axis[] YAxes { get; set; }
 
     }
+
 
     [MessagePackObject]
     public class ChartViewModelScatter
