@@ -128,12 +128,12 @@
                         </div>
                         @if (DonneesImportes.ActualData.CurrentDistribution.CarloQuantileTest == null)
                         {
-                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter un test basés sur les quantiles simulés</button>
+                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter le graphique de probabilité des quantiles.</button>
                         }
                         else
                         {
                             <div class="pt-3" @onclick="()=>ShowFullScreen(Quantile)">
-                                <h5>Quantile of Quantile Plot</h5>
+                                <h5>Probability of Quantile Plot</h5>
                                 <CartesianChart Series="Quantile.Series" Sections="Quantile.RectangularSection" DrawMarginFrame="Quantile.DrawMarginFrame" />
                             </div>
                         }

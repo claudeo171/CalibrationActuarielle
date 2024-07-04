@@ -53,9 +53,9 @@ namespace OnlineCalibrator.Shared
             {
                 Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
                 Name = "Quantile",
-                GeometryFill= new SolidColorPaint(SKColors.CornflowerBlue),
-                GeometryStroke = new SolidColorPaint(SKColors.CornflowerBlue),
-                GeometrySize = 5,
+                GeometryFill= new SolidColorPaint(SKColors.Green),
+                GeometryStroke = new SolidColorPaint(SKColors.Black),
+                GeometrySize = 7,
                 Fill=null,
                 Stroke=null
             }.OnPointMeasured(point =>
@@ -66,17 +66,17 @@ namespace OnlineCalibrator.Shared
 
                 if(point.Model.Y<0.005 || point.Model.Y > 0.995)
                 {
-                    point.Visual.Stroke = new SolidColorPaint(SKColors.Red);
-                    point.Visual.Fill = new SolidColorPaint(SKColors.Red);
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Black);
+                    point.Visual.Fill = new SolidColorPaint(SKColors.DarkRed);
                 }
                 else if (point.Model.Y < 0.025 || point.Model.Y > 0.975)
                 {
-                    point.Visual.Stroke = new SolidColorPaint(SKColors.Orange);
-                    point.Visual.Fill = new SolidColorPaint(SKColors.Orange);
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Black);
+                    point.Visual.Fill = new SolidColorPaint(SKColors.DarkOrange);
                 }
                 else if (point.Model.Y < 0.05 || point.Model.Y > 0.95)
                 {
-                    point.Visual.Stroke = new SolidColorPaint(SKColors.Yellow);
+                    point.Visual.Stroke = new SolidColorPaint(SKColors.Black);
                     point.Visual.Fill = new SolidColorPaint(SKColors.Yellow);
                 }
             })
