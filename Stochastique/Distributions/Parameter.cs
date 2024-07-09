@@ -35,7 +35,7 @@ namespace Stochastique.Distributions
         }
 
         [Key(0)]
-        public double Value { get; private set; }
+        public double Value { get; set; }
         [Key(1)]
         public Distribution? Estimateur { get; set; }
 

@@ -50,7 +50,11 @@ namespace Stochastique.Test
         public Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest Test { get; set; }
         public void OnAfterDeserialize()
         {
-            Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(Values, Values.Select((x, i) => Distribution.CDF((i + 0.5) / Values.Length)).ToArray());
+            try
+            {
+                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(Values, Values.Select((x, i) => Distribution.CDF((i + 0.5) / Values.Length)).ToArray());
+            }
+            catch { }
         }
 
         public void OnBeforeSerialize()

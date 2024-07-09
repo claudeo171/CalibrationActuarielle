@@ -10,6 +10,12 @@ namespace Stochastique
     [MessagePackObject]
     public class Point
     {
+        public Point() { }
+        public Point(double x, double y)
+        {
+            X = x;
+            Y = y;
+        }
         [Key(0)]
         public double X { get; set; }
         [Key(1)]

@@ -110,6 +110,34 @@ namespace OnlineCalibrator.Shared
             }
             skChart.SaveImage($"{name}.png");
         }
+        public static void SaveChartImage(List<Point[]> points, List<Paint> fill, List<Paint> content, List<int> geometrySize, string name, int width = 2000, int height = 1500, bool showAxis = false)
+        {
+
+            var skChart = new SKCartesianChart()
+            {
+                Series = points.Select((a, i) =>
+                    new LineSeries<ObservablePoint>
+                    {
+                        Values = a.Select(x => new ObservablePoint(x.X, x.Y)),
+                        Stroke = content[i],
+                        Fill = fill[i],
+                        GeometrySize = geometrySize[i],
+                        LineSmoothness= 0
+                    }
+                ),
+                Width = width,
+                Height = height,
+            };
+            if (!showAxis)
+            {
+                skChart.XAxes.First().ShowSeparatorLines = false;
+                skChart.YAxes.First().ShowSeparatorLines = false;
+                skChart.XAxes.First().Labeler = a => "";
+                skChart.YAxes.First().Labeler = a => "";
+            }
+            skChart.SaveImage($"{name}.png");
+        }
+
         public static void SaveChartImage(List<Point[]> pointsArray, string name, int width = 2000, int height = 1500, bool showAxis = false)
         {
             var series = new List<ISeries>();

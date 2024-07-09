@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Accord.Statistics;
+using MathNet.Numerics.Statistics;
 using OnlineCalibrator.Batch;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
@@ -7,7 +8,7 @@ using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
 using System.Text;
 
-if (false)
+if (args.Length == 3)
 {
     if (args.Length < 3)
     {
@@ -33,9 +34,10 @@ if (false)
         distributions[i] = d.CalibratedDistribution;
     }
     StringBuilder sb = new StringBuilder();
+    List<double> values = new List<double>();
     for (int i = 0; i < nombreSimulation; i++)
     {
-
+        values.AddRange(distributions[i].Simulate(random, 1000));
         sb.Append($"Simulation {i + 1};{distributions[i].Type};");
         foreach (var param in distributions[i].AllParameters())
         {
@@ -43,15 +45,17 @@ if (false)
         }
         sb.AppendLine("");
     }
+    var variance = values.Variance();
+    var theoricalDistribution = calibratedDistribution.Variance();
     File.WriteAllText("result.csv", sb.ToString());
 }
 else
 {
     for (int i = 5; i < 20; i++)
     {
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseQuantilNormInf", Environment.ProcessorCount, true,i, true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseQuantilNorm1", Environment.ProcessorCount, true, i,true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseVarianceNormInf", Environment.ProcessorCount, true, i,false);
+        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseQuantilNormInf", Environment.ProcessorCount, true, i, true);
+        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseQuantilNorm1", Environment.ProcessorCount, true, i, true);
+        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseVarianceNormInf", Environment.ProcessorCount, true, i, false);
         OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseVarianceNorm1", Environment.ProcessorCount, true, i, false);
         /*
         OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, true, 0, "resultratioInf0", Environment.ProcessorCount,false);
@@ -72,7 +76,7 @@ else
     }
     var normal = new NormalDistribution(0, 1);
     var laplace = new LaplaceDistribution(0, 1);
-    var mlist=laplace.GetMomentList(10);
+    var mlist = laplace.GetMomentList(10);
     var m2list = normal.GetMomentList(10);
 
 
