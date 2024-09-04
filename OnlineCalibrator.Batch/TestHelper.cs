@@ -102,9 +102,6 @@ namespace OnlineCalibrator.Batch
                 {
                     val[i] = GetMoment(d.Simulate(r, size),maxMoment);
                 }
-                var toto = val.Select(a => a[9]).Sum() / 100000;
-                var tttt=Math.Sqrt(val.Select(a => a[9]).ToArray().Variance());
-
                 for (int i = 0; i < maxMoment; i++)
                 {
                     var array = val.Select((a) => Math.Abs(a[i] - moment[i])).ToArray();
@@ -148,10 +145,10 @@ namespace OnlineCalibrator.Batch
         {
             List<ResultPuissance> result = new List<ResultPuissance>();
             double[] moment = distributionTeste.GetMomentList(maxMoment);
-            List<int> sampleSize = new List<int>() { 10, 20, 30, 50, 100, 200, 300, 400, 500, 1000, 2000 };
+            List<int> sampleSize = new List<int>() { 10, 20, 30, 50, 100, 200, 300, 400, 500, 1000 };
             foreach (var i in sampleSize)
             {
-                var seuil = GetSeuilTest(distributionTeste, i, 10, risque1espece, r, isInfty, isRatio, powN,normaliser, normalizedWithQuantile);
+                var seuil = GetSeuilTest(distributionTeste, i, maxMoment, risque1espece, r, isInfty, isRatio, powN,normaliser, normalizedWithQuantile);
                 double nbFalse = 0;
                 double nbFalseNormal = 0;
                 double nbFalseShapiro = 0;

@@ -11,7 +11,7 @@ namespace Stochastique.Copule
 {
     public enum CopuleParameterName:int
     {
-        thetaClayton,thetaAMH, rho
+        thetaClayton,thetaAMH,thetaFrank,thetaGumbel, thetaJoe, rho
     }
     [MessagePackObject]
     public class CopuleParameter

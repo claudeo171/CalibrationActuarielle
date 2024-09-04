@@ -51,12 +51,15 @@ if (args.Length == 3)
 }
 else
 {
-    for (int i = 5; i < 20; i++)
+    for (int i = 20; i <= 20; i++)
     {
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseQuantilNormInf", Environment.ProcessorCount, true, i, true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseQuantilNorm1", Environment.ProcessorCount, true, i, true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseVarianceNormInf", Environment.ProcessorCount, true, i, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseVarianceNorm1", Environment.ProcessorCount, true, i, false);
+        if (i <= 5 || i >= 17)
+        {
+            OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseQuantilNormInf", Environment.ProcessorCount, true, i, true);
+            OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseQuantilNorm1", Environment.ProcessorCount, true, i, true);
+            OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseVarianceNormInf", Environment.ProcessorCount, true, i, false);
+            OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseVarianceNorm1", Environment.ProcessorCount, true, i, false);
+        }
         /*
         OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, true, 0, "resultratioInf0", Environment.ProcessorCount,false);
         OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, true, 0, "resultRatioInf0", EnvironmentN.ProcessorCount, false);

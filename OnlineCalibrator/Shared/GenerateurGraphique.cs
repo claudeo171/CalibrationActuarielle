@@ -110,7 +110,7 @@ namespace OnlineCalibrator.Shared
             }
             skChart.SaveImage($"{name}.png");
         }
-        public static void SaveChartImage(List<Point[]> points, List<Paint> fill, List<Paint> content, List<int> geometrySize, string name, int width = 2000, int height = 1500, bool showAxis = false)
+        public static void SaveChartImage(List<Point[]> points, List<Paint> fill, List<Paint> content, List<Paint> geometryFill, List<int> geometrySize, string name, int width = 2000, int height = 1500, bool showAxis = false)
         {
 
             var skChart = new SKCartesianChart()
@@ -122,11 +122,18 @@ namespace OnlineCalibrator.Shared
                         Stroke = content[i],
                         Fill = fill[i],
                         GeometrySize = geometrySize[i],
-                        LineSmoothness= 0
+                        GeometryFill = geometryFill[i],
+                        LineSmoothness = 0
                     }
                 ),
                 Width = width,
                 Height = height,
+                DrawMarginFrame = new DrawMarginFrame
+                {
+
+                    Fill = new SolidColorPaint(new SKColor(220, 220, 220)),
+                    Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
+                }
             };
             if (!showAxis)
             {
@@ -136,6 +143,7 @@ namespace OnlineCalibrator.Shared
                 skChart.YAxes.First().Labeler = a => "";
             }
             skChart.SaveImage($"{name}.png");
+
         }
 
         public static void SaveChartImage(List<Point[]> pointsArray, string name, int width = 2000, int height = 1500, bool showAxis = false)
