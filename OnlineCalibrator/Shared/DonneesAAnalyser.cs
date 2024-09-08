@@ -191,7 +191,7 @@ namespace OnlineCalibrator.Shared
         {
             if(CalibratedDistribution!=null)
             {
-                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new MonteCarloQuantileTest( Values,CalibratedDistribution,0.995));
+                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new BetaQuantileTest( Values,CalibratedDistribution,0.995));
             }
         }    
 

@@ -10,7 +10,8 @@ namespace OnlineCalibrator.Shared
     {
         ShapiroWilk, JarqueBera,
         KolmogorovSmirnov,
-        MonteCarloQuantile
+        BetaQuantile,
+        EELQuantile,
     }
     public enum TypeDonnees
     {
