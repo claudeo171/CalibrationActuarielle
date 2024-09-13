@@ -147,6 +147,19 @@ namespace OnlineCalibrator.Shared
             return rst;
         }
 
+        public Point[] GetQuantileBetaPlot()
+        {
+            Point[] rst = new Point[Values.Length];
+            Distribution loi;
+            var values = Values.Order().ToArray();
+            var betaTest = CurrentDistribution.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.BetaQuantile) as BetaQuantileTest;
+            for (int i = 0; i < Values.Length; i++)
+            {
+                rst[i] = new Point() { X = values[i], Y = betaTest.PValues[i] };
+
+            }
+            return rst;
+        }
         public Point[] GetQuantilePlot()
         {
             Point[] rst =new Point[Values.Length];
@@ -154,7 +167,7 @@ namespace OnlineCalibrator.Shared
             var values = Values.Order().ToArray();
             for (int i=0;i<Values.Length;i++)
             {
-                rst[i] = new Point() { X = values[i], Y = CurrentDistribution.CarloQuantileTest.PValues[i] };
+                rst[i] = new Point() { X = values[i], Y = CurrentDistribution.EELQuantileTest.PValues[i] };
 
             }
             return rst;
@@ -191,7 +204,7 @@ namespace OnlineCalibrator.Shared
         {
             if(CalibratedDistribution!=null)
             {
-                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new BetaQuantileTest( Values,CalibratedDistribution,0.995));
+                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new EELQuantileTest( Values,CalibratedDistribution,0.995));
             }
         }    
 

@@ -4,7 +4,6 @@ using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
 using SkiaSharp;
 using Stochastique;
-using Stochastique.Copule;
 using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
 
@@ -16,7 +15,6 @@ GenerationGraphique.SaveChartImage(
     new List<Point[]> { Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, normal.PDF(-5.0 + (i) / 10.0))).ToArray(), Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, truncated.PDF(-5 + (i) / 10.0))).ToArray() },
     new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(50)), new SolidColorPaint(SKColors.Red.WithAlpha(50)) },
     new List<Paint> { new SolidColorPaint(SKColors.Blue), new SolidColorPaint(SKColors.Red) },
-    new List<Paint> { null, null },
     new List<int> { 0, 0 },
     "truncatedpdf", 600, 400, true
 
@@ -25,7 +23,6 @@ GenerationGraphique.SaveChartImage(
     new List<Point[]> { Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, normal.CDF(-5.0 + (i) / 10.0))).ToArray(), Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, truncated.CDF(-5 + (i) / 10.0))).ToArray() },
     new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(50)), new SolidColorPaint(SKColors.Red.WithAlpha(50)) },
     new List<Paint> { new SolidColorPaint(SKColors.Blue), new SolidColorPaint(SKColors.Red) },
-    new List<Paint> { null, null },
     new List<int> { 0, 0 },
     "truncatedCdf", 600, 400, true
 
@@ -34,7 +31,6 @@ GenerationGraphique.SaveChartImage(
     new List<Point[]> { Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, student.PDF(-5.0 + (i) / 10.0))).ToArray(), Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, afine.PDF(-5 + (i) / 10.0))).ToArray() },
     new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(50)), new SolidColorPaint(SKColors.Red.WithAlpha(50)) },
     new List<Paint> { new SolidColorPaint(SKColors.Blue), new SolidColorPaint(SKColors.Red) },
-    new List<Paint> { null, null },
     new List<int> { 0, 0 },
     "afinepdf", 600, 400, true
 
@@ -43,24 +39,8 @@ GenerationGraphique.SaveChartImage(
     new List<Point[]> { Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, student.CDF(-5.0 + (i) / 10.0))).ToArray(), Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, afine.CDF(-5 + (i) / 10.0))).ToArray() },
     new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(50)), new SolidColorPaint(SKColors.Red.WithAlpha(50)) },
     new List<Paint> { new SolidColorPaint(SKColors.Blue), new SolidColorPaint(SKColors.Red) },
-    new List<Paint> { null,null },
     new List<int> { 0, 0 },
     "afineCdf", 600, 400, true
-
-    );
-var tr = new CopuleClayton(2, 5).SimulerCopule(new Random(), 100);
-List<Point> pts = new List<Point>();
-for(int i = 0; i < tr[0].Count; i++)
-{
-    pts.Add(new Point(tr[0][i], tr[1][i]));
-}
-GenerationGraphique.SaveChartImage(
-    new List<Point[]> { pts.ToArray() },
-    new List<Paint> { null },
-    new List<Paint> { null },
-    new List<Paint> { new SolidColorPaint(SKColors.CornflowerBlue) },
-    new List<int> { 10 },
-    "clayton", 600, 400, true
 
     );
 var d = Double.MinValue;
@@ -82,7 +62,7 @@ elt.ActualData.GetQQPlot();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
 elt.ActualData.GetQQPlot();
 elt.ActualData.AddMonteCarloTest();
-var toto2 = elt.ActualData.CurrentDistribution.CarloQuantileTest.Alpha;
+var toto2 = elt.ActualData.CurrentDistribution.EELQuantileTest.Alpha;
 elt.ActualData.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Manuelle);
 foreach (var v in toto)
 {

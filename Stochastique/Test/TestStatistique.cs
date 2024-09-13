@@ -40,7 +40,7 @@ namespace OnlineCalibrator.Shared
 
         public static List<TestStatistique> GetTestsDistribution(Distribution distribution, double[] datas)
         {
-            var rst = new List<TestStatistique>() { new KolmogorovSmirnovTest(datas,distribution) };
+            var rst = new List<TestStatistique>() { new KolmogorovSmirnovTest(datas,distribution), new BetaQuantileTest(datas,distribution,0.05) };
             switch (distribution.Type)
             {
                 case TypeDistribution.Normal:

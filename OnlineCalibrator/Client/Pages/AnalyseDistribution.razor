@@ -126,15 +126,19 @@
                             <h5> PDF + CDF </h5>
                             <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
                         </div>
-                        @if (DonneesImportes.ActualData.CurrentDistribution.CarloQuantileTest == null)
+                        <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileBeta)">
+                            <h5>Probability of Quantile Plot</h5>
+                            <CartesianChart Series="QuantileBeta.Series" Sections="QuantileBeta.RectangularSection" DrawMarginFrame="QuantileBeta.DrawMarginFrame" />
+                        </div>
+                        @if (DonneesImportes.ActualData.CurrentDistribution.EELQuantileTest == null)
                         {
-                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter le graphique de probabilité des quantiles.</button>
+                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter le graphique de probabilité des quantiles au niveau global (EEL).</button>
                         }
                         else
                         {
-                            <div class="pt-3" @onclick="()=>ShowFullScreen(Quantile)">
-                                <h5>Probability of Quantile Plot</h5>
-                                <CartesianChart Series="Quantile.Series" Sections="Quantile.RectangularSection" DrawMarginFrame="Quantile.DrawMarginFrame" />
+                            <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileEEL)">
+                                <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
+                                <CartesianChart Series="QuantileEEL.Series" Sections="QuantileEEL.RectangularSection" DrawMarginFrame="QuantileEEL.DrawMarginFrame" />
                             </div>
                         }
 
@@ -280,7 +284,8 @@
     private ChartViewModelLine? QQPlot;
     private ChartViewModelLine? PPPlot;
     private ChartViewModelLine? PDFCDF;
-    private ChartViewModelLine? Quantile;
+    private ChartViewModelLine? QuantileEEL;
+    private ChartViewModelLine? QuantileBeta;
 
     private ChartViewModelLine? CurrentFullSizeChart;
     private bool showModal;
@@ -361,9 +366,10 @@
             new List<Paint>() { null, null },
         new List<double>() { 0, 0 }, new List<Paint>() { null, null }, true
         );
-        if (DonneesImportes.ActualData?.CurrentDistribution?.CarloQuantileTest != null)
+        QuantileBeta = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantileBetaPlot());
+        if (DonneesImportes.ActualData?.CurrentDistribution?.EELQuantileTest != null)
         {
-            Quantile = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
+            QuantileEEL = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
         }
         StateHasChanged();
     }

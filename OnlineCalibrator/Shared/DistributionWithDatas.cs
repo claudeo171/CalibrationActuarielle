@@ -106,6 +106,6 @@ namespace OnlineCalibrator.Shared
         [Key(12)]
         public double ProbabiliteMachineLearningImage { get; set; }
         [IgnoreMember]
-        public BetaQuantileTest CarloQuantileTest => TestStatistiques?.FirstOrDefault(a => a is BetaQuantileTest) as BetaQuantileTest;
+        public EELQuantileTest EELQuantileTest => TestStatistiques?.FirstOrDefault(a => a is EELQuantileTest) as EELQuantileTest;
     }
 }
