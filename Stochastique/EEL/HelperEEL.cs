@@ -1,6 +1,7 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra.Factorization;
+using Stochastique.Distributions.Continous;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,8 +18,8 @@ namespace Stochastique.EEL
             double[] g = new double[n];
             for (int i = 0; i < n; i++)
             {
-                h[i] = new Beta(i + 1, n - i).InverseCumulativeDistribution(alphaLocal / 2);
-                g[i] = new Beta(i + 1, n - i).InverseCumulativeDistribution(1 - (alphaLocal / 2));
+                h[i] = new LoiBeta(i + 1, n - i).InverseCDF(alphaLocal / 2);
+                g[i] = new LoiBeta(i + 1, n - i).InverseCDF(1 - (alphaLocal / 2));
             }
             return GetLevelFromBounds(h, g);
         }
@@ -34,8 +35,8 @@ namespace Stochastique.EEL
             {
                 for (int i = 0; i < n; i++)
                 {
-                    h[i] = new Beta(i + 1, n - i).InverseCumulativeDistribution(etaMoy / 2);
-                    g[i] = new Beta(i + 1, n - i).InverseCumulativeDistribution(1 - (etaMoy / 2));
+                    h[i] = new LoiBeta(i + 1, n - i).InverseCDF(etaMoy / 2);
+                    g[i] = new LoiBeta(i + 1, n - i).InverseCDF(1 - (etaMoy / 2));
                 }
                 double testAlpha = GetLevelFromBounds(h, g);
                 if (Math.Abs(testAlpha - alpha) / alpha <= tol)

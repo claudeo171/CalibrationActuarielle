@@ -98,8 +98,10 @@ namespace Stochastique.Copule
             {
                 ValeursTemp.Add(valeur[indices[i]]);
             }
-
-            valeur = ValeursTemp;
+            for (int i = 0; i < valeur.Count; i++)
+            {
+                valeur[i] = ValeursTemp[i];
+            }
         }
 
         public static double NegativeProd(int value,double decalage=0)

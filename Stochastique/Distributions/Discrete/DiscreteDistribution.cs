@@ -31,7 +31,7 @@ namespace Stochastique.Distributions.Discrete
         }
         public override double PDF(double x)
         {
-            if (Math.Abs(Math.Round(x) - x) < 1e-10)
+            if (Math.Abs(Math.Round(x) - x) < 1e-10 && x < int.MaxValue)
             {
                 return PDFInt((int)x);
             }

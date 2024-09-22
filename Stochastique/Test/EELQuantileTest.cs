@@ -71,7 +71,7 @@ namespace Stochastique.Test
             List<double> quantiles = Values.Select(a => Distribution.CDF(a)).ToList();
             for (int i = 0; i < quantiles.Count; i++)
             {
-                var quantileBeta = new BetaDistribution(i + 1, quantiles.Count -i).CDF(quantiles[i]);
+                var quantileBeta = new Stochastique.Distributions.Continous.LoiBeta(i + 1, quantiles.Count -i).CDF(quantiles[i]);
                 var valueForEEL = quantileBeta > 0.5 ? 1 - quantileBeta : quantileBeta;
                 PValues.Add(0.5 - ((1 - HelperEEL.GetQuantile(valueForEEL,  quantiles.Count))/2)*( quantileBeta>0.5?1:-1));
             }

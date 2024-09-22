@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MathNet.Symbolics;
+using Stochastique.Autre;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +17,63 @@ namespace Stochastique
                 return c;
             }
             return a / b;
+        }
+        public static List<int> Rang(this List<double> valeurs)
+        {
+            return valeurs.SortIndex().SortIndex();
+        }
+
+        private static List<int> SortIndex(this List<double> tab)
+        {
+            List<ValIndice> l = new List<ValIndice>();
+            for (int i = 0; i < tab.Count; i++)
+            {
+                l.Add(new ValIndice(i, tab[i]));
+            }
+
+            l.Sort(ValIndice.comparaison);
+            List<int> sortIndex = new List<int>();
+            for (int i = 0; i < tab.Count; i++)
+            {
+                sortIndex.Add(l[i].indice);
+            }
+
+            return sortIndex;
+        }
+
+        private static List<int> SortIndex(this List<int> tab)
+        {
+            List<double> d = new List<double>();
+            foreach (int i in tab)
+            {
+                d.Add(i);
+            }
+
+            return d.SortIndex();
+        }
+        public static void ReordonnerSimulations(this List<double> valeurs, List<int> indices)
+        {
+            double[] ValeursTemp = new double[valeurs.Count];
+            for (int i = 0; i < valeurs.Count; i++)
+            {
+                ValeursTemp[i]=valeurs[indices[i]];
+            }
+            for (int i = 0; i < valeurs.Count; i++)
+            {
+                valeurs[i]=ValeursTemp[i];
+            }
+        }
+        public static List<double> UniformeEmpirique(this List<double> valeurs)
+        {
+            List<double> u = new List<double>();
+            List<int> r = Rang(valeurs);
+            double invNbSimulations = 1.0 / (valeurs.Count + 1);
+            for (int i = 0; i < valeurs.Count; i++)
+            {
+                u.Add(invNbSimulations * (r[i] + 1));
+            }
+
+            return u;
         }
         public static string ToBeautifulString(this double d, bool isPercent = false)
         {

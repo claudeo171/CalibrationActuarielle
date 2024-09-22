@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
+    [MessagePack.MessagePackObject]
     public abstract class CopuleArchimedienne:Copule
     {
         //C(u,v) = inverseGenerateur(generateur(u)+generateur(v))
@@ -15,11 +16,12 @@ namespace Stochastique.Copule
         protected abstract double InverseGenerateurDerivate(double t, int ordre);
         protected abstract double InverseGenerateur(double t);
         //Loi dont la tranformée de Laplace est égale à la fonction "inverseGenerateur"
-        protected Distribution distribution;
+        [MessagePack.Key(4)]
+        protected Distribution Distribution { get; set; }
 
         public override List<List<double>> SimulerCopule(Random r, int nbSim)
         {
-            double[] N = distribution.Simulate(r,nbSim);
+            double[] N = Distribution.Simulate(r,nbSim);
             List<List<double>> uniformes = new List<List<double>>();
             ExponentialDistribution loiExp1 = new ExponentialDistribution(1);
 

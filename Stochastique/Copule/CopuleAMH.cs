@@ -10,8 +10,10 @@ using Stochastique.Enums;
 
 namespace Stochastique.Copule
 {
+    [MessagePack.MessagePackObject]
     public class CopuleAMH: CopuleArchimedienne
     {
+        [MessagePack.IgnoreMember]
         private double Theta => GetParameter(CopuleParameterName.thetaAMH).Value;
 
         public CopuleAMH(int dimension, double theta)
@@ -39,7 +41,7 @@ namespace Stochastique.Copule
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, CopuleHelper.RechercheDichotomique(0, 0.99999,(a)=>FonctionTau(tau,a))));
             base.Initialize(value, typeCalibration);
-            distribution = new GeometricDistribution(1 - GetParameter(CopuleParameterName.thetaAMH).Value);
+            Distribution = new GeometricDistribution(1 - GetParameter(CopuleParameterName.thetaAMH).Value);
         }
 
         private void communConstructeurs(double theta)
@@ -50,7 +52,7 @@ namespace Stochastique.Copule
             }
 
             AddParameter(new CopuleParameter(CopuleParameterName.thetaAMH, theta));
-            distribution = new GeometricDistribution(1 - theta);
+            Distribution = new GeometricDistribution(1 - theta);
         }
 
         protected override double Generateur(double t)

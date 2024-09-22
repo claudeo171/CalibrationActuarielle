@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Stochastique.Distributions.Continous
 {
     [MessagePackObject]
-    public class BetaDistribution : Distribution
+    public class LoiBeta : Distribution
     {
         [Key(6)]
         public override TypeDistribution Type => TypeDistribution.Beta;
@@ -25,11 +25,11 @@ namespace Stochastique.Distributions.Continous
         public override double InconditionnalMinimumPossibleValue => 0;
         [IgnoreMember]
         public override double InconditionnalMaximumPossibleValue => 1;
-        public BetaDistribution()
+        public LoiBeta()
         {
             
         }
-        public BetaDistribution(double a, double b)
+        public LoiBeta(double a, double b)
         {
             AddParameters(new List<Parameter> { new Parameter(ParametreName.aBeta, a), new Parameter(ParametreName.bBeta, b) });
         }

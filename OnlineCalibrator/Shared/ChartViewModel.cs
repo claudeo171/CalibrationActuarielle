@@ -51,7 +51,7 @@ namespace OnlineCalibrator.Shared
             Series = new ISeries[]{
             new LineSeries<ObservablePoint>
             {
-                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
+                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }).ToList(),
                 Name = "Quantile",
                 GeometryFill= new SolidColorPaint(SKColors.Green),
                 GeometryStroke = new SolidColorPaint(SKColors.Black),
@@ -131,7 +131,7 @@ namespace OnlineCalibrator.Shared
             var serieAsList = Series.ToList();
             serieAsList.Add(new LineSeries<ObservablePoint>
             {
-                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
+                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }).ToList(),
                 Fill = fill, // mark
                 Stroke = stroke,
                 GeometryFill = color == null ? null : new SolidColorPaint(color.Color),
@@ -188,7 +188,7 @@ namespace OnlineCalibrator.Shared
             var serieAsList = Series.ToList();
             serieAsList.Add(new LineSeries<ObservablePoint>
             {
-                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }),
+                Values = valeurs.Select(a => new ObservablePoint { X = a.X, Y = a.Y }).ToList(),
                 GeometryFill = fill,
                 GeometryStroke = stroke,
                 GeometrySize = 10,

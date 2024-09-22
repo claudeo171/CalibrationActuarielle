@@ -8,8 +8,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
+    [MessagePack.MessagePackObject]
     public class CopuleClayton:CopuleArchimedienne
     {
+        [MessagePack.IgnoreMember]
         private double Theta => GetParameter(CopuleParameterName.thetaClayton).Value;
 
         public CopuleClayton(int dimension, double theta)
@@ -37,7 +39,7 @@ namespace Stochastique.Copule
             }
 
             AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton,theta));
-            distribution = new GammaDistribution(1 / theta, theta);
+            Distribution = new GammaDistribution(1 / theta, theta);
         }
 
         protected override double Generateur(double t)
@@ -71,7 +73,7 @@ namespace Stochastique.Copule
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton, 2 * tau / (1 - tau)));
             base.Initialize(value, typeCalibration);
-            distribution = new GammaDistribution(1 / GetParameter(CopuleParameterName.thetaClayton).Value, GetParameter(CopuleParameterName.thetaClayton).Value);
+            Distribution = new GammaDistribution(1 / GetParameter(CopuleParameterName.thetaClayton).Value, GetParameter(CopuleParameterName.thetaClayton).Value);
         }
     }
 }

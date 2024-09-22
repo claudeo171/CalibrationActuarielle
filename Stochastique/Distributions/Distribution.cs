@@ -12,7 +12,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Stochastique.Distributions
 {
     [MessagePackObject]
-    [MessagePack.Union(0, typeof(BetaDistribution))]
+    [MessagePack.Union(0, typeof(LoiBeta))]
     [MessagePack.Union(1, typeof(CauchyDistribution))]
     [MessagePack.Union(2, typeof(ExponentialDistribution))]
     [MessagePack.Union(3, typeof(FisherDistribution))]
@@ -98,7 +98,7 @@ namespace Stochastique.Distributions
                 case TypeDistribution.Binomial:
                     return new BinomialDistribution();
                 case TypeDistribution.Beta:
-                    return new BetaDistribution();
+                    return new LoiBeta();
                 case TypeDistribution.Cauchy:
                     return new CauchyDistribution();
                 case TypeDistribution.Exponential:

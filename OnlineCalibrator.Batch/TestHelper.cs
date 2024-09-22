@@ -192,14 +192,14 @@ namespace OnlineCalibrator.Batch
         {
             var normal = new NormalDistribution(0, 1);
             List<Distribution> distributions = new List<Distribution> {
-                new BetaDistribution(0.5, 0.5), new BetaDistribution(1, 1), new BetaDistribution(2, 2),
+                new LoiBeta(0.5, 0.5), new LoiBeta(1, 1), new LoiBeta(2, 2),
                 new CauchyDistribution(0.5,0), new CauchyDistribution(1, 0), new CauchyDistribution(2, 0),
                 new UniformDistribution(0, 1),
                 new LaplaceDistribution(0,1),
                 new LogisticDistribution(2,2),
                 new TukeyDistribution(0.14),new TukeyDistribution(0.5), new TukeyDistribution(2), new TukeyDistribution(5),new TukeyDistribution(10),
                 new StudentDistribution(1),new StudentDistribution(2),new StudentDistribution(4),new StudentDistribution(10),
-                new BetaDistribution(2, 1), new BetaDistribution(2, 5), new BetaDistribution(4, 0.5),new BetaDistribution(5, 1),
+                new LoiBeta(2, 1), new LoiBeta(2, 5), new LoiBeta(4, 0.5),new LoiBeta(5, 1),
                 new Khi2Distribution(1),new Khi2Distribution(2),new Khi2Distribution(4),new Khi2Distribution(10),
                 new GammaDistribution(2, 2), new GammaDistribution(3, 2), new GammaDistribution(5, 1),new GammaDistribution(9, 1),new GammaDistribution(15, 1),new GammaDistribution(100, 1),
                 new GumbelDistribution(1,2),

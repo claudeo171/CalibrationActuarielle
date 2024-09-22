@@ -71,7 +71,7 @@ namespace Stochastique.Test
             PValues = new List<double>();
             for(int i = 0; i < quantiles.Count; i++)
             {
-                var distributionBeta=new BetaDistribution(i+1,quantiles.Count-i);
+                var distributionBeta=new LoiBeta(i+1,quantiles.Count-i);
                 PValues.Add(1-distributionBeta.CDF(quantiles[i]));
             }
         }

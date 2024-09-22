@@ -11,6 +11,10 @@ namespace Stochastique.Copule
 {
     [MessagePack.Union(0, typeof(CopuleAMH))]
     [MessagePack.Union(1, typeof(CopuleClayton))]
+    [MessagePack.Union(2, typeof(CopuleFrank))]
+    [MessagePack.Union(3, typeof(CopuleGaussienne))]
+    [MessagePack.Union(4, typeof(CopuleGumbel))]
+    [MessagePack.Union(5, typeof(CopuleJoe))]
     [MessagePack.MessagePackObject]
     public abstract class Copule
     {
@@ -245,6 +249,34 @@ namespace Stochastique.Copule
                     throw new Exception("Type de copule non reconnu");
             }
         }
+        public virtual void AppliquerCopule(List<List<double>> variablesAleatoires, Random r)
+        {
+            if (variablesAleatoires.Count != Dimension)
+            {
+                throw new Exception("Nombre de variables aléatoires diffère de la dimension de la copule");
+            }
 
+            int nbSim = variablesAleatoires[0].Count;
+
+            for (int i = 1; i < Dimension; i++)
+            {
+                if (variablesAleatoires[1].Count != nbSim)
+                {
+                    throw new Exception();
+                }
+            }
+
+            List<List<double>> uniformes = SimulerCopule(r,nbSim);
+
+            List<int> nouvelOrdre = RendreComonotone(variablesAleatoires[0], uniformes[0]);
+
+            for (int i = 1; i < Dimension; i++)
+            {
+                uniformes[i].ReordonnerSimulations(nouvelOrdre);
+                RendreComonotone(uniformes[i], variablesAleatoires[i]);
+            }
+        }
+
+       
     }
 }

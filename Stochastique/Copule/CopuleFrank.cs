@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stochastique.Distributions.Discrete;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,12 +7,15 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
+    [MessagePack.MessagePackObject]
     public class CopuleFrank : CopuleArchimedienne
     {
+        [MessagePack.IgnoreMember]
         public double Theta => GetParameter(CopuleParameterName.thetaFrank).Value;
         public CopuleFrank(double theta)
         {
             AddParameter(new CopuleParameter(CopuleParameterName.thetaFrank, theta));
+            Distribution = new LogarithmiqueDistribution(1-Math.Exp(-Theta));
         }
         protected override double Generateur(double t)
         {

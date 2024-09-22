@@ -92,7 +92,7 @@ namespace OnlineCalibrator.Shared
                 {
                     new LineSeries<ObservablePoint>
                     {
-                        Values = points.Select(a=> new ObservablePoint(a.X,  a.Y)),
+                        Values = points.Select(a => new ObservablePoint(a.X, a.Y)).ToList(),
                         Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4, Color= SKColors.Blue, IsStroke=true, IsFill=true,  },
 
                         GeometrySize = 0
@@ -118,7 +118,7 @@ namespace OnlineCalibrator.Shared
                 Series = points.Select((a, i) =>
                     new LineSeries<ObservablePoint>
                     {
-                        Values = a.Select(x => new ObservablePoint(x.X, x.Y)),
+                        Values = a.Select(x => new ObservablePoint(x.X, x.Y)).ToList(),
                         Stroke = content[i],
                         Fill = fill[i],
                         GeometrySize = geometrySize[i],
@@ -171,7 +171,7 @@ namespace OnlineCalibrator.Shared
 
                 series.Add(new LineSeries<ObservablePoint>
                 {
-                    Values = points.Select(a => new ObservablePoint(a.X, a.Y)),
+                    Values = points.Select(a => new ObservablePoint(a.X, a.Y)).ToList(),
                     Stroke = new SolidColorPaint(skcol) { StrokeThickness = 2, Color = skcol, IsStroke = true, IsFill = false },
                     Fill = null,
                     GeometrySize = 0
