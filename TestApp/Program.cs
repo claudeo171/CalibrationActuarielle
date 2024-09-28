@@ -10,6 +10,7 @@ using Stochastique.Copule;
 using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
 using System.Text;
+using TestApp;
 
 var normal = new NormalDistribution(0, 1);
 var logNormal = new NormalDistribution(0, 1000000);
@@ -106,7 +107,7 @@ var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.CalibratedDistribution = elt.ActualData.Distributions.First(a => a.Distribution is GammaDistribution).Distribution;
 elt.ActualData.GetQQPlot();
 
-
+elt.ActualData.Distributions.First().ToMsgPack().FromMsgPack<DistributionWithDatas>();
 
 var toto33 = DonneesImportes.FromMsgPack(elt.ToMsgPack());
 elt.ActualData.CalibratedDistribution=toto.First(a=>a.Distribution.Type==Stochastique.Enums.TypeDistribution.Beta).Distribution;

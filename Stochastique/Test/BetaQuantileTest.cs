@@ -42,6 +42,10 @@ namespace Stochastique.Test
                 }
             }
         }
+        public BetaQuantileTest()
+        {
+
+        }
         public BetaQuantileTest(double[] values,Distribution distribution, double alpha)
         {
             TypeTestStatistique = TypeTestStatistique.BetaQuantile;

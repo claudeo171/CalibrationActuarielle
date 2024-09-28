@@ -43,6 +43,10 @@ namespace Stochastique.Test
                 }
             }
         }
+        public EELQuantileTest()
+        {
+
+        }
         public EELQuantileTest(double[] values, Distribution distribution, double alpha)
         {
             TypeTestStatistique = TypeTestStatistique.EELQuantile;

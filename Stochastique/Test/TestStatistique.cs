@@ -14,6 +14,8 @@ namespace OnlineCalibrator.Shared
     [Union(0, typeof(ShapiroTest))]
     [Union(1, typeof(JarqueBeraTest))]
     [Union(2, typeof(KolmogorovSmirnovTest))]
+    [Union(3, typeof(BetaQuantileTest))]
+    [Union(4, typeof(EELQuantileTest))]
 
     public abstract class TestStatistique
     {
