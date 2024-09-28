@@ -10,12 +10,17 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Vecteur
 {
+    [MessagePack.MessagePackObject]
     public class VecteurGaussien : VecteurAleatoire
     {
-        private DenseVector vecteurEsperance;
-        private DenseVector vecteurEcartType;
-        private DenseMatrix matriceCorrelation;
-        private DenseMatrix triangleInfCholesky;
+        [MessagePack.Key(1)]
+        public DenseVector VecteurEsperance { get; set; }
+        [MessagePack.Key(2)]
+        public DenseVector VecteurEcartType { get; set; }
+        [MessagePack.Key(3)]
+        public DenseMatrix MatriceCorrelation { get; set; }
+        [MessagePack.Key(4)]
+        public DenseMatrix TriangleInfCholesky { get; set; }
 
         public VecteurGaussien(DenseVector vecteurEsperance, DenseVector vecteurEcartType, DenseMatrix matriceCorrelation)
         {
@@ -30,25 +35,25 @@ namespace Stochastique.Vecteur
                 checkLigneMatrice(i, matriceCorrelation);
             }
 
-            this.vecteurEsperance = new DenseVector(DenseVectorStorage<double>.OfVector(vecteurEsperance.Storage));
-            this.vecteurEcartType = new DenseVector(DenseVectorStorage<double>.OfVector(vecteurEcartType.Storage));
-            this.matriceCorrelation = new DenseMatrix(DenseColumnMajorMatrixStorage<double>.OfMatrix(matriceCorrelation.Storage));
+            this.VecteurEsperance = new DenseVector(DenseVectorStorage<double>.OfVector(vecteurEsperance.Storage));
+            this.VecteurEcartType = new DenseVector(DenseVectorStorage<double>.OfVector(vecteurEcartType.Storage));
+            this.MatriceCorrelation = new DenseMatrix(DenseColumnMajorMatrixStorage<double>.OfMatrix(matriceCorrelation.Storage));
             calculerCholesky();
         }
 
         public VecteurGaussien(DenseMatrix matriceCorrelation)
         {
             Dimension = Math.Min(matriceCorrelation.RowCount, matriceCorrelation.ColumnCount);
-            vecteurEsperance = new DenseVector(Dimension);
-            vecteurEcartType = new DenseVector(Dimension);
-            this.matriceCorrelation = new DenseMatrix(Dimension);
+            VecteurEsperance = new DenseVector(Dimension);
+            VecteurEcartType = new DenseVector(Dimension);
+            this.MatriceCorrelation = new DenseMatrix(Dimension);
 
             for (int i = 0; i < Dimension; i++)
             {
                 checkLigneMatrice(i, matriceCorrelation);
-                vecteurEcartType.At(i, 1.0);
+                VecteurEcartType.At(i, 1.0);
             }
-            this.matriceCorrelation = new DenseMatrix(DenseColumnMajorMatrixStorage<double>.OfMatrix(matriceCorrelation.Storage));
+            this.MatriceCorrelation = new DenseMatrix(DenseColumnMajorMatrixStorage<double>.OfMatrix(matriceCorrelation.Storage));
             calculerCholesky();
         }
 
@@ -67,18 +72,18 @@ namespace Stochastique.Vecteur
         {
             try
             {
-                triangleInfCholesky = (DenseMatrix)matriceCorrelation.Cholesky().Factor;
+                TriangleInfCholesky = (DenseMatrix)MatriceCorrelation.Cholesky().Factor;
             }
             catch (Exception e)
             {
                 if (Dimension == 2)
                 {
-                    triangleInfCholesky = new DenseMatrix(Dimension);
+                    TriangleInfCholesky = new DenseMatrix(Dimension);
 
-                    triangleInfCholesky.At(0, 0, matriceCorrelation[0, 1]);
-                    triangleInfCholesky.At(0, 1, 0);
-                    triangleInfCholesky.At(1, 0, 1);
-                    triangleInfCholesky.At(1, 1, 0);
+                    TriangleInfCholesky.At(0, 0, MatriceCorrelation[0, 1]);
+                    TriangleInfCholesky.At(0, 1, 0);
+                    TriangleInfCholesky.At(1, 0, 1);
+                    TriangleInfCholesky.At(1, 1, 0);
                 }
 
                 Console.WriteLine(e.StackTrace);
@@ -98,14 +103,14 @@ namespace Stochastique.Vecteur
                 }
             }
 
-            matriceGaussiennes = (DenseMatrix)triangleInfCholesky.Multiply(matriceGaussiennes);
+            matriceGaussiennes = (DenseMatrix)TriangleInfCholesky.Multiply(matriceGaussiennes);
             List<List<double>> variables = new List<List<double>>();
 
             for (int i = 0; i < Dimension; i++)
             {
                 for (int j = 0; j < nbSim; j++)
                 {
-                    matriceGaussiennes.At(i, j, vecteurEsperance.At(i) + vecteurEcartType.At(i) * matriceGaussiennes.At(i, j));
+                    matriceGaussiennes.At(i, j, VecteurEsperance.At(i) + VecteurEcartType.At(i) * matriceGaussiennes.At(i, j));
                 }
 
                 variables.Add(new List<double>(matriceGaussiennes.Row(i).ToArray()));

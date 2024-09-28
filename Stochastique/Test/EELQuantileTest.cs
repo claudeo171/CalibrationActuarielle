@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Test
 {
+    [MessagePackObject]
     public class EELQuantileTest : TestStatistique
     {
         private double[] valuesSeuil=new double[] { 0.9, 0.7, 0.5, 0.3, 0.1, 0.05, 0.02, 0.01, 0.002, 0.0005 };

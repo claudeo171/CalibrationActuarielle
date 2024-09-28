@@ -1,4 +1,5 @@
 ﻿using LiveChartsCore.Defaults;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Optimization;
 using MathNet.Numerics.RootFinding;
@@ -35,6 +36,14 @@ namespace Stochastique.Distributions
     [MessagePack.Union(20, typeof(TrunkatedDistribution))]
     [MessagePack.Union(21, typeof(LoiAfine))]
     [MessagePack.Union(22, typeof(MixtureDistribution))]
+    [MessagePack.Union(23, typeof(JoeDistribution))]
+    [MessagePack.Union(24, typeof(LogarithmiqueDistribution))]
+    [MessagePack.Union(25, typeof(PartieEntierePuissanceUniformeDistribution))]
+    [MessagePack.Union(26, typeof(TukeyDistribution))]
+    [MessagePack.Union(27, typeof(Pareto))]
+    [MessagePack.Union(28, typeof(Logistic))]
+    [MessagePack.Union(29, typeof(Laplace))]
+    [MessagePack.Union(30, typeof(GumbelDistribution))]
     public abstract class Distribution : IMessagePackSerializationCallbackReceiver
     {
         /// <summary>
@@ -292,7 +301,9 @@ namespace Stochastique.Distributions
             }
             double abs = (max + min) / 2;
             double ordonne = CDF(abs);
-            while (Math.Abs(ordonne - x) > 1e-6)
+            int maxIteration = 1000;
+            int iteration = 0;
+            while (Math.Abs(ordonne - x) > 1e-6 && iteration< maxIteration)
             {
                 if (x < ordonne)
                 {
@@ -304,6 +315,7 @@ namespace Stochastique.Distributions
                 }
                 abs = (max + min) / 2;
                 ordonne = CDF(abs);
+                iteration++;
             }
             return abs;
         }

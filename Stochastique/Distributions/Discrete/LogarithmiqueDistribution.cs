@@ -7,9 +7,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MessagePack;
 
 namespace Stochastique.Distributions.Discrete
 {
+    [MessagePackObject]
     public class LogarithmiqueDistribution : DiscreteDistribution
     {
         public LogarithmiqueDistribution() { }
@@ -17,7 +19,9 @@ namespace Stochastique.Distributions.Discrete
         {
             AddParameter(new Parameter(ParametreName.p, p));
         }
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Logarithmique;
+        [IgnoreMember]
         public double P => GetParameter(ParametreName.p).Value;
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)

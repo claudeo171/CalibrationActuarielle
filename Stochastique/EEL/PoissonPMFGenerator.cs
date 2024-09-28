@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
+    [MessagePack.MessagePackObject]
     public class PoissonPMFGenerator
     {
         public PoissonPMFGenerator(int max_k)
@@ -52,8 +53,12 @@ namespace Stochastique.EEL
                 pmf_array_ptr[i] = Math.Exp(-lambda + i * log_lambda - log_gamma_LUT[i + 1]);
             }
         }
+
+        [MessagePack.Key(0)]
         private int MaxK;
+        [MessagePack.Key(1)]
         private double[] log_gamma_LUT;
+        [MessagePack.Key(2)]
         public double[] pmf_array_ptr;
     }
 }

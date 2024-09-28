@@ -1,4 +1,5 @@
-﻿using Stochastique.Enums;
+﻿using MessagePack;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,10 +8,12 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
+    [MessagePackObject]
     public class PartieEntierePuissanceUniformeDistribution : DiscreteDistribution
     {
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.PartieEntierePuissanceUniforme;
-
+        [IgnoreMember]
         public double Theta=> GetParameter(ParametreName.theta).Value;
 
         public PartieEntierePuissanceUniformeDistribution(double  theta)

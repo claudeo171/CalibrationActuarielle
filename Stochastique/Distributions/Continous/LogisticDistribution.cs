@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class LogisticDistribution : Distribution
     {
         public LogisticDistribution() { }
@@ -17,8 +19,13 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.s, s));
         }
 
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Logistic;
+
+        [IgnoreMember]
         public double Mu => GetParameter(ParametreName.mu).Value;
+
+        [IgnoreMember]
         public double S => GetParameter(ParametreName.s).Value;
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
         {

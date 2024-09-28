@@ -10,11 +10,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class ParetoDistribution : Distribution
     {
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Pareto;
 
+        [IgnoreMember]
         public double K => GetParameter(ParametreName.k).Value;
+
+        [IgnoreMember]
         public double XM => GetParameter(ParametreName.xm).Value;
         [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;

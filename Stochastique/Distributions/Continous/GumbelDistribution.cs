@@ -1,5 +1,6 @@
 ﻿using Accord.Math;
 using MathNet.Numerics.Statistics;
+using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
+    [MessagePackObject]
     public class GumbelDistribution : Distribution
     {
         public GumbelDistribution() { }
@@ -17,8 +19,14 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.mu, mu));
             AddParameter(new Parameter(ParametreName.beta, beta));
         }
+
+        [IgnoreMember]
         public double Mu => GetParameter(ParametreName.mu).Value;
+
+        [IgnoreMember]
         public double Beta => GetParameter(ParametreName.beta).Value;
+
+        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Gumbel;
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)

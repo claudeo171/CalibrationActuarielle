@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
+    [MessagePackObject]
     public class DoubleBuffer<T>
     {
+        [Key(0)]
         public T[] Buff0 { get; set; }
+        [Key(1)]
         public T[] Buff1 { get; set; }
-
+        [Key(2)]
         public bool IsBuff0SRC { get; set; }
 
         public T[] get_src => IsBuff0SRC ? Buff0 : Buff1;

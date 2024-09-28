@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
+    [MessagePack.MessagePackObject]
     public class FFTWConvolver
     {
         public FFTWConvolver(int maximum_input_size)

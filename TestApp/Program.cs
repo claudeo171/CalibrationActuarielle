@@ -94,7 +94,7 @@ var d = Double.MinValue;
 
 Console.WriteLine(d.ToBeautifulString());
 //DonneesImportes.FromMsgPack(File.ReadAllBytes("C:\\Users\\Claude\\Downloads\\log (3).data"));
-var elt=FileService.GetDataFromFile(new FileStream("C:\\Users\\Claude\\OneDrive\\Documents\\data.csv", FileMode.Open,FileAccess.Read), "data.csv");
+var elt=FileService.GetDataFromFile(new FileStream("C:\\users\\claude\\Documents\\NormaleCorrelle.csv", FileMode.Open,FileAccess.Read), "NormaleCorrelle.csv");
 
 
 elt.NomData= elt.Donnees.First().Name;
@@ -103,6 +103,11 @@ elt.ActualData.IncludeTrunkatedDistributions = false;
 elt.ActualData.IsDiscreteDistribution = false;
 
 var toto = elt.ActualData.GetAllDistributions();
+elt.ActualData.CalibratedDistribution = elt.ActualData.Distributions.First(a => a.Distribution is GammaDistribution).Distribution;
+elt.ActualData.GetQQPlot();
+
+
+
 var toto33 = DonneesImportes.FromMsgPack(elt.ToMsgPack());
 elt.ActualData.CalibratedDistribution=toto.First(a=>a.Distribution.Type==Stochastique.Enums.TypeDistribution.Beta).Distribution;
 elt.ActualData.GetQQPlot();
