@@ -1,5 +1,6 @@
 ﻿using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,16 +58,11 @@ namespace Stochastique.Copule
            return Math.Pow(Math.Max(0,u.Sum(a=>Math.Pow(a,-Theta))-1),-1/Theta);
         }
 
-        protected override double InverseGenerateurDerivate(double t, int ordre)
+        protected override Expr InverseGenerator()
         {
-            if (1 + Theta * t < 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return -Math.Pow(Theta, ordre - 1) * Math.Pow(1 + Theta * t, -1 / Theta - ordre) * CopuleHelper.NegativeProd(ordre - 1, 1 / Theta);
-            }
+            var theta = Expr.Variable("thetaClayton");
+            var t = Expr.Variable("t");
+            return (1 + theta*t).Pow(-1/t);
         }
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {

@@ -9,9 +9,12 @@ using Stochastique;
 using Stochastique.Copule;
 using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
+using Stochastique.SpecialFunction;
 using System.Text;
 using TestApp;
 
+
+var rst=Debye.gsl_sf_debye_1_e(0.01);
 var normal = new NormalDistribution(0, 1);
 var logNormal = new NormalDistribution(0, 1000000);
 var rand = MersenneTwister.MTRandom.Create(139478);
@@ -102,7 +105,9 @@ elt.NomData= elt.Donnees.First().Name;
 elt.ActualData.IncludeTrunkatedDistributions = false;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
-
+elt.NomDataConjointe1 = elt.Donnees.First().Name;
+elt.NomDataConjointe2 = elt.Donnees.Last().Name;
+var ttttt=elt.ActualDonneesPourAnalyseConjointe.GetAllCopula();
 var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.CalibratedDistribution = elt.ActualData.Distributions.First(a => a.Distribution is GammaDistribution).Distribution;
 elt.ActualData.GetQQPlot();

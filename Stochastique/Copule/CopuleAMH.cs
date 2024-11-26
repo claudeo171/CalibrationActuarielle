@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Stochastique.Distributions.Discrete;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 using Stochastique.Enums;
 
 namespace Stochastique.Copule
@@ -64,15 +65,12 @@ namespace Stochastique.Copule
         {
             return (1 - Theta) / (Math.Exp(t) - Theta);
         }
-        protected override double InverseGenerateurDerivate(double t, int ordre)
+
+        protected override Expr InverseGenerator()
         {
-            double rst = 0;
-            for(int i=1;i<=ordre;i++)
-            {
-                rst += Math.Exp(i * t) * Math.Pow(Math.Exp(t) - Theta, -ordre - 1) * B(ordre, i);
-            }
-            rst *= Theta - 1;
-            return rst;
+            var theta = Expr.Variable("thetaAMH");
+            var t = Expr.Variable("t");
+            return (1- theta)/(Expr.E.Pow(t)-theta);
         }
 
         private int B(int n,int k)
@@ -90,5 +88,7 @@ namespace Stochastique.Copule
                 return k * B(n - 1, k) - k * B(n - 1, k - 1);
             }
         }
+
+
     }
 }

@@ -56,6 +56,7 @@ namespace Stochastique.Enums
         Logarithmique=24,
         PartieEntierePuissanceUniforme=25,
         Joe=26,
+        Stable=27,
         Trunkated =1000,
         TrunkatedNormal = 1001,
         TrunkatedStudent = 1002, 
@@ -80,6 +81,6 @@ namespace Stochastique.Enums
 
     public enum TypeCopule
     {
-        Clayton,CopuleAMH
+        Clayton,CopuleAMH,Frank,Gumbel,Joe,Gaussian
     }
 }

@@ -13,7 +13,10 @@ namespace Stochastique.Copule
     {
         [MessagePack.Key(5)]
         private DenseMatrix matriceCorrelations;
-
+        public CopuleGaussienne()
+        {
+            Type = Enums.TypeCopule.Gaussian;
+        }
         public CopuleGaussienne(double rho)
         {
             if (rho < -1 || rho > 1)

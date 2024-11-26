@@ -576,7 +576,6 @@ namespace Stochastique.Distributions
         public void OnBeforeSerialize()
         {
             ParametersList = AllParameters()?.ToList();
-            Console.WriteLine("Before");
         }
         /// <summary>
         /// Fuction called after deserialization to store parameters in a dictionnary

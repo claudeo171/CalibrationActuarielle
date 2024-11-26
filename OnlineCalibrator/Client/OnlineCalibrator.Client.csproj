@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86;x64</Platforms>
@@ -15,12 +15,13 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-rc3.3" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-rc4.5" />
     <PackageReference Include="MersenneTwister" Version="1.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.2.38" />
+    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.22" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.FSharp.Core.ByRefKinds;
 
 namespace Stochastique.Copule
 {
@@ -68,6 +69,7 @@ namespace Stochastique.Copule
     }
     public static class CopuleHelper
     {
+
         public static List<int> Rang(this IEnumerable<double> data)
         {
             int count = data.Count();

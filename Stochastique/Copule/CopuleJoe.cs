@@ -1,4 +1,5 @@
 ﻿using Stochastique.Distributions.Discrete;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,9 @@ namespace Stochastique.Copule
     [MessagePack.MessagePackObject]
     public class CopuleJoe : CopuleArchimedienne
     {
-        public CopuleJoe() { }
+        public CopuleJoe() {
+            Type = Enums.TypeCopule.Joe;
+        }
         public CopuleJoe(double theta)
         {
             Dimension = 2;
@@ -29,9 +32,11 @@ namespace Stochastique.Copule
             return 1 - Math.Pow((1 - Math.Exp(-t)), 1 / Theta);
         }
 
-        protected override double InverseGenerateurDerivate(double t, int ordre)
+        protected override Expr InverseGenerator()
         {
-            throw new NotImplementedException();
+            var theta = Expr.Variable("thetaJoe");
+            var t = Expr.Variable("t");
+            return 1- (1-(-t).Exp()).Pow(1 / theta);
         }
     }
 }

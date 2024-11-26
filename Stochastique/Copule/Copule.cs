@@ -245,6 +245,14 @@ namespace Stochastique.Copule
                     return new CopuleClayton();
                 case TypeCopule.CopuleAMH:
                     return new CopuleAMH();
+                case TypeCopule.Frank:
+                    return new CopuleFrank();
+                case TypeCopule.Gumbel:
+                    return new CopuleGumbel();
+                case TypeCopule.Joe:
+                    return new CopuleJoe();
+                case TypeCopule.Gaussian:
+                    return new CopuleGaussienne();
                 default:
                     throw new Exception("Type de copule non reconnu");
             }

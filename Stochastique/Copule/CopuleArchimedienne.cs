@@ -1,10 +1,12 @@
 ﻿using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
+using Expr = MathNet.Symbolics.SymbolicExpression;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Symbolics;
 
 namespace Stochastique.Copule
 {
@@ -13,11 +15,30 @@ namespace Stochastique.Copule
     {
         //C(u,v) = inverseGenerateur(generateur(u)+generateur(v))
         protected abstract double Generateur(double t);
-        protected abstract double InverseGenerateurDerivate(double t, int ordre);
+        
         protected abstract double InverseGenerateur(double t);
         //Loi dont la tranformée de Laplace est égale à la fonction "inverseGenerateur"
         [MessagePack.Key(4)]
         protected Distribution Distribution { get; set; }
+
+        protected abstract Expr InverseGenerator();
+
+        protected double InverseGenerateurDerivate(double t, int ordre)
+        {
+            var fct = InverseGenerator();
+            var variable = SymbolicExpression.Variable("t");
+            var values = new Dictionary<string, FloatingPoint>();
+            values.Add("t", t);
+            foreach (var v in AllParameters())
+            {
+                values.Add(v.Name.ToString(), v.Value);
+            }
+            for (int i = 0; i < ordre; i++)
+            {
+                fct = fct.Differentiate(variable);
+            }
+            return fct.Evaluate(values).RealValue;
+        }
 
         public override List<List<double>> SimulerCopule(Random r, int nbSim)
         {
