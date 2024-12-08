@@ -29,23 +29,10 @@ namespace OnlineCalibrator.Shared
         {
             get
             {
-                var xValueOrdered = DonneesAAnalyser1.Values.Select<double, (double valeur, int indice)>((a, i) => new(a, i)).OrderBy(a => a.valeur).ToArray();
-                var yValueOrdered = DonneesAAnalyser2.Values.Select<double, (double valeur, int indice)>((a, i) => new(a, i)).OrderBy(a => a.valeur).ToArray();
-                Point[] rst = new Point[xValueOrdered.Length];
-                for (int i = 0; i < DonneesAAnalyser1.Values.Length; i++)
-                {
-                    if (rst[xValueOrdered[i].indice] == null)
-                    {
-                        rst[xValueOrdered[i].indice] = new Point();
-                    }
-                    if (rst[yValueOrdered[i].indice] == null)
-                    {
-                        rst[yValueOrdered[i].indice] = new Point();
-                    }
-                    rst[xValueOrdered[i].indice].X = (double)i/ xValueOrdered.Length;
-                    rst[yValueOrdered[i].indice].Y = (double)i/ xValueOrdered.Length;
-                }
-                return rst;
+                var elts = new List<List<double>>();
+                elts.Add(DonneesAAnalyser1.Values.ToList());
+                elts.Add(DonneesAAnalyser2.Values.ToList());
+                return elts.GetDensity();
             }
         }
 

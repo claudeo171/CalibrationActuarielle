@@ -58,6 +58,22 @@ File.WriteAllText(@".\rstCorrel.csv",sb.ToString());
 var truncated = new TrunkatedDistribution(normal, 0.1, 0.75);
 var student = new StudentDistribution(3);
 var afine = new LoiAfine(student, 2, 1);
+GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDensity(logNormal.Simulate(rand, 1000).ToArray(), 100) },
+
+    new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(0)) },
+    new List<Paint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness=0 } },
+    new List<Paint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 0 } },
+    new List<int> { 0 },
+
+    "pfgml");
+GenerationGraphique.SaveChartImage(new List<Point[]> { ln3.GetDensity() },
+
+    new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(0)) },
+    new List<Paint> { null },
+    new List<Paint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 5 } },
+    new List<int> { 10 },
+
+    "rangML");
 GenerationGraphique.SaveChartImage(
     new List<Point[]> { Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, normal.PDF(-5.0 + (i) / 10.0))).ToArray(), Enumerable.Repeat(0.0, 100).Select((a, i) => new Point(-5.0 + (i) / 10.0, truncated.PDF(-5 + (i) / 10.0))).ToArray() },
     new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(50)), new SolidColorPaint(SKColors.Red.WithAlpha(50)) },

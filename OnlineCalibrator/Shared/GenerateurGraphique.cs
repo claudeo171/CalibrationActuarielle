@@ -123,17 +123,12 @@ namespace OnlineCalibrator.Shared
                         Fill = fill[i],
                         GeometrySize = geometrySize[i],
                         GeometryFill = geometryFill[i],
-                        LineSmoothness = 0
+                        LineSmoothness = 0,
                     }
                 ),
                 Width = width,
                 Height = height,
-                DrawMarginFrame = new DrawMarginFrame
-                {
 
-                    Fill = new SolidColorPaint(new SKColor(220, 220, 220)),
-                    Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
-                }
             };
             if (!showAxis)
             {
@@ -141,6 +136,15 @@ namespace OnlineCalibrator.Shared
                 skChart.YAxes.First().ShowSeparatorLines = false;
                 skChart.XAxes.First().Labeler = a => "";
                 skChart.YAxes.First().Labeler = a => "";
+            }
+            else
+            {
+                skChart.DrawMarginFrame = new DrawMarginFrame
+                {
+
+                    Fill = new SolidColorPaint(new SKColor(220, 220, 220)),
+                    Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
+                };
             }
             skChart.SaveImage($"{name}.png");
 

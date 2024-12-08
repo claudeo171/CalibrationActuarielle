@@ -264,7 +264,26 @@ namespace Stochastique.Copule
 
             return nbSwap;
         }
-
+        public static Point[] GetDensity(this List<List<double>> valeurs)
+        {
+            var xValueOrdered = valeurs[0].Select<double, (double valeur, int indice)>((a, i) => new(a, i)).OrderBy(a => a.valeur).ToArray();
+            var yValueOrdered = valeurs[1].Select<double, (double valeur, int indice)>((a, i) => new(a, i)).OrderBy(a => a.valeur).ToArray();
+            Point[] rst = new Point[xValueOrdered.Length];
+            for (int i = 0; i < xValueOrdered.Length; i++)
+            {
+                if (rst[xValueOrdered[i].indice] == null)
+                {
+                    rst[xValueOrdered[i].indice] = new Point();
+                }
+                if (rst[yValueOrdered[i].indice] == null)
+                {
+                    rst[yValueOrdered[i].indice] = new Point();
+                }
+                rst[xValueOrdered[i].indice].X = (double)i / xValueOrdered.Length;
+                rst[yValueOrdered[i].indice].Y = (double)i / xValueOrdered.Length;
+            }
+            return rst;
+        }
         public static List<double> GetCDF(this List<List<double>> values)
         {
             List<double> rst = new List<double>();

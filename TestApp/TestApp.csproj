@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OnlineCalibrator.Service\OnlineCalibrator.Service.csproj" />
     <ProjectReference Include="..\OnlineCalibrator\Shared\OnlineCalibrator.Shared.csproj" />
   </ItemGroup>

@@ -19,8 +19,9 @@
     <PackageReference Include="MersenneTwister" Version="1.0.6" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.22" />
+    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.30" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
   </ItemGroup>
 
