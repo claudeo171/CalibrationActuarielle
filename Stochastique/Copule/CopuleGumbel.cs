@@ -1,4 +1,5 @@
 ﻿using MathNet.Symbolics;
+using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using Stochastique.SpecialFunction;
 using System;
@@ -18,6 +19,7 @@ namespace Stochastique.Copule
         public CopuleGumbel() : base(2)
         {
             Type = TypeCopule.Gumbel;
+            
         }
         protected override double Generateur(double t)
         {
@@ -42,7 +44,7 @@ namespace Stochastique.Copule
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaGumbel, 1/1-tau ));
             base.Initialize(value, typeCalibration);
-            //Distribution = new GeometricDistribution(1 - GetParameter(CopuleParameterName.thetaAMH).Value);
+            Distribution = new StableDistribution(0, Math.Pow(Math.Cos(Math.PI / (2 * Theta)), Theta), 1 / Theta, 1);
         }
 
     }
