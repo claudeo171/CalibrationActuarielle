@@ -12,11 +12,13 @@ html, body {
     align-items: center;
     display: flex;
 }
-img-fullPage {
-    object-fit: contain;
-    max-width: 100%;
+.img-fullPage {
     max-height: 100%;
+    max-width: 100%;
     aspect-ratio: 1/1;
+    margin-left: auto;
+    margin-right: auto;
+    width:auto;
 }
 
 h1:focus {

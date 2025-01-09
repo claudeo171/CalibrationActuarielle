@@ -7,20 +7,21 @@ using System.Text;
 using System.Threading.Tasks;
 using Stochastique.Enums;
 using Stochastique.SpecialFunction;
+using MathNet.Symbolics;
 
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
-    public class CopuleFrank : CopuleArchimedienne
+    public partial class CopuleFrank : CopuleArchimedienne
     {
         [MessagePack.IgnoreMember]
         public double Theta => GetParameter(CopuleParameterName.thetaFrank).Value;
 
-        public CopuleFrank()
+        public CopuleFrank() : base(2)
         {
             Type = TypeCopule.Frank;
         }
-        public CopuleFrank(double theta)
+        public CopuleFrank(double theta) : base(2)
         {
             AddParameter(new CopuleParameter(CopuleParameterName.thetaFrank, theta));
             Distribution = new LogarithmiqueDistribution(1-Math.Exp(-Theta));
@@ -28,14 +29,14 @@ namespace Stochastique.Copule
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
             double tau = value.First().TauKendall(value.Last());
-            AddParameter(new CopuleParameter(CopuleParameterName.thetaFrank, CopuleHelper.RechercheDichotomique(0, 0.99999, (a) => FonctionTau(tau, a))));
+            AddParameter(new CopuleParameter(CopuleParameterName.thetaFrank, CopuleHelper.RechercheDichotomique(0.00001, 30, (a) => FonctionTau(tau, a))));
             base.Initialize(value, typeCalibration);
-            Distribution = new GeometricDistribution(1 - GetParameter(CopuleParameterName.thetaAMH).Value);
+            Distribution = new LogarithmiqueDistribution(1 - Math.Exp(-Theta));
         }
 
         private double FonctionTau(double tau, double theta)
         {
-            return tau - (1 - 4 / Theta *(1 - Debye.gsl_sf_debye_1_e(Theta)));
+            return tau - (1 - 4 / theta * (1 - Debye.gsl_sf_debye_1_e(theta)));
         }
 
         protected override double Generateur(double t)
@@ -48,11 +49,13 @@ namespace Stochastique.Copule
             return -1/Theta * Math.Log(1+Math.Exp(-t)*(Math.Exp(-Theta)-1));
         }
 
-        protected override Expr InverseGenerator()
+        protected override Expr InverseGenerator(SymbolicExpression param,List<SymbolicExpression> copuleParam)
         {
-            var theta = Expr.Variable("thetaFrank");
-            var t = Expr.Variable("t");
-            return -(1 / theta) * (-1 / t) *(1+(-t).Exp()*((-theta).Exp()-1)).Ln();
+            return -(1 / copuleParam[0]) * (1 + (-param).Exp() * ((-copuleParam[0]).Exp()-1)).Ln();
+        }
+        protected override Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
+        {
+            return -(((-copuleParam[0]*param).Exp()-1)/ ((-copuleParam[0] ).Exp() - 1)).Ln();
         }
     }
 }

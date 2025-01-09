@@ -52,9 +52,15 @@ namespace Stochastique.Copule
                     case CopuleParameterName.rho:
                         return -1;
                     case CopuleParameterName.thetaClayton:
-                        return -1+Math.Pow(10,-10);
+                        return 0.00001;
                     case CopuleParameterName.thetaAMH:
                         return 0;
+                    case CopuleParameterName.thetaFrank:
+                        return 0.00001;
+                    case CopuleParameterName.thetaGumbel:
+                        return 1.001;
+                    case CopuleParameterName.thetaJoe:
+                        return 1.00001;
                     default:
                         return double.MinValue;
                 }
@@ -74,6 +80,12 @@ namespace Stochastique.Copule
                         return double.MaxValue;
                     case CopuleParameterName.thetaAMH:
                         return 1 - Math.Pow(10, -10);
+                    case CopuleParameterName.thetaFrank:
+                        return 30;
+                    case CopuleParameterName.thetaGumbel:
+                        return 1e10;
+                    case CopuleParameterName.thetaJoe:
+                        return 100;
                     default:
                         return double.MinValue;
                 }

@@ -13,8 +13,54 @@ using Stochastique.SpecialFunction;
 using System.Text;
 using TestApp;
 
+#region test copule
+var testCopule = FileService.GetDataFromFile(new FileStream("C:\\users\\parent.claude\\Documents\\Classeur1.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv");
 
-var rst=Debye.gsl_sf_debye_1_e(0.01);
+
+testCopule.NomData = testCopule.Donnees.First().Name;   
+testCopule.ActualData.IncludeTrunkatedDistributions = false;
+//var toto = elt.ActualData.GetAllDistributions();
+testCopule.ActualData.IsDiscreteDistribution = false;
+testCopule.NomDataConjointe1 = "A";
+testCopule.NomDataConjointe2 = "D";
+var resultatTestCopule = testCopule.ActualDonneesPourAnalyseConjointe.GetAllCopula();
+testCopule.ActualDonneesPourAnalyseConjointe?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
+testCopule.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123));
+//testCopule.DonneesPourAnalyseConjointes = null;
+var trololo4864=testCopule.ToMsgPack();
+var totogggg= MessagePack.MessagePackSerializer.Serialize(testCopule.ActualDonneesPourAnalyseConjointe.Copules[2]);
+DonneesImportes.FromMsgPack(trololo4864);
+#endregion
+
+#region Graphique Puissance test
+
+var loiNormale = new NormalDistribution(0, 1);
+var loiBeta = new LoiBeta(0.5, 0.5);
+var loiBeta2 = new GammaDistribution(5, 5);
+int nbSim = 1000;
+double[] statNormale = new double[nbSim];
+double[] statBeta = new double[nbSim];
+double[] statBeta2 = new double[nbSim];
+Random randdd= new Random(154365458);
+for(int i = 0; i < nbSim; i++)
+{
+    statNormale[i] = new ShapiroTest(loiNormale.Simulate(randdd, 50)).Test.Statistic;
+    statBeta[i] = new ShapiroTest(loiBeta.Simulate(randdd, 50)).Test.Statistic;
+    statBeta2[i] = new ShapiroTest(loiBeta2.Simulate(randdd, 50)).Test.Statistic;
+}
+
+GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDensity(statNormale, 100), GenerationGraphique.GetDensity(statBeta, 100), GenerationGraphique.GetDensity(statBeta2, 100) },
+
+    new List<Paint> { new SolidColorPaint(SKColors.Blue.WithAlpha(0)), new SolidColorPaint(SKColors.DarkRed.WithAlpha(0)), new SolidColorPaint(SKColors.Indigo.WithAlpha(0)) },
+    new List<Paint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.DarkRed) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.Indigo) { StrokeThickness = 0 } },
+     new List<Paint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.DarkRed) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.Indigo) { StrokeThickness = 0 } },
+    new List<int> { 0,0,0 },
+
+    "distributionTestShapiro",800, 400, true);
+
+#endregion
+
+var rst =Debye.gsl_sf_debye_1_e(0.01);
 var normal = new NormalDistribution(0, 1);
 var logNormal = new NormalDistribution(0, 1000000);
 var rand = MersenneTwister.MTRandom.Create(139478);

@@ -8,6 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Stochastique;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics;
+using Stochastique.Test;
 
 namespace OnlineCalibrator.Batch
 {
@@ -20,14 +24,27 @@ namespace OnlineCalibrator.Batch
             {
                 valueCopy[i] = value[i];
             }
+            //On travaille sur des données centrées réduites
             double[] res = new double[maxMoment];
             for (int i = 1; i <= maxMoment; i++)
             {
-
                 res[i - 1] = valueCopy.Sum() / valueCopy.Length;
                 for(int j = 0; j < valueCopy.Length; j++)
                 {
                     valueCopy[j] *= value[j]; 
+                }
+            }
+            return res;
+        }
+        public static double[] CentrerMoment(this double[] value)
+        {
+            double[] res = new double[value.Length];
+            res[0] = 0;
+            for(int i=1;i<value.Length; i++)
+            {
+                for(int j=0;j<=i; j++)
+                {
+                    res[i] += value[i-j]*Math.Pow(-value[0],j)* SpecialFunctions.Binomial(i+1,j);
                 }
             }
             return res;
@@ -57,7 +74,8 @@ namespace OnlineCalibrator.Batch
                 {
                     if (normalisation != null)
                     {
-                        rtemp = Math.Abs( rtemp - theoricalMoment[i-1] )/  normalisation[i - 1];
+
+                        rtemp = normalisation[i - 1] == 0 ? (Math.Abs(rtemp - theoricalMoment[i - 1])>10e-12?1000:0) : Math.Abs( rtemp - theoricalMoment[i-1] )/  normalisation[i - 1];
                     }
                     else
                     {
@@ -87,10 +105,10 @@ namespace OnlineCalibrator.Batch
             return result;
         }
 
-        public static (double seuilInf, double seuilSup, double[]? normalisation) GetSeuilTest(Distribution d, int size, int maxMoment, double alpha, Random r, bool isInfty, bool isRatio, double powN, bool normaliser, bool normalizedWithQuantile)
+        public static (double seuilInf, double seuilSup, double[]? normalisation) GetSeuilTest(Distribution d, int size, int maxMoment, double alpha, Random r, bool isInfty, bool isRatio, double powN, bool normaliser, bool normalizedWithQuantile,bool centrerReduire)
         {
             int nb = 100000;
-            double[] moment = d.GetMomentList(maxMoment);
+            double[] moment = d.GetMomentList(maxMoment,centrerReduire).CentrerMoment();
 
             if (normaliser)
             {
@@ -100,19 +118,33 @@ namespace OnlineCalibrator.Batch
                 double[] normalisation = new double[maxMoment];
                 for (int i = 0; i < nb; i++)
                 {
-                    val[i] = GetMoment(d.Simulate(r, size),maxMoment);
+                    if (centrerReduire)
+                    {
+                        val[i] = GetMoment(d.Simulate(r, size).CentrerReduire(), maxMoment).CentrerMoment();
+                    }
+                    else
+                    {
+                        val[i] = GetMoment(d.Simulate(r, size), maxMoment).CentrerMoment();
+                    }
                 }
                 for (int i = 0; i < maxMoment; i++)
                 {
                     var array = val.Select((a) => Math.Abs(a[i] - moment[i])).ToArray();
                     array.Sort();
-                    if (normalizedWithQuantile)
-                    { 
-                        normalisation[i] = array[(int)(nb * (1 - alpha))];
+                    if (centrerReduire && i < 2)
+                    {
+                        normalisation[i] = 0;
                     }
                     else
                     {
-                        normalisation[i] = Math.Sqrt(array.Variance());
+                        if (normalizedWithQuantile)
+                        {
+                            normalisation[i] = array[(int)(nb * (1 - alpha))];
+                        }
+                        else
+                        {
+                            normalisation[i] = Math.Sqrt(array.Variance());
+                        }
                     }
                 }
                 for (int i = 0; i < nb; i++)
@@ -127,7 +159,7 @@ namespace OnlineCalibrator.Batch
                 double[] val = new double[nb];
                 for (int i = 0; i < nb; i++)
                 {
-                    val[i] = d.Simulate(r, size).GetMoment(maxMoment).GetStatistic( moment, maxMoment, isInfty, isRatio, powN, null);
+                    val[i] = d.Simulate(r, size).GetMoment(maxMoment).CentrerMoment().GetStatistic( moment, maxMoment, isInfty, isRatio, powN, null);
                 }
                 val.Sort();
                 if (isRatio)
@@ -144,11 +176,14 @@ namespace OnlineCalibrator.Batch
         public static List<ResultPuissance> CalculerPuissance(Distribution distributionTeste, Distribution distributionCalibree, double risque1espece, Random r, bool isInfty, bool isRatio, double powN,bool normaliser,int maxMoment, bool normalizedWithQuantile)
         {
             List<ResultPuissance> result = new List<ResultPuissance>();
-            double[] moment = distributionTeste.GetMomentList(maxMoment);
-            List<int> sampleSize = new List<int>() { 10, 20, 30, 50, 100, 200, 300, 400, 500, 1000 };
+            bool centrerReduire = distributionTeste is NormalDistribution;
+            double[] moment = distributionTeste.GetMomentList(maxMoment, centrerReduire).CentrerMoment();
+            List<int> sampleSize = new List<int>() { 10, 20, 30, 50, 100, 200 };
+            
             foreach (var i in sampleSize)
             {
-                var seuil = GetSeuilTest(distributionTeste, i, maxMoment, risque1espece, r, isInfty, isRatio, powN,normaliser, normalizedWithQuantile);
+
+                var seuil = GetSeuilTest(distributionTeste, i, maxMoment, risque1espece, r, isInfty, isRatio, powN,normaliser, normalizedWithQuantile, centrerReduire);
                 double nbFalse = 0;
                 double nbFalseNormal = 0;
                 double nbFalseShapiro = 0;
@@ -158,12 +193,20 @@ namespace OnlineCalibrator.Batch
                 {
                     var sample = distributionCalibree.Simulate(r, i);
                     var sampleNormal = distributionTeste.Simulate(r, i);
-                    if (!double.IsNaN(distributionCalibree.ExpextedValue()) && !double.IsNaN(distributionCalibree.Variance()))
+                    if (centrerReduire)
                     {
-                        sample = sample.Select(a => a * distributionTeste.StandardDeviation() / distributionCalibree.StandardDeviation() - distributionCalibree.ExpextedValue() + distributionTeste.ExpextedValue()).ToArray();
+                        sample = sample.CentrerReduire();
+                        sampleNormal= sampleNormal.CentrerReduire();
                     }
-                    ShapiroTest shapiro = new ShapiroTest(sample);
-                    ShapiroTest shapiroNormal = new ShapiroTest(sampleNormal);
+                    else
+                    {
+                        if (!double.IsNaN(distributionCalibree.ExpextedValue()) && !double.IsNaN(distributionCalibree.Variance()))
+                        {
+                            sample = sample.Select(a => a * distributionTeste.StandardDeviation() / distributionCalibree.StandardDeviation() - distributionCalibree.ExpextedValue() + distributionTeste.ExpextedValue()).ToArray();
+                        }
+                    }
+                    KolmogorovSmirnovTest shapiro = new KolmogorovSmirnovTest(sample, new StudentDistribution(i));
+                    KolmogorovSmirnovTest shapiroNormal = new KolmogorovSmirnovTest(sampleNormal, new StudentDistribution(i - 1));
                     if (shapiro.PValue < risque1espece)
                     {
                         nbFalseShapiro++;
@@ -172,12 +215,12 @@ namespace OnlineCalibrator.Batch
                     {
                         nbFalseShapiroNormal++;
                     }
-                    var value = sample.GetMoment(maxMoment).GetStatistic(moment, maxMoment, isInfty, isRatio, powN,seuil.normalisation);
+                    var value = sample.GetMoment(maxMoment).CentrerMoment().GetStatistic(moment, maxMoment, isInfty, isRatio, powN,seuil.normalisation);
                     if (seuil.seuilInf > value || seuil.seuilSup < value)
                     {
                         nbFalse++;
                     }
-                    var valueNormal = sampleNormal.GetMoment(maxMoment).GetStatistic(moment, maxMoment, isInfty, isRatio, powN, seuil.normalisation);
+                    var valueNormal = sampleNormal.GetMoment(maxMoment).CentrerMoment().GetStatistic(moment, maxMoment, isInfty, isRatio, powN, seuil.normalisation);
                     if (seuil.seuilInf > valueNormal || seuil.seuilSup < valueNormal)
                     {
                         nbFalseNormal++;
@@ -209,9 +252,9 @@ namespace OnlineCalibrator.Batch
                 new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-2),normal.CDF(1)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(1)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(2))
             };
             var rst = new List<ResultPuissance>[distributions.Count];
-            Parallel.For(0, distributions.Count, new ParallelOptions { MaxDegreeOfParallelism = parralleLevel }, (int i) =>
+            Parallel.For(0, distributions.Count, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (int i) =>
             {
-                rst[i] = OnlineCalibrator.Batch.TestHelper.CalculerPuissance(new NormalDistribution(0, 1), distributions[i], 0.05, new Random(),isInfty,isRatio,powN, normaliser, maxMoment, normalizedWithQuantile);
+                rst[i] = OnlineCalibrator.Batch.TestHelper.CalculerPuissance(normal, distributions[i], 0.05, new Random(),isInfty,isRatio,powN, normaliser, maxMoment, normalizedWithQuantile);
                 Console.WriteLine($"La distribution {distributions[i]} a été testé");
             });
             var stringResult = new StringBuilder();

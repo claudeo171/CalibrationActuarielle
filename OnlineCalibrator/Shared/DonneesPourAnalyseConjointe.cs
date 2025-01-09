@@ -131,7 +131,7 @@ namespace OnlineCalibrator.Shared
                 copule = GetCopule(typeDistribution.GetValueOrDefault(), null).Copule;
             }
             var simulatedData=copule.SimulerCopule(r, DonneesAAnalyser1.Values.Length);
-            for (int i = 0; i < simulatedData.Count; i++)
+            for (int i = 0; i < simulatedData.First().Count; i++)
             {
                 rst[1][i] = new Point() { X = simulatedData[0][i], Y = simulatedData[1][i] };
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,17 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
+    [MessagePack.MessagePackObject]
+    [MessagePack.Union(0,typeof(BinomialDistribution))]
+    [MessagePack.Union(1, typeof(BernouliDistribution))]
+    [MessagePack.Union(2, typeof(GeometricDistribution))]
+    [MessagePack.Union(3, typeof(HyperGeometricalDistribution))]
+    [MessagePack.Union(4, typeof(LogarithmiqueDistribution))]
+    [MessagePack.Union(5, typeof(NegativeBinomialDistribution))]
+    [MessagePack.Union(6, typeof(PascalDistribution))]
+    [MessagePack.Union(7, typeof(PoissonDistribution))]
+    [MessagePack.Union(8, typeof(JoeDistribution))]
+    [MessagePack.Union(9, typeof(PartieEntierePuissanceUniformeDistribution))]
     public abstract class DiscreteDistribution : Distribution
     {
         [MessagePack.IgnoreMember]
@@ -37,7 +49,7 @@ namespace Stochastique.Distributions.Discrete
             }
             return 0;
         }
-        [MessagePack.Key(11)]
+        [IgnoreMember]
         public List<double> ProbabilitesCummulees { get; set; }
 
         private void CalculerProbabiliteCummulees()
@@ -47,7 +59,7 @@ namespace Stochastique.Distributions.Discrete
                 double probabilite = 0;
                 int i = 0;
                 ProbabilitesCummulees = new List<double>();
-                while (probabilite < 1 - 1e-15)
+                while (probabilite < 1 - 1e-5)
                 {
                     probabilite += PDF(i);
                     ProbabilitesCummulees.Add(probabilite);

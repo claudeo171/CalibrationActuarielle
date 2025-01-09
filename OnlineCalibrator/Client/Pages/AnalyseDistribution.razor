@@ -36,13 +36,13 @@
 <!-- Modal -->
 <div @onclick="HideModal" class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;background:#555555AA;":"display: none;")" id="exampleModalLong" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog" style="max-width:100vw">
-        <div class="modal-content" style="height:90vh;width:90vw;position:absolute;top:5vh;left:5vw; display:block" >
+        <div class="modal-content" style="height:90vh;width:90vw;position:absolute;top:5vh;left:5vw; display:block">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Graphique </h5>
                 <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close" @onclick="HideModal">
                 </button>
             </div>
-            <div class="modal-body" style="height:80vh;width:90vw" >
+            <div class="modal-body" style="height:80vh;width:90vw">
                 @if (CurrentFullSizeChart != null)
                 {
                     if (CurrentFullSizeChart.YAxes != null)
@@ -52,7 +52,7 @@
                     }
                     else
                     {
-                        if(CurrentFullSizeChart.RectangularSection != null)
+                        if (CurrentFullSizeChart.RectangularSection != null)
                         {
                             <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" Sections="CurrentFullSizeChart.RectangularSection" />
                         }
@@ -89,37 +89,42 @@
                             Distributions discrètes?
                         </label>
                     </div>
-                    @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
-                    {
-                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
-                            @foreach (var item in AviableMethod)
-                            {
-                                <option value="@item">@item</option>
-                            }
-                            )
-                        </InputSelect>
-                        @if (DonneesImportes.ActualData.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
+                    <div>
+                        <label class="form-select-label">
+                            Méthode de selection de loi:
+                        </label>
+                        @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                         {
-                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.CalibratedTypeDistribution)" Value="@DonneesImportes.ActualData.CalibratedTypeDistribution" ValueChanged="(TypeDistribution? s)=>{DonneesImportes.ActualData.CalibratedTypeDistribution=s; UpdateChart();}">
-                                @foreach (var item in DonneesImportes.ActualData.VisisbleData.Select(a => a.Distribution))
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
+                                @foreach (var item in AviableMethod)
                                 {
-                                    <option value="@item.Type">@item.Type</option>
+                                    <option value="@item">@item</option>
                                 }
                                 )
                             </InputSelect>
-                        }
-                        <div class="pt-3">
-                            <h5 class="fw-bold">
-                                @DonneesImportes.ActualData.CalibratedDistribution?.Type
-                            </h5>
-                        </div>
-                        <ul>
-                            @foreach (var item in DonneesImportes.ActualData.CalibratedDistribution?.AllParameters())
+                            @if (DonneesImportes.ActualData.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
                             {
-                                <li>@item.Name : @item.Value</li>
+                                <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.CalibratedTypeDistribution)" Value="@DonneesImportes.ActualData.CalibratedTypeDistribution" ValueChanged="(TypeDistribution? s)=>{DonneesImportes.ActualData.CalibratedTypeDistribution=s; UpdateChart();}">
+                                    @foreach (var item in DonneesImportes.ActualData.VisisbleData.Select(a => a.Distribution))
+                                    {
+                                        <option value="@item.Type">@item.Type</option>
+                                    }
+                                    )
+                                </InputSelect>
                             }
-                        </ul>
-                    }
+                            <div class="pt-3">
+                                <h5 class="fw-bold">
+                                    @DonneesImportes.ActualData.CalibratedDistribution?.Type
+                                </h5>
+                            </div>
+                            <ul>
+                                @foreach (var item in DonneesImportes.ActualData.CalibratedDistribution?.AllParameters())
+                                {
+                                    <li>@item.Name : @item.Value</li>
+                                }
+                            </ul>
+                        }
+                    </div>
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
                         <div class="pt-3" @onclick="()=>ShowFullScreen(PDFCDF)">
@@ -176,7 +181,7 @@
                     {
                         <div @onclick="()=>ShowFullScreen(QQPlot)">
                             QQPlot
-                            <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame"  />
+                            <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
                         </div>
                     }
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)

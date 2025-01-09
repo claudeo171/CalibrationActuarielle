@@ -169,6 +169,7 @@ namespace OnlineCalibrator.Shared
     [MessagePackObject]
     public class ChartViewModelScatter
     {
+        public ChartViewModelScatter() { }
         public ChartViewModelScatter(Point[] valeurs)
         {
             Series = new ISeries[0];

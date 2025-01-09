@@ -16,12 +16,17 @@ namespace Stochastique.EEL
         public T[] Buff1 { get; set; }
         [Key(2)]
         public bool IsBuff0SRC { get; set; }
-
+        [IgnoreMember]
         public T[] get_src => IsBuff0SRC ? Buff0 : Buff1;
+        [IgnoreMember]
         public T[] get_dest => IsBuff0SRC ? Buff1 : Buff0;
         public void flip()
         {
             IsBuff0SRC = !IsBuff0SRC;
+        }
+        public DoubleBuffer()
+        {
+
         }
         public DoubleBuffer(int n, T value)
         {

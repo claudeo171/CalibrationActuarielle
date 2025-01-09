@@ -15,7 +15,7 @@ using static alglib;
 namespace Stochastique.Distributions
 {
     [MessagePackObject]
-    public class TrunkatedDistribution : Distribution
+    public partial class TrunkatedDistribution : Distribution
     {
 
         public TrunkatedDistribution() { }
@@ -152,7 +152,7 @@ namespace Stochastique.Distributions
         [Key(16)]
         private double? ComputedKurtosis { get; set; }
 
-
+        [Key(17)]
         private double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {

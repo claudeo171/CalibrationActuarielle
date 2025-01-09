@@ -8,28 +8,29 @@ using System.Threading.Tasks;
 using Stochastique.Distributions.Discrete;
 using Expr = MathNet.Symbolics.SymbolicExpression;
 using Stochastique.Enums;
+using MathNet.Symbolics;
 
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
-    public class CopuleAMH: CopuleArchimedienne
+    public partial class CopuleAMH: CopuleArchimedienne
     {
         [MessagePack.IgnoreMember]
         private double Theta => GetParameter(CopuleParameterName.thetaAMH).Value;
 
-        public CopuleAMH(int dimension, double theta)
+        public CopuleAMH(int dimension, double theta):base(dimension)
         {
             communConstructeurs(theta);
             CheckDimension(dimension);
         }
 
-        public CopuleAMH(double theta)
+        public CopuleAMH(double theta):base(2)
         {
             communConstructeurs(theta);
             Dimension = 2;
         }
 
-        public CopuleAMH()
+        public CopuleAMH() : base(2)
         {
             Type = TypeCopule.CopuleAMH;
         }
@@ -66,11 +67,9 @@ namespace Stochastique.Copule
             return (1 - Theta) / (Math.Exp(t) - Theta);
         }
 
-        protected override Expr InverseGenerator()
+        protected override Expr InverseGenerator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
         {
-            var theta = Expr.Variable("thetaAMH");
-            var t = Expr.Variable("t");
-            return (1- theta)/(Expr.E.Pow(t)-theta);
+            return (1- copuleParam[0]) /(Expr.E.Pow(param) - copuleParam[0]);
         }
 
         private int B(int n,int k)
@@ -89,6 +88,9 @@ namespace Stochastique.Copule
             }
         }
 
-
+        protected override Expr Generator(Expr param, List<Expr> copuleParameter)
+        {
+            return (1 - copuleParameter[0] * (1 - param) / param).Log();
+        }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Stochastique.EEL
 {
     [MessagePack.MessagePackObject]
-    public class PoissonPMFGenerator
+    public partial class PoissonPMFGenerator
     {
         public PoissonPMFGenerator(int max_k)
         {

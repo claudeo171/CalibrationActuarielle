@@ -6,28 +6,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MathNet.Symbolics;
 
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
-    public class CopuleClayton:CopuleArchimedienne
+    public partial class CopuleClayton:CopuleArchimedienne
     {
         [MessagePack.IgnoreMember]
         private double Theta => GetParameter(CopuleParameterName.thetaClayton).Value;
 
-        public CopuleClayton(int dimension, double theta)
+        public CopuleClayton(int dimension, double theta) : base(dimension)
         {
             communConstructeurs(theta);
             CheckDimension(dimension);
         }
 
-        public CopuleClayton(double theta)
+        public CopuleClayton(double theta) : base(2)
         {
             communConstructeurs(theta);
             Dimension = 2;
         }
 
-        public CopuleClayton()
+        public CopuleClayton() : base(2)
         {
             Type = TypeCopule.Clayton;
         }
@@ -58,11 +59,13 @@ namespace Stochastique.Copule
            return Math.Pow(Math.Max(0,u.Sum(a=>Math.Pow(a,-Theta))-1),-1/Theta);
         }
 
-        protected override Expr InverseGenerator()
+        protected override Expr InverseGenerator(SymbolicExpression param,List<SymbolicExpression> copuleParam)
         {
-            var theta = Expr.Variable("thetaClayton");
-            var t = Expr.Variable("t");
-            return (1 + theta*t).Pow(-1/t);
+            return (1 + copuleParam[0] * param).Pow(-1/ copuleParam[0]);
+        }
+        protected override Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
+        {
+            return 1 / copuleParam[0] * (param.Pow(-copuleParam[0]) - 1);
         }
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {

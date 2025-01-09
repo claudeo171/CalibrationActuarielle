@@ -21,7 +21,10 @@ namespace Stochastique.Vecteur
         public DenseMatrix MatriceCorrelation { get; set; }
         [MessagePack.Key(4)]
         public DenseMatrix TriangleInfCholesky { get; set; }
+        public VecteurGaussien()
+        {
 
+        }
         public VecteurGaussien(DenseVector vecteurEsperance, DenseVector vecteurEcartType, DenseMatrix matriceCorrelation)
         {
             Dimension = Math.Min(vecteurEsperance.Count, Math.Min(vecteurEcartType.Count, Math.Min(matriceCorrelation.RowCount, matriceCorrelation.ColumnCount)));

@@ -15,6 +15,7 @@ namespace OnlineCalibrator.Shared
     [MessagePackObject]
     public class JarqueBeraTest : TestStatistique
     {
+        
         public JarqueBeraTest() {
             TypeTestStatistique = TypeTestStatistique.JarqueBera;
         }
@@ -28,10 +29,9 @@ namespace OnlineCalibrator.Shared
 
         public double CalculatePValue(double[] values)
         {
-            var screwness = Statistics.Skewness(values);
-            var kutosis = Statistics.Kurtosis(values);
-            double stat = values.Length / 6 * (screwness * screwness + (kutosis - 3) * (kutosis - 3) / 4);
-            return  1 - new Khi2Distribution(values.Length).CDF(stat);
+            double p = 0;
+            alglib.jarquebera.jarqueberatest(values, values.Length, ref p, new alglib.xparams(0) { });
+            return p;
         }
 
     }

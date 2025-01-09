@@ -1,4 +1,5 @@
-﻿using Stochastique.Enums;
+﻿using MathNet.Symbolics;
+using Stochastique.Enums;
 using Stochastique.SpecialFunction;
 using System;
 using System.Collections.Generic;
@@ -10,11 +11,11 @@ using Expr = MathNet.Symbolics.SymbolicExpression;
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
-    public class CopuleGumbel : CopuleArchimedienne
+    public partial class CopuleGumbel : CopuleArchimedienne
     {
         [MessagePack.IgnoreMember]
         public double Theta => GetParameter(CopuleParameterName.thetaGumbel).Value;
-        public CopuleGumbel()
+        public CopuleGumbel() : base(2)
         {
             Type = TypeCopule.Gumbel;
         }
@@ -28,11 +29,13 @@ namespace Stochastique.Copule
             return Math.Exp(Math.Pow(-t,1/Theta));
         }
 
-        protected override Expr InverseGenerator()
+        protected override Expr InverseGenerator(SymbolicExpression param, List<SymbolicExpression> copuleParameter)
         {
-            var theta = Expr.Variable("thetaGumbel");
-            var t = Expr.Variable("t");
-            return (-t).Pow(1/theta).Exp();
+            return (-(param).Pow(1/ copuleParameter[0])).Exp();
+        }
+        protected override Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
+        {
+            return (-param.Ln()).Pow(copuleParam[0]);
         }
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {

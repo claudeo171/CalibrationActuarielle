@@ -9,19 +9,28 @@ using System.Threading.Tasks;
 namespace Stochastique.Distributions.Discrete
 {
     [MessagePackObject]
-    public class JoeDistribution : DiscreteDistribution
+    public partial class JoeDistribution : DiscreteDistribution
     {
+        public override void OnAfterDeserialize()
+        {
+            base.OnAfterDeserialize();
+            SimulateurRejet = new SimulateurRejet(this, new PartieEntierePuissanceUniformeDistribution(Theta), 1.44269509130226 + 0.52882337976858 / Theta);
+        }
         [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Joe;
         [IgnoreMember]
         public double Theta => GetParameter(ParametreName.theta).Value;
+        public JoeDistribution()
+        {
 
+        }
         public JoeDistribution(double theta)
         {
             AddParameter(new Parameter(ParametreName.theta, theta));
             SimulateurRejet = new SimulateurRejet(this, new PartieEntierePuissanceUniformeDistribution(theta), 1.44269509130226 + 0.52882337976858 / theta);
             //Voir en cas d'évolution du paramètre pour la gestion 
         }
+        [IgnoreMember]
         private SimulateurRejet SimulateurRejet { get; set; }
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
         {

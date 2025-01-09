@@ -9,13 +9,16 @@ using System.Threading.Tasks;
 namespace Stochastique.Distributions.Discrete
 {
     [MessagePackObject]
-    public class PartieEntierePuissanceUniformeDistribution : DiscreteDistribution
+    public partial class PartieEntierePuissanceUniformeDistribution : DiscreteDistribution
     {
         [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.PartieEntierePuissanceUniforme;
         [IgnoreMember]
         public double Theta=> GetParameter(ParametreName.theta).Value;
+        public PartieEntierePuissanceUniformeDistribution()
+        {
 
+        }
         public PartieEntierePuissanceUniformeDistribution(double  theta)
         {
             AddParameter(new Parameter(ParametreName.theta, theta));

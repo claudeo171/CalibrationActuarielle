@@ -1,8 +1,8 @@
-﻿using LiveChartsCore.Defaults;
-using MathNet.Numerics.Distributions;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.Optimization;
-using MathNet.Numerics.RootFinding;
+﻿using Accord.IO;
+using Accord.Statistics.Distributions;
+using Accord.Statistics.Distributions.Fitting;
+using LiveChartsCore.Defaults;
+
 using MathNet.Symbolics;
 using MessagePack;
 using Stochastique.Distributions.Continous;
@@ -40,11 +40,10 @@ namespace Stochastique.Distributions
     [MessagePack.Union(24, typeof(LogarithmiqueDistribution))]
     [MessagePack.Union(25, typeof(PartieEntierePuissanceUniformeDistribution))]
     [MessagePack.Union(26, typeof(TukeyDistribution))]
-    [MessagePack.Union(27, typeof(Pareto))]
-    [MessagePack.Union(28, typeof(Logistic))]
-    [MessagePack.Union(29, typeof(Laplace))]
+    [MessagePack.Union(28, typeof(LogisticDistribution))]
+    [MessagePack.Union(29, typeof(LaplaceDistribution))]
     [MessagePack.Union(30, typeof(GumbelDistribution))]
-    public abstract class Distribution : IMessagePackSerializationCallbackReceiver
+    public abstract class Distribution : IMessagePackSerializationCallbackReceiver, IDistribution<double>
     {
         /// <summary>
         /// If true, the expected value can be computed easily.
@@ -352,7 +351,7 @@ namespace Stochastique.Distributions
                 ParametresParNom.Add(parameter.Name, parameter);
             }
         }
-        public virtual double[] GetMomentList(int nb)
+        public virtual double[] GetMomentList(int nb,bool estCentreReduit)
         {
             var rst=new double[nb];
             var fct= FonctionGenerateurDesMoment();
@@ -580,7 +579,7 @@ namespace Stochastique.Distributions
         /// <summary>
         /// Fuction called after deserialization to store parameters in a dictionnary
         /// </summary>
-        public void OnAfterDeserialize()
+        public virtual void OnAfterDeserialize()
         {
             ParametresParNom = ParametersList.ToDictionary(a => a.Name, a => a);
         }
@@ -616,6 +615,81 @@ namespace Stochastique.Distributions
         public override string ToString()
         {
             return Type +"("+string.Concat(AllParameters().Select(a=>a.Name +":"+a.Value))+")";
+        }
+
+        public double DistributionFunction(double x)
+        {
+            return CDF(x);
+        }
+
+        public double ProbabilityFunction(double x)
+        {
+            return PDF(x);
+        }
+
+        public double LogProbabilityFunction(double x)
+        {
+            return Math.Log(PDF(x));
+        }
+
+        public double ComplementaryDistributionFunction(double x)
+        {
+            return 1 - DistributionFunction(x);
+        }
+
+        public double DistributionFunction(params double[] x)
+        {
+            return DistributionFunction(x[0]);
+        }
+
+        public double ProbabilityFunction(params double[] x)
+        {
+            return ProbabilityFunction(x[0]);
+        }
+
+        public double LogProbabilityFunction(params double[] x)
+        {
+            return LogProbabilityFunction(x[0]);
+        }
+
+        public double ComplementaryDistributionFunction(params double[] x)
+        {
+            return ComplementaryDistributionFunction(x[0]);
+        }
+
+        public void Fit(Array observations)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Fit(Array observations, double[] weights)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Fit(Array observations, int[] weights)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Fit(Array observations, IFittingOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Fit(Array observations, double[] weights, IFittingOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Fit(Array observations, int[] weights, IFittingOptions options)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Clone()
+        {
+            return this.DeepClone();
         }
     }
 

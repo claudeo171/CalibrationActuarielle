@@ -1,4 +1,5 @@
-﻿using MathNet.Symbolics;
+﻿using Accord.Statistics;
+using MathNet.Symbolics;
 using Stochastique.Autre;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,12 @@ namespace Stochastique
                 return c;
             }
             return a / b;
+        }
+        public static double[] CentrerReduire(this double[] value)
+        {
+            var mean = value.Mean();
+            var sd = value.StandardDeviation() * Math.Sqrt( 1.0 * (value.Length - 1)/ value.Length);
+            return value.Select(a => (a - mean) / sd).ToArray();
         }
         public static List<int> Rang(this List<double> valeurs)
         {

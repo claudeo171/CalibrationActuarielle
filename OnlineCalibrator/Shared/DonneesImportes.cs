@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace OnlineCalibrator.Shared
 {
     [MessagePackObject]
-    public class DonneesImportes
+    public partial class DonneesImportes
     {
         [Key(0)]
         public List<DonneesAAnalyser>? Donnees { get; set; }

@@ -1,4 +1,7 @@
 ﻿using MathNet.Numerics.LinearAlgebra.Double;
+using MessagePack;
+using Stochastique.Distributions.Continous;
+using Stochastique.Enums;
 using Stochastique.Vecteur;
 using System;
 using System.Collections.Generic;
@@ -9,10 +12,12 @@ using System.Threading.Tasks;
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
-    public class CopuleGaussienne : Copule
+    public partial class CopuleGaussienne : Copule, IMessagePackSerializationCallbackReceiver
     {
-        [MessagePack.Key(5)]
+        [IgnoreMember]
         private DenseMatrix matriceCorrelations;
+        [Key(5)]
+        private double[][] matrice;
         public CopuleGaussienne()
         {
             Type = Enums.TypeCopule.Gaussian;
@@ -30,6 +35,7 @@ namespace Stochastique.Copule
             matriceCorrelations.At(0, 1, rho);
             matriceCorrelations.At(1, 0, rho);
             matriceCorrelations.At(1, 1, 1);
+            AddParameter(new CopuleParameter(CopuleParameterName.rho, rho));
         }
 
         public CopuleGaussienne(DenseMatrix matriceCorrelations)
@@ -51,6 +57,25 @@ namespace Stochastique.Copule
             }
         }
 
+        public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
+        {
+            Dimension = value.Count();
+            if (Dimension==2)
+            {
+                var rho = Math.Sin(Math.PI / 2 * value.First().TauKendall(value.Last()));
+                matriceCorrelations = new DenseMatrix(Dimension);
+                matriceCorrelations.At(0, 0, 1);
+                matriceCorrelations.At(0, 1, rho);
+                matriceCorrelations.At(1, 0, rho);
+                matriceCorrelations.At(1, 1, 1);
+                AddParameter(new CopuleParameter(CopuleParameterName.rho, rho));
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public override double CDFCopula(List<double> u)
         {
             throw new NotImplementedException();
@@ -58,6 +83,14 @@ namespace Stochastique.Copule
 
         public override double DensityCopula(IEnumerable<double> u)
         {
+            var distrib = new NormalDistribution(0,1);
+            if(Dimension==2)
+            {
+                var rho = matriceCorrelations.At(0, 1);
+                var a = distrib.InverseCDF(  u.First());
+                var b = distrib.InverseCDF(u.Last());
+                return 1 / Math.Sqrt(1 - rho * rho) * Math.Exp(-((a * a + b * b) * rho * rho - a * b * rho) / (2 * (1 - rho * rho)));
+            }
             throw new NotImplementedException();
         }
 
@@ -72,6 +105,19 @@ namespace Stochastique.Copule
             }
 
             return uniformes;
+        }
+
+        public void OnBeforeSerialize()
+        {
+            matrice = matriceCorrelations?.ToColumnArrays();
+        }
+
+        public void OnAfterDeserialize()
+        {
+            matriceCorrelations = new DenseMatrix( matrice.Length, matrice[0].Length);
+            for(int i=0;i< matrice.Length;i++)
+                for (int j = 0; j < matrice[i].Length; j++)
+                    matriceCorrelations.At(i, j, matrice[i][j]);
         }
     }
 }

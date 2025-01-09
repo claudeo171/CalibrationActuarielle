@@ -58,6 +58,10 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int k)
         {
+            if(k<=0)
+            {
+                return 0;
+            }
             return -1 / Math.Log(1 - P) * Math.Pow(P, k) / k;
         }
     }

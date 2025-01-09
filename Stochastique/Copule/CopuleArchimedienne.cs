@@ -7,10 +7,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MathNet.Symbolics;
+using System.ComponentModel.DataAnnotations;
+using static alglib;
+using static Accord.Math.FourierTransform;
 
 namespace Stochastique.Copule
 {
     [MessagePack.MessagePackObject]
+    [MessagePack.Union(0,typeof(CopuleAMH))]
+    [MessagePack.Union(1, typeof(CopuleClayton))]
+    [MessagePack.Union(2, typeof(CopuleFrank))]
+    [MessagePack.Union(3, typeof(CopuleGumbel))]
+    [MessagePack.Union(4, typeof(CopuleJoe))]
     public abstract class CopuleArchimedienne:Copule
     {
         //C(u,v) = inverseGenerateur(generateur(u)+generateur(v))
@@ -21,23 +29,50 @@ namespace Stochastique.Copule
         [MessagePack.Key(4)]
         protected Distribution Distribution { get; set; }
 
-        protected abstract Expr InverseGenerator();
+        protected abstract Expr InverseGenerator(SymbolicExpression param,List<SymbolicExpression> copuleParameter);
 
-        protected double InverseGenerateurDerivate(double t, int ordre)
+        protected abstract Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParameter);
+        [MessagePack.Key(5)]
+        public int Dimension { get; set; }
+        [MessagePack.IgnoreMember]
+        public SymbolicExpression densite;
+        [MessagePack.IgnoreMember]
+        public SymbolicExpression Densite
         {
-            var fct = InverseGenerator();
-            var variable = SymbolicExpression.Variable("t");
-            var values = new Dictionary<string, FloatingPoint>();
-            values.Add("t", t);
+            get
+            {
+                if(densite==null)
+                {
+                    CalculerDensite();
+                }
+                return densite;
+            }
+        }
+        private void CalculerDensite()
+        {
+            var listeVariable = new List<SymbolicExpression>();
+            var listeVariableCopule = new List<SymbolicExpression>();
             foreach (var v in AllParameters())
             {
-                values.Add(v.Name.ToString(), v.Value);
+                listeVariableCopule.Add(Expr.Variable(v.Name.ToString()));
             }
-            for (int i = 0; i < ordre; i++)
+            var sommeGenerateur = Expr.Zero;
+            for (int i = 1; i <= Dimension; i++)
             {
-                fct = fct.Differentiate(variable);
+                var variable = Expr.Variable("u" + i);
+                listeVariable.Add(variable);
+                sommeGenerateur = sommeGenerateur + Generator(variable, listeVariableCopule);
             }
-            return fct.Evaluate(values).RealValue;
+            var rst = InverseGenerator(sommeGenerateur, listeVariableCopule);
+            for (int i = 0; i < Dimension; i++)
+            {
+                rst = rst.Differentiate(listeVariable[i]);
+            }
+            densite = rst;
+        }
+        public CopuleArchimedienne(int dimention)
+        {
+            Dimension = dimention;
         }
 
         public override List<List<double>> SimulerCopule(Random r, int nbSim)
@@ -60,15 +95,7 @@ namespace Stochastique.Copule
         }
         public override double DensityCopula(IEnumerable<double> u)
         {
-            var sumGenerator = u.Sum(a => Generateur(a));
-            var sumInverseGenerator = InverseGenerateurDerivate(sumGenerator, Dimension);
-            var dividende = u.Prod(a => InverseGenerateurDerivate(Generateur(a), 1));
-            var rst = sumInverseGenerator.Divide(dividende, 0);
-            if(rst<0)
-            {
-                rst=0;
-            }
-            return rst;
+            return Densite.Evaluate(AllParameters().Select(a=> new KeyValuePair<string, FloatingPoint>(a.Name.ToString(),(FloatingPoint)a.Value)).Concat(u.Select((a,i)=> new KeyValuePair<string, FloatingPoint>("u"+(i+1), (FloatingPoint) a))).ToDictionary()).RealValue;
         }
     }
 }

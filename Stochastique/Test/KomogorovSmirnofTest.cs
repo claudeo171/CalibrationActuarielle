@@ -1,4 +1,6 @@
-﻿using Accord.Statistics.Testing;
+﻿using Accord.Statistics.Distributions.Univariate;
+using Accord.Statistics.Testing;
+using MathNet.Symbolics;
 using MessagePack;
 using Newtonsoft.Json.Linq;
 using OnlineCalibrator.Shared;
@@ -11,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Test
 {
-    public class KolmogorovSmirnovTest : TestStatistique, IMessagePackSerializationCallbackReceiver
+    [MessagePackObject]
+    public partial class KolmogorovSmirnovTest : TestStatistique, IMessagePackSerializationCallbackReceiver
     {
         [Key(5)]
         public double[] Values { get; set; }
@@ -26,7 +29,7 @@ namespace Stochastique.Test
             Distribution = d;
             try
             {
-                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(values, values.Select((x, i) => Distribution.CDF((i + 0.5) / values.Length)).ToArray());
+                Test = new Accord.Statistics.Testing.KolmogorovSmirnovTest(values, d);
             }
             catch (Exception e)
             {
@@ -47,14 +50,16 @@ namespace Stochastique.Test
             PValue = Test.PValue;
         }
         [IgnoreMember]
-        public Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest Test { get; set; }
+        public Accord.Statistics.Testing.HypothesisTest<KolmogorovSmirnovDistribution> Test { get; set; }
         public void OnAfterDeserialize()
         {
             try
             {
-                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(Values, Values.Select((x, i) => Distribution.CDF((i + 0.5) / Values.Length)).ToArray());
+                Test = new Accord.Statistics.Testing.KolmogorovSmirnovTest(Values, Distribution);
             }
-            catch { }
+            catch {
+                Test = new Accord.Statistics.Testing.TwoSampleKolmogorovSmirnovTest(Values, Values.Select((x, i) => Double.IsNaN(Distribution.CDF((i + 0.5) / Values.Length)) ? Distribution.CDF((i + 0.5) / Values.Length) : 0).ToArray());
+            }
         }
 
         public void OnBeforeSerialize()

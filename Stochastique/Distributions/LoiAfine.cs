@@ -17,7 +17,7 @@ namespace Stochastique.Distributions
 
         [Key(7)]
         public override TypeDistribution Type => throw new NotImplementedException();
-
+        public LoiAfine() { }
         public LoiAfine(Distribution loiBase, double a, double b)
         {
             LoiBase = loiBase;
