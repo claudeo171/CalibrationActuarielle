@@ -609,7 +609,7 @@ namespace Stochastique.Distributions
         public abstract IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values);
         public double[] GetParameterValues(IEnumerable<double> values, double decalage, double ratio)
         {
-            return CalibrateWithMoment(values.Select(a=>a*ratio+decalage)).Select(a=> a.Value).ToArray();
+            return CalibrateWithMoment(values.Select(a=>(a+decalage)*ratio)).Select(a=> a.Value).ToArray();
         }
 
         public override string ToString()

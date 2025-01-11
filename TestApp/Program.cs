@@ -60,6 +60,20 @@ GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDe
 
 #endregion
 
+
+#region Test Tronqué
+var testTronque = FileService.GetDataFromFile(new FileStream("./TestTronque.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv");
+
+
+testTronque.NomData = testTronque.Donnees.First().Name;
+testTronque.ActualData.IncludeTrunkatedDistributions = true;
+//var toto = elt.ActualData.GetAllDistributions();
+testTronque.ActualData.IsDiscreteDistribution = false;
+
+testTronque.ActualData.GetAllDistributions();
+testTronque.ActualData.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
+#endregion
+
 var rst =Debye.gsl_sf_debye_1_e(0.01);
 var normal = new NormalDistribution(0, 1);
 var logNormal = new NormalDistribution(0, 1000000);

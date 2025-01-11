@@ -13,7 +13,7 @@ namespace Stochastique.Distributions.Continous
         public double Mu => GetParameter(ParametreName.mu).Value;
         public double Sigma => GetParameter(ParametreName.sigma).Value;
         public double Alpha => GetParameter(ParametreName.a).Value;
-        public double Beta => GetParameter(ParametreName.b).Value;
+        public double Beta => GetParameter(ParametreName.beta).Value;
         public double C1 { get; set; }
         public double C2 { get; set; }
         public double C3 { get; set; }

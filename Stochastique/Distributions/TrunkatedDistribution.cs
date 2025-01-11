@@ -216,18 +216,20 @@ namespace Stochastique.Distributions
         {
             List<double> ll = new List<double>();
             var mean = value.Mean();
+            var ecartType = value.StandardDeviation();
+            var min = value.Min();
+            var max = value.Max();
             List<List<double>> param = new List<List<double>>();
             BaseDistribution.Initialize(value, typeCalibration);
             var initialParameters = BaseDistribution.AllParameters().Select(a => a.Value).ToList();
-            List<(double, double, double, double)> ratios = new List<(double, double, double, double)>() 
-            { 
-                (-mean/2,5,0,0.5),
-                (mean/2,5,0.5,1),
-                (mean/5,5,0.3,0.8),
-                (0,5,0.2,0.8),
-                (0,5,0.3,0.7),
-                (-mean/2,5,0.1,0.6),
-                (mean/2,5,0.4,0.9),
+            List<(double, double)> ratios = new List<(double, double)>() 
+            {
+                (-ecartType,3),
+                (ecartType,3),
+                (-2*ecartType,5),
+                (2*ecartType,5),
+                (0,2),
+                (0,4),
             };
             AddParameter(new Parameter(ParametreName.qUp, 1));
             AddParameter(new Parameter(ParametreName.qDown, 0));
@@ -237,13 +239,15 @@ namespace Stochastique.Distributions
                 for (int i = 0; i < parametres.Length; i++)
                 {
                     BaseDistribution.AllParameters().ElementAt(i).SetValue( parametres[i]);
-                }
-                GetParameter(ParametreName.qDown).SetValue(ratio.Item3);
-                GetParameter(ParametreName.qUp).SetValue( ratio.Item4);
-                RAZComputedMoment();
 
+                }
                 try
                 {
+                    GetParameter(ParametreName.qDown).SetValue(BaseDistribution.CDF(min)*0.9);
+                    GetParameter(ParametreName.qUp).SetValue(Math.Min(1, BaseDistribution.CDF(max) * 1.1));
+                    RAZComputedMoment();
+
+
                     base.Initialize(value, typeCalibration);
                 }
                 catch
