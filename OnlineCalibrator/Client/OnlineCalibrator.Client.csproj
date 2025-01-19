@@ -10,29 +10,15 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\script\common.js" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" />
     <TrimmerRootAssembly Include="LiveChartsCore" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.0.1" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc4.5" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-rc4.5" />
-    <PackageReference Include="MersenneTwister" Version="1.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.0" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.118.0-preview.2.3" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.118.0-preview.2.3" />
-    <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.118.0-preview.2.3" />
-    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.31" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\OnlineCalibrator.Service\OnlineCalibrator.Service.csproj" />
-    <ProjectReference Include="..\Shared\OnlineCalibrator.Shared.csproj" />
+    <ProjectReference Include="..\..\OnlineCalibrator.SharedPages\OnlineCalibrator.SharedPages.csproj" />
   </ItemGroup>
 
   <ItemGroup>

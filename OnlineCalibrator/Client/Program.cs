@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using OnlineCalibrator.Client;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
+using OnlineCalibrator.SharedPages;
 using SpawnDev.BlazorJS;
 using SpawnDev.BlazorJS.WebWorkers;
 

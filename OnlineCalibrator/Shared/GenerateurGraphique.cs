@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Stochastique;
+using LiveChartsCore.Painting;
 
 namespace OnlineCalibrator.Shared
 {
@@ -93,7 +94,7 @@ namespace OnlineCalibrator.Shared
                     new LineSeries<ObservablePoint>
                     {
                         Values = points.Select(a => new ObservablePoint(a.X, a.Y)).ToList(),
-                        Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4, Color= SKColors.Blue, IsStroke=true, IsFill=true,  },
+                        Stroke = new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4, Color= SKColors.Blue  },
 
                         GeometrySize = 0
                     }
@@ -110,7 +111,7 @@ namespace OnlineCalibrator.Shared
             }
             skChart.SaveImage($"{name}.png");
         }
-        public static void SaveChartImage(List<Point[]> points, List<Paint> fill, List<Paint> content, List<Paint> geometryFill, List<int> geometrySize, string name, int width = 2000, int height = 1500, bool showAxis = false)
+        public static void SaveChartImage(List<Point[]> points, List<SolidColorPaint> fill, List<SolidColorPaint> content, List<SolidColorPaint> geometryFill, List<int> geometrySize, string name, int width = 2000, int height = 1500, bool showAxis = false)
         {
 
             var skChart = new SKCartesianChart()
@@ -176,7 +177,7 @@ namespace OnlineCalibrator.Shared
                 series.Add(new LineSeries<ObservablePoint>
                 {
                     Values = points.Select(a => new ObservablePoint(a.X, a.Y)).ToList(),
-                    Stroke = new SolidColorPaint(skcol) { StrokeThickness = 2, Color = skcol, IsStroke = true, IsFill = false },
+                    Stroke = new SolidColorPaint(skcol) { StrokeThickness = 2, Color = skcol},
                     Fill = null,
                     GeometrySize = 0
                 });

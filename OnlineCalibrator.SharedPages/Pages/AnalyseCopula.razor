@@ -1,0 +1,234 @@
+﻿@using LiveChartsCore.Painting
+@using OnlineCalibrator.Service
+@using OnlineCalibrator.Shared;
+@using System
+@using System.Text
+@using System.IO
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
+@using SkiaSharp;
+@using SpawnDev.BlazorJS.WebWorkers
+@using Stochastique.Enums;
+@using Stochastique;
+@using LiveChartsCore.SkiaSharpView.Painting;
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inject NavigationManager NavManager
+@inject IJSRuntime js
+@inject DonneeContainer donneeContainer
+@page "/AnalyseCopula"
+<nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+        <li class="breadcrumb-item"><a href="/CalibrateDistributionConjointe">Calibration des données conjointe (@DonneesImportes.NomDataConjointe1 - @DonneesImportes.NomDataConjointe2)</a></li>
+        <li class="breadcrumb-item active">Indetification de la copule</li>
+    </ol>
+</nav>
+<div class="row">
+    @if (DonneesImportes != null)
+    {
+        <div class="col-6 col-sm-12 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    Paramétrage de la calibration
+                </div>
+                <div class="card-body">
+                    @if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null && DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule != null)
+                    {
+
+                        <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration)" Value="@DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
+                            @foreach (var item in AviableMethod)
+                            {
+                                <option value="@item">@item</option>
+                            }
+                            )
+                        </InputSelect>
+                        @if (DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
+                        {
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType)" Value="@DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType" ValueChanged="(TypeCopule? s)=>{DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopuleType=s; UpdateChart();}">
+                                @foreach (var item in DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.Select(a => a.Copule))
+                                {
+                                    <option value="@item.Type">@item.Type</option>
+                                }
+                                )
+                            </InputSelect>
+                        }
+                        <div>
+                            @DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule?.Type
+                        </div>
+                        <ul>
+                            @foreach (var item in DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule?.AllParameters())
+                            {
+                                <li>@item.Name : @item.Value</li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Export données CSV
+                </div>
+                <div class="card-body">
+                    <label>Nombre de ligne</label>
+                    <InputNumber @bind-Value="@NbRow" />
+                    <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-12 col-xl-6">
+            <div class="card">
+                <div class="card-header">
+                    Analyse de la copule sélectionnée
+                </div>
+                <div class="card-body">
+                    @if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null && DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule != null)
+                    {
+                        <div> <b>Log-Vraissemblance de la copule :</b> @DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.First(a => a.Copule.Type == DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule.Type).LogLikelihood.ToString("N4") </div>
+                        <div> <b>Graphique des Rang</b> (copule en rouge et données en bleu): </div>
+                        <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
+
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (copules != null)
+    {
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-header">
+                    Copules
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+
+                        <th>Loi</th>
+                        <th>LogLikelihood</th>
+                        <th>AIC</th>
+                        <th>BIC</th>
+                            @for (int i = 0; i < copules.Max(a => a.Copule.AllParameters().Count()); i++)
+                            {
+                            <th>Parametre @(i + 1)</th>
+                            }
+                        </thead>
+                        <tbody>
+                            @if (copules != null)
+                            {
+                                @foreach (var test in copules)
+                                {
+                                    <tr>
+                                        <td>@test.Copule.Type</td>
+                                        <td>@test.LogLikelihood.ToString("F4")</td>
+                                        <td>@test.AIC.ToString("F4")</td>
+                                        <td>@test.BIC.ToString("F4")</td>
+                                        @for (int i = 0; i < copules.Max(a => a.Copule.AllParameters().Count()); i++)
+                                        {
+                                            if (i < test.Copule.AllParameters().Count())
+                                            {
+                                                <td>@test.Copule.AllParameters().ElementAt(i).ToString()</td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="toast-container position-absolute p-3 bottom-0 end-0">
+    @foreach (var error in Notifications)
+    {
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <iconify-icon icon="oi:info" class="text-info"></iconify-icon>
+                <strong class="me-auto">Erreur</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" @onclick="@(()=>SuppressionNotification(error))" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @error
+            </div>
+        </div>
+    }
+
+</div>
+
+
+@code {
+    private bool isInit;
+    private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.Manuelle };
+    private List<CopuleWithData>? copules;
+    private DonneesImportes? DonneesImportes;
+    private ChartViewModelScatter? QQPlot;
+    private List<string> Notifications = new List<string>();
+    private int NbRow = 1000;
+    protected override async void OnInitialized()
+    {
+
+        if (donneeContainer.Value != null)
+        {
+            DonneesImportes = donneeContainer.Value;
+        }
+        else
+        {
+            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+        }
+        if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null)
+        {
+            copules = DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetAllCopula();
+            isInit = true;
+            ChangeSelectionMethod(DonneesImportes.ActualDonneesPourAnalyseConjointe.MethodeCalibration);
+            SaveData();
+            StateHasChanged();
+        }
+    }
+
+    protected void ChangeSelectionMethod(MethodeCalibrationRetenue m)
+    {
+        DonneesImportes.ActualDonneesPourAnalyseConjointe?.ChangeSelectionMethod(m);
+        UpdateChart();
+        SaveData();
+
+    }
+
+    private async void SaveData()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(DonneesImportes.ToMsgPack()));
+    }
+    public async void UpdateChart()
+    {
+
+        QQPlot = new ChartViewModelScatter(
+        DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123)),
+        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) });
+        StateHasChanged();
+    }
+    public async void ExportSample()
+    {
+        Random r = MersenneTwister.MTRandom.Create(1234533);
+        StringBuilder sb = new StringBuilder();
+        var sample = DonneesImportes.ActualDonneesPourAnalyseConjointe?.CalibratedCopule.SimulerCopule(r, NbRow);
+        for (int i = 0; i < NbRow; i++)
+        {
+            sb.AppendLine(string.Join(";", sample[i].Select(a => a.ToString())));
+        }
+        await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+    }
+
+    public void SuppressionNotification(string notif)
+    {
+        Notifications.Remove(notif);
+    }
+
+}

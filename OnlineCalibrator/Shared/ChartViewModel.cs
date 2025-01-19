@@ -2,6 +2,7 @@
 using LiveChartsCore.ConditionalDraw;
 using LiveChartsCore.Defaults;
 using LiveChartsCore.Drawing;
+using LiveChartsCore.Painting;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Drawing;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
@@ -26,7 +27,7 @@ namespace OnlineCalibrator.Shared
             Series = new ISeries[0];
             AddSerie(valeurs, null, new SolidColorPaint(SKColors.CornflowerBlue), 0, 0, null, false);
         }
-        public ChartViewModelLine(List<Point[]> valeurs, List<Paint> stroke, List<Paint> fill, List<double> size, List<Paint> color, bool differentAxes = false, bool rectangularSections = false)
+        public ChartViewModelLine(List<Point[]> valeurs, List<SolidColorPaint> stroke, List<SolidColorPaint> fill, List<double> size, List<SolidColorPaint> color, bool differentAxes = false, bool rectangularSections = false)
         {
             Series = new ISeries[0];
             if (differentAxes)
@@ -126,7 +127,7 @@ namespace OnlineCalibrator.Shared
                 },
             };
         }
-        public void AddSerie(Point[] valeurs, Paint? stroke, Paint? fill, int indice, double size, Paint color, bool differentAxes)
+        public void AddSerie(Point[] valeurs, SolidColorPaint? stroke, SolidColorPaint? fill, int indice, double size, SolidColorPaint color, bool differentAxes)
         {
             var serieAsList = Series.ToList();
             serieAsList.Add(new LineSeries<ObservablePoint>
