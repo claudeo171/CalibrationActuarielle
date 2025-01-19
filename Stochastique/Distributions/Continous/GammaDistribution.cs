@@ -78,7 +78,7 @@ namespace Stochastique.Distributions.Continous
             List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
-            result.Add(new Parameter(ParametreName.theta, variance / ev));
+            result.Add(new Parameter(ParametreName.theta, Math.Max(0.001, variance / ev)));
             result.Add(new Parameter(ParametreName.k, ev * ev / variance));
             return result;
         }

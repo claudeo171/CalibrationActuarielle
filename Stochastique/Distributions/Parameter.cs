@@ -57,10 +57,6 @@ namespace Stochastique.Distributions
                         return double.MinValue;
                     case ParametreName.sigma:
                         return Math.Pow(10, -100);
-                    case ParametreName.qDown:
-                        return 0;
-                    case ParametreName.qUp:
-                        return 0;
                     case ParametreName.p:
                         return Math.Pow(10, -14);
                     case ParametreName.n:
@@ -120,10 +116,6 @@ namespace Stochastique.Distributions
                         return 1- Math.Pow(10, -14);
                     case ParametreName.n:
                         return double.MaxValue;
-                    case ParametreName.qDown:
-                        return 1;
-                    case ParametreName.qUp:
-                        return 1;
                     case ParametreName.lambda:
                         return double.MaxValue;
                     case ParametreName.a:
@@ -165,7 +157,7 @@ namespace Stochastique.Distributions
             {
                 return new List<Constraint>
                 {
-                    new Constraint(ParametreName.qUp, ParametreName.qDown)
+                   
                 };
             }
         }

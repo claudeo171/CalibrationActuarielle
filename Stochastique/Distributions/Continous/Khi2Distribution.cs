@@ -90,7 +90,7 @@ namespace Stochastique.Distributions.Continous
         }
         public override double Simulate(Random r)
         {
-            return base.Simulate(r, 1)[0];
+            return Simulate(r, 1)[0];
         }
     }
 }

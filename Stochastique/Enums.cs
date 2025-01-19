@@ -13,7 +13,7 @@ namespace Stochastique.Enums
     public enum ParametreName
     {
         aAfine, bAfine, mu, sigma, n,nStudent,
-        k,qUp,qDown,
+        k,
         p,lambda,r,N,a,b,d1,d2,
         theta,aCauchy,bCauchy,
         Np,xm,aBeta,bBeta,beta,s

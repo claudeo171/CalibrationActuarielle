@@ -95,7 +95,12 @@ namespace Stochastique.Copule
         }
         public override double DensityCopula(IEnumerable<double> u)
         {
-            return Densite.Evaluate(AllParameters().Select(a=> new KeyValuePair<string, FloatingPoint>(a.Name.ToString(),(FloatingPoint)a.Value)).Concat(u.Select((a,i)=> new KeyValuePair<string, FloatingPoint>("u"+(i+1), (FloatingPoint) a))).ToDictionary()).RealValue;
+            try
+            {
+                return Densite.Evaluate(AllParameters().Select(a => new KeyValuePair<string, FloatingPoint>(a.Name.ToString(), (FloatingPoint)a.Value)).Concat(u.Select((a, i) => new KeyValuePair<string, FloatingPoint>("u" + (i + 1), (FloatingPoint)a))).ToDictionary()).RealValue;
+            }
+            catch
+            { return 0; }
         }
     }
 }

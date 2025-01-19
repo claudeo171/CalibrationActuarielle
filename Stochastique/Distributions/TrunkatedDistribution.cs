@@ -19,15 +19,15 @@ namespace Stochastique.Distributions
     {
 
         public TrunkatedDistribution() { }
-        public TrunkatedDistribution(Distribution distrib)
+        public TrunkatedDistribution(Distribution? distrib)
         {
             BaseDistribution = distrib;
         }
-        public TrunkatedDistribution(Distribution d, double qDown,double qUp)
+        public TrunkatedDistribution(Distribution d, double valeurMin,double valeurMax)
         {
             BaseDistribution = d;
-            AddParameter(new Parameter(ParametreName.qDown, qDown));
-            AddParameter(new Parameter(ParametreName.qUp, qUp));
+            ValeurMax = valeurMax;
+            ValeurMin = valeurMin;
         }
 
         [Key(6)]
@@ -48,12 +48,17 @@ namespace Stochastique.Distributions
         private double? ComputedExpectedValue { get; set; }
         [Key(9)]
         private double? ComputedVariance { get; set; }
-
         [Key(10)]
-        public double QuantileUp => GetParameter(ParametreName.qUp).Value;
+        public double ValeurMin { get; set; }
 
         [Key(11)]
-        public double QuantileDown => GetParameter(ParametreName.qDown).Value;
+        public double ValeurMax { get; set; }
+        [IgnoreMember]
+        public double QuantileUp => BaseDistribution.CDF(ValeurMax);
+        [IgnoreMember]
+        public double QuantileDown => BaseDistribution.CDF(ValeurMin);
+        [IgnoreMember]
+        public override int NumberOfParameter => AllParameters().Count()+2;
 
         [Key(12)]
         public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
@@ -158,6 +163,7 @@ namespace Stochastique.Distributions
         {
             if (SimulatedValue == null)
             {
+                
                 SimulatedValue = Simulate(new Random(3433), 100000);
             }
         }
@@ -169,9 +175,16 @@ namespace Stochastique.Distributions
             }
             else
             {
-                SimulateValue();
-                ComputedExpectedValue=SimulatedValue.Mean();
-                return ComputedExpectedValue.Value;
+                if (QuantileUp - QuantileDown < 1)
+                {
+                    return double.NaN;
+                }
+                else
+                {
+                    SimulateValue();
+                    ComputedExpectedValue = SimulatedValue.Mean();
+                    return ComputedExpectedValue.Value;
+                }
             }
 
         }
@@ -185,6 +198,10 @@ namespace Stochastique.Distributions
             }
             else
             {
+                if(QuantileUp - QuantileDown< 1e-10)
+                {
+                    return 0;
+                }
                 return BaseDistribution.PDF(x) / (QuantileUp - QuantileDown);
             }
         }
@@ -197,23 +214,46 @@ namespace Stochastique.Distributions
             }
             else
             {
-                SimulateValue();
-                ComputedVariance = SimulatedValue.Variance();
-                return ComputedVariance.Value;
+                if (QuantileUp - QuantileDown < 1)
+                {
+                    return double.NaN;
+                }
+                else
+                {
+                    SimulateValue();
+                    ComputedVariance = SimulatedValue.Variance();
+                    return ComputedVariance.Value;
+                }
             }
         }
         public override double Skewness()
         {
-            SimulateValue();
-            return SimulatedValue.Skewness();
+            if (QuantileUp - QuantileDown < 1)
+            {
+                return double.NaN;
+            }
+            else
+            {
+                SimulateValue();
+                return SimulatedValue.Skewness();
+            }
         }
         public override double Kurtosis()
         {
-            SimulateValue();
-            return SimulatedValue.Kurtosis();
+            if (QuantileUp - QuantileDown < 1)
+            {
+                return double.NaN;
+            }
+            else
+            {
+                SimulateValue();
+                return SimulatedValue.Kurtosis();
+            }
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
+            ValeurMin=value.Min();
+            ValeurMax=value.Max();
             List<double> ll = new List<double>();
             var mean = value.Mean();
             var ecartType = value.StandardDeviation();
@@ -231,8 +271,6 @@ namespace Stochastique.Distributions
                 (0,2),
                 (0,4),
             };
-            AddParameter(new Parameter(ParametreName.qUp, 1));
-            AddParameter(new Parameter(ParametreName.qDown, 0));
             foreach (var ratio in ratios)
             {
                 var parametres = BaseDistribution.GetParameterValues(value,ratio.Item1,ratio.Item2);
@@ -243,11 +281,7 @@ namespace Stochastique.Distributions
                 }
                 try
                 {
-                    GetParameter(ParametreName.qDown).SetValue(BaseDistribution.CDF(min)*0.9);
-                    GetParameter(ParametreName.qUp).SetValue(Math.Min(1, BaseDistribution.CDF(max) * 1.1));
                     RAZComputedMoment();
-
-
                     base.Initialize(value, typeCalibration);
                 }
                 catch
@@ -269,8 +303,6 @@ namespace Stochastique.Distributions
             }
             else
             {
-                GetParameter(ParametreName.qUp).SetValue(1);
-                GetParameter(ParametreName.qDown).SetValue(0);
                 var parametres = BaseDistribution.AllParameters().ToList();
                 for (int i = 0; i < parametres.Count; i++)
                 {
@@ -291,11 +323,18 @@ namespace Stochastique.Distributions
 
         public override double[] Simulate(Random r, int nbSimulations)
         {
-            var min = QuantileDown==0? double.MinValue : BaseDistribution.InverseCDF(QuantileDown);
-            var max = QuantileUp == 1 ? double.MaxValue : BaseDistribution.InverseCDF(QuantileUp);
-            var baseSimulated = BaseDistribution.Simulate(r,(int)( nbSimulations/(QuantileUp-QuantileDown)*1.4));
-            return  baseSimulated.Where(a => a >= min && a <= max).Take(nbSimulations).ToArray();
-
+            double[] rst = new double[nbSimulations];
+            int i = 0;
+            while(i<nbSimulations)
+            {
+                var baseSimulated = BaseDistribution.Simulate(r);
+                if(baseSimulated >= ValeurMin && baseSimulated <= ValeurMax)
+                {
+                    rst[i] = baseSimulated;
+                    i++;
+                }
+            }
+            return rst;
         }
 
         public override Parameter GetParameter(ParametreName nomParametre)
@@ -329,8 +368,6 @@ namespace Stochastique.Distributions
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
         {
             var param=BaseDistribution.CalibrateWithMoment(values).ToList();
-            param.Add(new Parameter(ParametreName.qUp, 1));
-            param.Add(new Parameter(ParametreName.qDown, 0));
             return param;
         }
     }

@@ -77,6 +77,8 @@ namespace Stochastique.Distributions
 
         [IgnoreMember]
         public virtual double InconditionnalMaximumPossibleValue => double.MaxValue;
+        [IgnoreMember]
+        public virtual int NumberOfParameter => AllParameters().Count();
 
         /// <summary>
         /// Create a distribution with the type of the distribution.
@@ -543,7 +545,7 @@ namespace Stochastique.Distributions
             double epsg = 0;
             double epsf = 0;
             double epsx = 0;
-            int maxits = 1000;
+            int maxits = 80;
             double diffstep = 1.0e-6;
 
             alglib.minbleiccreatef(x, diffstep, out state);

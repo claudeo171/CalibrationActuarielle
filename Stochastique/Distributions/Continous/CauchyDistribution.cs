@@ -78,11 +78,11 @@ namespace Stochastique.Distributions.Continous
         {
             var normal1= new NormalDistribution(0,1).Simulate(r, nbSimulations);
             var normal2 = new NormalDistribution(0, 1).Simulate(r, nbSimulations);
-            return  normal1.Select((a,i)=> B + a / normal2[i]).ToArray();
+            return  normal1.Select((a,i)=> B + a.Divide( normal2[i],0)).ToArray();
         }
         public override double Simulate(Random r)
         {
-            return base.Simulate(r, 1)[0];
+            return Simulate(r, 1)[0];
         }
     }
 }
