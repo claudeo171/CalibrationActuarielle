@@ -5,6 +5,7 @@
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
 @using Stochastique
+@using pax.BlazorChartJs
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
@@ -32,9 +33,11 @@
                         <div class="card-header">
                             Nuage de points
                         </div>
-                        <div class="card-body divChart">
+                        <div class="card-body divChart chart-container">
                             <CartesianChart Series="ChartScatterPlot.Series" DrawMarginFrame="ChartScatterPlot.DrawMarginFrame">
                             </CartesianChart>
+                            <ChartComponent ChartJsConfig="ChartScatterPlot.ChartJsConfig">
+                            </ChartComponent>
                         </div>
                     </div>
                 </div>
@@ -46,9 +49,11 @@
                         <div class="card-header">
                             Nuage de points des rangs
                         </div>
-                        <div class="card-body divChart">
+                        <div class="card-body divChart chart-container">
                             <CartesianChart Series="ChartScatterPlotRank.Series" DrawMarginFrame="ChartScatterPlotRank.DrawMarginFrame">
                             </CartesianChart>
+                            <ChartComponent ChartJsConfig="ChartScatterPlotRank.ChartJsConfig" >
+                            </ChartComponent>
                         </div>
                     </div>
                 </div>

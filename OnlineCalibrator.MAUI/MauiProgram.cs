@@ -4,6 +4,7 @@ using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
 using SpawnDev.BlazorJS.WebWorkers;
 using SpawnDev.BlazorJS;
+using pax.BlazorChartJs;
 
 namespace OnlineCalibrator.MAUI
 {
@@ -26,7 +27,13 @@ namespace OnlineCalibrator.MAUI
             //for multithreading
             builder.Services.AddBlazorJSRuntime();
             builder.Services.AddWebWorkerService();
-
+            builder.Services.AddChartJs(options =>
+            {
+                // default
+                options.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js";
+                options.ChartJsPluginDatalabelsLocation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
+                options.ChartJsPluginAnnotation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation";
+            });
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
     		builder.Logging.AddDebug();

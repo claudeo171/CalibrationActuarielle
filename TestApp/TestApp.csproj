@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OnlineCalibrator.Service\OnlineCalibrator.Service.csproj" />
+    <ProjectReference Include="..\OnlineCalibrator.SharedPages\OnlineCalibrator.SharedPages.csproj" />
     <ProjectReference Include="..\OnlineCalibrator\Shared\OnlineCalibrator.Shared.csproj" />
   </ItemGroup>
 

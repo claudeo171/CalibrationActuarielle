@@ -15,7 +15,7 @@ using static alglib;
 namespace Stochastique.Distributions
 {
     [MessagePackObject]
-    public partial class TrunkatedDistribution : Distribution
+    public class TrunkatedDistribution : Distribution
     {
 
         public TrunkatedDistribution() { }
@@ -44,10 +44,7 @@ namespace Stochastique.Distributions
         /// <summary>
         /// Define if the distributtion is trunkated at is lower or upper bound
         /// </summary>
-        [Key(8)]
-        private double? ComputedExpectedValue { get; set; }
-        [Key(9)]
-        private double? ComputedVariance { get; set; }
+
         [Key(10)]
         public double ValeurMin { get; set; }
 
@@ -83,82 +80,9 @@ namespace Stochastique.Distributions
             }
         }
 
-        [Key(13)]
-        private double MinValue
-        {
-            get
-            {
-                if (Type == TypeDistribution.TrunkatedBeta)
-                {
-                    return 0;
-                }
-                else
-                {
-                    double root = 0;
-                    var rst= Bisection.TryFindRoot((a) => CDF(a) - 1e-10, GetMin(), GetMax(), accuracy: 1e-8, maxIterations: 1000,out root);
-                    if (rst)
-                    {
-                        return root;
-                    }
-                    else
-                    {
-                        return GetMin();
-                    }
-                }
-            }
-        }
-
-        private double GetMin()
-        {
-            double d = -1;
-            while (CDF(d) > 1e-10)
-            {
-                d *= 10;
-            }
-            return d;
-        }
-
-        private double GetMax()
-        {
-            double d = 1;
-            while (1 - CDF(d) > 1e-10)
-            {
-                d *= 10;
-            }
-            return d;
-        }
-
-        [Key(14)]
-        private double MaxValue
-        {
-            get
-            {
-                if (Type == TypeDistribution.TrunkatedBeta)
-                {
-                    return 1;
-                }
-                else
-                {
-                    double root = 0;
-                    var rst=Bisection.TryFindRoot((a) => 1 - CDF(a) - 1e-10, GetMin(), GetMax(), accuracy: 1e-8, maxIterations: 1000,out root);
-                    if (rst)
-                    {
-                        return root;
-                    }
-                    else
-                    {
-                        return GetMax();
-                    }
-                }
-            }
-        }
-        [Key(15)]
-        private double? ComptedSkewness { get; set; }
-        [Key(16)]
-        private double? ComputedKurtosis { get; set; }
 
         [Key(17)]
-        private double[] SimulatedValue { get; set; }
+        public double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {
             if (SimulatedValue == null)
@@ -169,24 +93,15 @@ namespace Stochastique.Distributions
         }
         public override double ExpextedValue()
         {
-            if (ComputedExpectedValue.HasValue)
+            if (QuantileUp - QuantileDown < 1)
             {
-                return ComputedExpectedValue.Value;
+                return double.NaN;
             }
             else
             {
-                if (QuantileUp - QuantileDown < 1)
-                {
-                    return double.NaN;
-                }
-                else
-                {
-                    SimulateValue();
-                    ComputedExpectedValue = SimulatedValue.Mean();
-                    return ComputedExpectedValue.Value;
-                }
+                SimulateValue();
+                return SimulatedValue.Mean();
             }
-
         }
 
         public override double PDF(double x)
@@ -208,22 +123,14 @@ namespace Stochastique.Distributions
 
         public override double Variance()
         {
-            if(ComputedVariance.HasValue)
-            {                
-                return ComputedVariance.Value;
+            if (QuantileUp - QuantileDown < 1)
+            {
+                return double.NaN;
             }
             else
             {
-                if (QuantileUp - QuantileDown < 1)
-                {
-                    return double.NaN;
-                }
-                else
-                {
-                    SimulateValue();
-                    ComputedVariance = SimulatedValue.Variance();
-                    return ComputedVariance.Value;
-                }
+                SimulateValue();
+                return SimulatedValue.Variance();
             }
         }
         public override double Skewness()
@@ -315,10 +222,6 @@ namespace Stochastique.Distributions
         private void RAZComputedMoment()
         {
             SimulatedValue = null;
-            ComptedSkewness = null;
-            ComputedExpectedValue = null;
-            ComputedKurtosis = null;
-            ComputedVariance = null;
         }
 
         public override double[] Simulate(Random r, int nbSimulations)

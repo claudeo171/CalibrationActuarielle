@@ -10,17 +10,17 @@
   <ItemGroup>
     <TrimmerRootAssembly Include="LiveChartsCore" />
     <TrimmerRootAssembly Include="FShart.Core" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.0.1" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc4.5" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-rc4.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.0" />
-    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.0" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.WebAssembly" Version="8.3.1-preview.2.3" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc5.1" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Blazor" Version="2.0.0-rc5.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.1" />
+    <PackageReference Include="Microsoft.ML.ImageAnalytics" Version="4.0.1" />
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.118.0-preview.2.3" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.118.0-preview.2.3" />
     <PackageReference Include="SkiaSharp.Views.Blazor" Version="3.118.0-preview.2.3" />
-    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.31" />
-    <PackageReference Include="System.Drawing.Common" Version="9.0.0" />
+    <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="2.5.36" />
+    <PackageReference Include="System.Drawing.Common" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>

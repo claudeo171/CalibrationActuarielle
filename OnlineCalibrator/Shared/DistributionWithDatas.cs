@@ -39,10 +39,10 @@ namespace OnlineCalibrator.Shared
         public double LogLikelihood { get; set; }
 
         [Key(2)]
-        public double AIC=> 2*Distribution.AllParameters().Count()-2*LogLikelihood;
+        public double AIC=> 2*Distribution.NumberOfParameter - 2*LogLikelihood;
 
         [Key(3)]
-        public double BIC => Math.Log(N) * Distribution.AllParameters().Count() - 2 * LogLikelihood;
+        public double BIC => Math.Log(N) * Distribution.NumberOfParameter - 2 * LogLikelihood;
 
 
         [Key(5)]

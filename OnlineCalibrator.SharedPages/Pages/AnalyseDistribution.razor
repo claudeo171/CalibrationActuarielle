@@ -13,6 +13,7 @@
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
 @using Stochastique.Test
+@using pax.BlazorChartJs
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -44,16 +45,21 @@
             <div class="modal-body" style="height:80vh;width:90vw">
                 @if (CurrentFullSizeChart != null)
                 {
+                    <ChartComponent ChartJsConfig="CurrentFullSizeChart.ChartJsConfig">
+                    </ChartComponent>
                     if (CurrentFullSizeChart.YAxes != null)
                     {
 
                         <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" YAxes="CurrentFullSizeChart.YAxes" />
+
                     }
                     else
                     {
+
                         if (CurrentFullSizeChart.RectangularSection != null)
                         {
                             <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" Sections="CurrentFullSizeChart.RectangularSection" />
+
                         }
                         else
                         {
@@ -76,14 +82,28 @@
                     Paramétrage de la calibration
                 </div>
                 <div class="card-body">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,true)" checked=@(DonneesImportes.ActualData.IncludeTrunkatedDistributions) id="flexCheckDefault" />
-                        <label class="form-check-label" for="flexCheckDefault">
-                            Inclure les distributions tronqués
+                    <div class="form-group">
+                        <label >
+                            Valeur Minimale distribution tronqué
                         </label>
+                        <InputNumber class="form-control" @bind-value="DonneesImportes.ActualData.ValeurMinTrukated"  />
                     </div>
+                    <div class="form-group">
+                        <label>
+                            Valeur Maximale distribution tronqué
+                        </label>
+                        <InputNumber class="form-control" @bind-value="DonneesImportes.ActualData.ValeurMaxTrukated" />
+                    </div>
+                    @if (DonneesImportes.ActualData.IncludeTrunkatedDistributions)
+                    {
+                        <button class="btn btn-primary" @onclick="()=>DonneesImportes.ActualData.MajCalibrationTronque()">MAJ Calibration distribution Tronquées</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" @onclick="()=>IncludeTrunkatedDistribution()" >Inclure Distributions Tronquées</button>
+                    }
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration(e,false)" checked=@(DonneesImportes.ActualData.IsDiscreteDistribution) />
+                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration((bool)e.Value,false)" checked=@(DonneesImportes.ActualData.IsDiscreteDistribution) />
                         <label class="form-check-label" for="flexCheckDefault">
                             Distributions discrètes?
                         </label>
@@ -94,7 +114,7 @@
                         </label>
                         @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                         {
-                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s)">
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>DonneesImportes.ActualData.MethodeCalibration)" Value="@DonneesImportes.ActualData.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s,true)">
                                 @foreach (var item in AviableMethod)
                                 {
                                     <option value="@item">@item</option>
@@ -128,10 +148,14 @@
                     {
                         <div class="pt-3" @onclick="()=>ShowFullScreen(PDFCDF)">
                             <h5> PDF + CDF </h5>
+                            <ChartComponent ChartJsConfig="PDFCDF.ChartJsConfig">
+                            </ChartComponent>
                             <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
                         </div>
                         <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileBeta)">
                             <h5>Probability of Quantile Plot</h5>
+                            <ChartComponent ChartJsConfig="QuantileBeta.ChartJsConfig">
+                            </ChartComponent>
                             <CartesianChart Series="QuantileBeta.Series" Sections="QuantileBeta.RectangularSection" DrawMarginFrame="QuantileBeta.DrawMarginFrame" />
                         </div>
                         @if (DonneesImportes.ActualData.CurrentDistribution.EELQuantileTest == null)
@@ -142,6 +166,8 @@
                         {
                             <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileEEL)">
                                 <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
+                                <ChartComponent @ref="quntileEELChart" ChartJsConfig="QuantileEEL.ChartJsConfig">
+                                </ChartComponent>
                                 <CartesianChart Series="QuantileEEL.Series" Sections="QuantileEEL.RectangularSection" DrawMarginFrame="QuantileEEL.DrawMarginFrame" />
                             </div>
                         }
@@ -181,6 +207,8 @@
                         <div @onclick="()=>ShowFullScreen(QQPlot)">
                             QQPlot
                             <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
+                            <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig">
+                            </ChartComponent>
                         </div>
                     }
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
@@ -188,6 +216,8 @@
                         <div @onclick="()=>ShowFullScreen(PPPlot)">
                             PPPlot
                             <CartesianChart Series="PPPlot.Series" DrawMarginFrame="PPPlot.DrawMarginFrame" />
+                            <ChartComponent ChartJsConfig="PPPlot.ChartJsConfig">
+                            </ChartComponent>
                         </div>
                     }
                 </div>
@@ -207,19 +237,19 @@
                         <table class="table">
                             <thead>
 
-                            <th class="text-center">Loi</th>
-                            <th class="text-center">LogLikelihood</th>
-                            <th class="text-center">AIC</th>
-                            <th class="text-center">BIC</th>
-                            <th class="text-center">KS-Test P-Value</th>
+                                <th class="text-center">Loi</th>
+                                <th class="text-center">LogLikelihood</th>
+                                <th class="text-center">AIC</th>
+                                <th class="text-center">BIC</th>
+                                <th class="text-center">KS-Test P-Value</th>
                                 @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
                                 {
-                                <th class="text-center">Parametre @(i + 1)</th>
+                                    <th class="text-center">Parametre @(i + 1)</th>
                                 }
-                            <th class="text-center">Esperance(%Ecart)</th>
-                            <th class="text-center">Variance(%Ecart)</th>
-                            <th class="text-center">Aplatissement(%Ecart)</th>
-                            <th class="text-center">Kurtosis(%Ecart)</th>
+                                <th class="text-center">Esperance(%Ecart)</th>
+                                <th class="text-center">Variance(%Ecart)</th>
+                                <th class="text-center">Aplatissement(%Ecart)</th>
+                                <th class="text-center">Kurtosis(%Ecart)</th>
                             </thead>
                             <tbody>
                                 @if (distributions != null)
@@ -290,6 +320,7 @@
     private ChartViewModelLine? PDFCDF;
     private ChartViewModelLine? QuantileEEL;
     private ChartViewModelLine? QuantileBeta;
+    public ChartComponent quntileEELChart;
 
     private ChartViewModelLine? CurrentFullSizeChart;
     private bool showModal;
@@ -311,7 +342,7 @@
         {
             distributions = DonneesImportes.ActualData?.GetAllDistributions();
             isInit = true;
-            ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration);
+            ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration,true);
             SaveData();
             StateHasChanged();
         }
@@ -324,58 +355,103 @@
         await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(data));
     }
 
-    protected void UpdateCalibration(ChangeEventArgs e, bool isTrunkated)
+    protected void UpdateCalibration(bool b, bool isTrunkated)
     {
         if (isTrunkated)
         {
-            DonneesImportes.ActualData.IncludeTrunkatedDistributions = (bool)e.Value;
+            DonneesImportes.ActualData.IncludeTrunkatedDistributions = b;
         }
         else
         {
-            DonneesImportes.ActualData.IsDiscreteDistribution = (bool)e.Value;
+            DonneesImportes.ActualData.IsDiscreteDistribution = b;
         }
         if (isInit)
         {
             distributions = DonneesImportes.ActualData?.GetAllDistributions();
-            ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration);
+            ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration,false);
             UpdateChart();
             SaveData();
 
         }
     }
 
-    protected void ChangeSelectionMethod(MethodeCalibrationRetenue m)
+    protected void ChangeSelectionMethod(MethodeCalibrationRetenue m, bool update)
     {
         DonneesImportes.ActualData?.ChangeSelectionMethod(m);
-        UpdateChart();
-        SaveData();
-
+        if (update)
+        {
+            UpdateChart();
+            SaveData();
+        }
     }
     public async void UpdateChart()
     {
-
-        QQPlot = new ChartViewModelLine(
-        DonneesImportes.ActualData?.GetQQPlot(),
-        new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
-        new List<SolidColorPaint>() { null, null },
-        new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
-        PPPlot = new ChartViewModelLine(
-        DonneesImportes.ActualData?.GetPPPlot(),
-        new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
-        new List<SolidColorPaint>() { null, null },
-        new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
-        PDFCDF = new ChartViewModelLine(
-            DonneesImportes.ActualData?.GetCDFPDF(),
+        if (QQPlot == null)
+        {
+            QQPlot = new ChartViewModelLine(
+            DonneesImportes.ActualData?.GetQQPlot(),
             new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
             new List<SolidColorPaint>() { null, null },
-        new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null }, true
-        );
-        QuantileBeta = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantileBetaPlot());
-        if (DonneesImportes.ActualData?.CurrentDistribution?.EELQuantileTest != null)
-        {
-            QuantileEEL = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PPPlot = new ChartViewModelLine(
+            DonneesImportes.ActualData?.GetPPPlot(),
+            new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PDFCDF = new ChartViewModelLine(
+                DonneesImportes.ActualData?.GetCDFPDF(),
+                new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+                new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null }, true
+            );
+            QuantileBeta = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantileBetaPlot());
+            if (DonneesImportes.ActualData?.CurrentDistribution?.EELQuantileTest != null)
+            {
+                QuantileEEL = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
+            }
         }
+        else
+        {
+            QQPlot.Update(
+            DonneesImportes.ActualData?.GetQQPlot(),
+            new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PPPlot.Update(
+            DonneesImportes.ActualData?.GetPPPlot(),
+            new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PDFCDF.Update(
+                DonneesImportes.ActualData?.GetCDFPDF(),
+                new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+                new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null }, true
+            );
+            QuantileBeta.UpdateQuantile(DonneesImportes.ActualData?.GetQuantileBetaPlot());
+            if (DonneesImportes.ActualData?.CurrentDistribution?.EELQuantileTest != null)
+            {
+                if (QuantileEEL == null)
+                {
+                    QuantileEEL = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
+                }
+                else
+                {
+                    QuantileEEL.UpdateQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
+                }
+            }
+        }
+        QQPlot.ChartJsConfig.ReinitializeChart();
+        PPPlot.ChartJsConfig.ReinitializeChart();
+        PDFCDF.ChartJsConfig.ReinitializeChart();
+        QuantileBeta.ChartJsConfig.ReinitializeChart();
+        QuantileEEL?.ChartJsConfig.ReinitializeChart();
         StateHasChanged();
+    }
+    public void IncludeTrunkatedDistribution()
+    {
+        DonneesImportes.ActualData.IncludeTrunkatedDistributions = true;
+        UpdateCalibration(true, true);
     }
     public async void ExportSample()
     {
@@ -416,7 +492,20 @@
 
     public async void ShowFullScreen(ChartViewModelLine chartViewModelLine)
     {
-        CurrentFullSizeChart = chartViewModelLine;
+        if (CurrentFullSizeChart == null)
+        {
+            CurrentFullSizeChart = new ChartViewModelLine();
+            CurrentFullSizeChart.ChartJsConfig = new ChartJsConfig();
+        }
+        CurrentFullSizeChart.RectangularSection = chartViewModelLine.RectangularSection;
+        CurrentFullSizeChart.Series = chartViewModelLine.Series;
+        CurrentFullSizeChart.YAxes = chartViewModelLine.YAxes;
+
+        CurrentFullSizeChart.ChartJsConfig.Data = chartViewModelLine.ChartJsConfig.Data;
+        CurrentFullSizeChart.ChartJsConfig.Options = chartViewModelLine.ChartJsConfig.Options;
+        CurrentFullSizeChart.ChartJsConfig.Type = chartViewModelLine.ChartJsConfig.Type;
+
+        CurrentFullSizeChart.ChartJsConfig.ReinitializeChart();
         showModal = true;
     }
     public void HideModal()

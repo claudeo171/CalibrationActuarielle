@@ -65,6 +65,49 @@ namespace OnlineCalibrator.Shared
         [Key(12)]
         public Distribution CalibratedDistribution { get; set; }
 
+        private double valeurMinTrukated;
+        private double valeurMaxTrukated;
+        [Key(15)]
+        public double ValeurMinTrukated
+        {
+            get => valeurMinTrukated;
+            set
+            {
+                valeurMinTrukated = Math.Min( value, Values.Min());
+                if (Distributions != null)
+                {
+                    foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+                    {
+                        ((TrunkatedDistribution)distribution.Distribution).ValeurMin = valeurMinTrukated;
+                    }
+                }
+            }
+        }
+        [Key(16)]
+        public double ValeurMaxTrukated
+        {
+            get => valeurMaxTrukated;
+            set
+            {
+                valeurMaxTrukated = Math.Max(value, Values.Max());
+                if (Distributions != null)
+                {
+                    foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+                    {
+                        ((TrunkatedDistribution)distribution.Distribution).ValeurMax = valeurMaxTrukated;
+                    }
+                }
+            }
+        }
+
+        public void MajCalibrationTronque()
+        {
+            foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+            {
+                ((TrunkatedDistribution)distribution.Distribution).Initialize(Values,TypeCalibration.MaximumLikelyhood);
+            }
+        }
+
         [IgnoreMember]
         public TypeDistribution? CalibratedTypeDistribution
         {
@@ -84,6 +127,8 @@ namespace OnlineCalibrator.Shared
         public DonneesAAnalyser() { }
         public void Initialize() 
         {
+            ValeurMinTrukated = Values.Min();
+            ValeurMaxTrukated = Values.Max();
             PointsCDF= GenerationGraphique.GetCDF(Values);
             PointsKDE= GenerationGraphique.GetDensity(Values,100);
         }

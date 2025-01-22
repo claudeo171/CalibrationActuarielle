@@ -27,6 +27,8 @@ if (args.Length == 3)
         var elts = calibratedDistribution.Simulate(random, data.ActualData.Values.Length);
         DonneesAAnalyser d = new DonneesAAnalyser();
         d.Values = elts;
+        d.ValeurMinTrukated = elts.Min();
+        d.ValeurMinTrukated = elts.Max();
         d.IsDiscreteDistribution = data.ActualData.IsDiscreteDistribution;
         d.IncludeTrunkatedDistributions = data.ActualData.IncludeTrunkatedDistributions;
         d.GetAllDistributions();

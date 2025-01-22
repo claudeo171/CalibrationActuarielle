@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -25,6 +25,7 @@
   <ItemGroup>
     <ProjectReference Include="..\OnlineCalibrator.Service\OnlineCalibrator.Service.csproj" />
     <ProjectReference Include="..\OnlineCalibrator\Shared\OnlineCalibrator.Shared.csproj" />
+    <ProjectReference Include="..\pax.BlazorChartJs\pax.BlazorChartJs.csproj" />
   </ItemGroup>
 
   <ItemGroup>

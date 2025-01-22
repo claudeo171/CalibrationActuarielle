@@ -11,6 +11,7 @@
 @using Stochastique.Enums;
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
+@using pax.BlazorChartJs
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -80,13 +81,14 @@
                 <div class="card-header">
                     Analyse de la copule sélectionnée
                 </div>
-                <div class="card-body">
+                <div class="card-body chart-container">
                     @if (DonneesImportes.ActualDonneesPourAnalyseConjointe != null && DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule != null)
                     {
                         <div> <b>Log-Vraissemblance de la copule :</b> @DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.First(a => a.Copule.Type == DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule.Type).LogLikelihood.ToString("N4") </div>
                         <div> <b>Graphique des Rang</b> (copule en rouge et données en bleu): </div>
                         <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
-
+                        <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig">
+                        </ChartComponent>
                     }
                 </div>
             </div>
@@ -104,13 +106,13 @@
                     <table class="table">
                         <thead>
 
-                        <th>Loi</th>
-                        <th>LogLikelihood</th>
-                        <th>AIC</th>
-                        <th>BIC</th>
+                            <th>Loi</th>
+                            <th>LogLikelihood</th>
+                            <th>AIC</th>
+                            <th>BIC</th>
                             @for (int i = 0; i < copules.Max(a => a.Copule.AllParameters().Count()); i++)
                             {
-                            <th>Parametre @(i + 1)</th>
+                                <th>Parametre @(i + 1)</th>
                             }
                         </thead>
                         <tbody>
@@ -207,12 +209,24 @@
     }
     public async void UpdateChart()
     {
+        if (QQPlot == null)
+        {
+            QQPlot = new ChartViewModelScatter(
+            DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123)),
+            new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+            new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) });
+        }
+        else
+        {
+            QQPlot.Update(
+            DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123)),
+            new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
+            new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) });
 
-        QQPlot = new ChartViewModelScatter(
-        DonneesImportes.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123)),
-        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
-        new List<Paint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) });
+        }
+        QQPlot.ChartJsConfig.ReinitializeChart();
         StateHasChanged();
+
     }
     public async void ExportSample()
     {
