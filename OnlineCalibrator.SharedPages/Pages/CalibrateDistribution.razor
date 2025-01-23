@@ -10,6 +10,8 @@
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @page "/CalibrateDistribution"
+
+<ModalChart @ref="modal" />
 @if (DonneesImportes != null)
 {
     <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
@@ -34,7 +36,7 @@
                     </div>
                     <div class="card-body">
                         <div class="chart-container500">
-                            <ChartComponent ChartJsConfig="ChartCDF.ChartJsConfig">
+                            <ChartComponent  @ref="c2" ChartJsConfig="ChartCDF.ChartJsConfig">
                             </ChartComponent>
                         </div>
                     </div>
@@ -50,7 +52,7 @@
                     </div>
                     <div class="card-body">
                         <div class="chart-container500">
-                            <ChartComponent ChartJsConfig="ChartKDE.ChartJsConfig">
+                            <ChartComponent  @ref="c1" ChartJsConfig="ChartKDE.ChartJsConfig">
                             </ChartComponent>
                         </div>
                     </div>
@@ -91,6 +93,9 @@
     </div>
 </div>
 @code {
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartComponent c2;
     private ChartViewModelLine ChartCDF;
     private ChartViewModelLine ChartKDE;
     private DonneesImportes? DonneesImportes;
@@ -120,4 +125,10 @@
             Console.WriteLine(e);
         }
     }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        c1.Modal = modal;
+        c2.Modal = modal;
+    }
 }
+

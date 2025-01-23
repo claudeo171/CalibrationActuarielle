@@ -11,6 +11,7 @@
 @inject DonneeContainer donneeContainer
 @page "/CalibrateDistributionConjointe"
 
+<ModalChart @ref="modal" />
 @if (DonneesImportes != null)
 {
     <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
@@ -35,7 +36,7 @@
                         </div>
                         <div class="card-body">
                             <div class="chart-container500">
-                                <ChartComponent ChartJsConfig="ChartScatterPlot.ChartJsConfig">
+                                <ChartComponent @ref="c1" ChartJsConfig="ChartScatterPlot.ChartJsConfig">
                                 </ChartComponent>
                             </div>
                         </div>
@@ -51,7 +52,7 @@
                         </div>
                         <div class="card-body">
                             <div class="chart-container500">
-                                <ChartComponent ChartJsConfig="ChartScatterPlotRank.ChartJsConfig">
+                                <ChartComponent @ref="c2" ChartJsConfig="ChartScatterPlotRank.ChartJsConfig">
                                 </ChartComponent>
                             </div>
                         </div>
@@ -116,5 +117,13 @@
         {
             Console.WriteLine(e);
         }
+    }
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartComponent c2;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        c1.Modal = modal;
+        c2.Modal = modal;
     }
 }

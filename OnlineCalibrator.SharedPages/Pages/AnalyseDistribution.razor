@@ -19,6 +19,7 @@
 @inject IJSRuntime js
 @inject DonneeContainer donneeContainer
 @page "/AnalyseDistribution"
+<ModalChart @ref="modal" />
 <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
@@ -34,46 +35,6 @@
     </ol>
 </nav>
 <!-- Modal -->
-<div @onclick="HideModal" class="modal @(showModal?"":"fade")" style="@(showModal?"display: block;padding-right: 17px;background:#555555AA;":"display: none;")" id="exampleModalLong" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-    <div class="modal-dialog" style="max-width:100vw">
-        <div class="modal-content" style="height:90vh;width:90vw;position:absolute;top:5vh;left:5vw; display:block">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Graphique </h5>
-                <button type="button" class="btn btn-close" data-dismiss="modal" aria-label="Close" @onclick="HideModal">
-                </button>
-            </div>
-            <div class="modal-body" style="height:80vh;width:90vw">
-                @if (CurrentFullSizeChart != null)
-                {
-                    <div class="chart-containerFull">
-                        <ChartComponent ChartJsConfig="CurrentFullSizeChart.ChartJsConfig">
-                        </ChartComponent>
-                    </div>
-                    if (CurrentFullSizeChart.YAxes != null)
-                    {
-
-                        <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" YAxes="CurrentFullSizeChart.YAxes" />
-
-                    }
-                    else
-                    {
-
-                        if (CurrentFullSizeChart.RectangularSection != null)
-                        {
-                            <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" Sections="CurrentFullSizeChart.RectangularSection" />
-
-                        }
-                        else
-                        {
-                            <CartesianChart Series="CurrentFullSizeChart.Series" DrawMarginFrame="CurrentFullSizeChart.DrawMarginFrame" />
-                        }
-                    }
-                }
-            </div>
-        </div>
-    </div>
-</div>
-
 
 <div class="row">
     @if (DonneesImportes != null)
@@ -148,34 +109,33 @@
                     </div>
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-                        <div class="pt-3" @onclick="()=>ShowFullScreen(PDFCDF)">
-                            <h5> PDF + CDF </h5>
-                            <div class="chart-container300">
-                                <ChartComponent ChartJsConfig="PDFCDF.ChartJsConfig">
-                                </ChartComponent>
-                            </div>
-                            <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
+
+                        <h5> PDF + CDF </h5>
+                        <div class="chart-container300">
+                            <ChartComponent @ref="c1" ChartJsConfig="PDFCDF.ChartJsConfig">
+                            </ChartComponent>
                         </div>
-                        <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileBeta)">
-                            <h5>Probability of Quantile Plot</h5>
-                            <div class="chart-container300">
-                                <ChartComponent ChartJsConfig="QuantileBeta.ChartJsConfig">
-                                </ChartComponent>
-                            </div>
+                        <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
+
+                        <h5>Probability of Quantile Plot</h5>
+                        <div class="chart-container300">
+                            <ChartComponent @ref="c2" ChartJsConfig="QuantileBeta.ChartJsConfig">
+                            </ChartComponent>
                         </div>
+
                         @if (DonneesImportes.ActualData.CurrentDistribution.EELQuantileTest == null)
                         {
                             <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter le graphique de probabilité des quantiles au niveau global (EEL).</button>
                         }
                         else
                         {
-                            <div class="pt-3" @onclick="()=>ShowFullScreen(QuantileEEL)">
-                                <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
-                                <div class="chart-container300">
-                                    <ChartComponent @ref="quntileEELChart" ChartJsConfig="QuantileEEL.ChartJsConfig">
-                                    </ChartComponent>
-                                </div>
+
+                            <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c3" @ref="quntileEELChart" ChartJsConfig="QuantileEEL.ChartJsConfig">
+                                </ChartComponent>
                             </div>
+
                         }
 
                     }
@@ -213,20 +173,20 @@
                 <div class="card-body">
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-                        <div @onclick="()=>ShowFullScreen(QQPlot)">
+                        <div>
                             QQPlot
                             <div class="chart-container300">
-                                <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig">
+                                <ChartComponent @ref="c4" ChartJsConfig="QQPlot.ChartJsConfig">
                                 </ChartComponent>
                             </div>
                         </div>
                     }
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-                        <div @onclick="()=>ShowFullScreen(PPPlot)">
+                        <div>
                             PPPlot
                             <div class="chart-container300">
-                                <ChartComponent ChartJsConfig="PPPlot.ChartJsConfig">
+                                <ChartComponent @ref="c5" ChartJsConfig="PPPlot.ChartJsConfig">
                                 </ChartComponent>
                             </div>
                         </div>
@@ -501,26 +461,25 @@
         Notifications.Remove(notif);
     }
 
-    public async void ShowFullScreen(ChartViewModelLine chartViewModelLine)
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartComponent c2;
+    private ChartComponent c3;
+    private ChartComponent c4;
+    private ChartComponent c5;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (CurrentFullSizeChart == null)
+        if (c1 != null)
         {
-            CurrentFullSizeChart = new ChartViewModelLine();
-            CurrentFullSizeChart.ChartJsConfig = new ChartJsConfig();
+            if (c3 != null)
+            {
+                c3.Modal = modal;
+            }
+            c1.Modal = modal;
+            c2.Modal = modal;
+
+            c4.Modal = modal;
+            c5.Modal = modal;
         }
-        CurrentFullSizeChart.RectangularSection = chartViewModelLine.RectangularSection;
-        CurrentFullSizeChart.Series = chartViewModelLine.Series;
-        CurrentFullSizeChart.YAxes = chartViewModelLine.YAxes;
-
-        CurrentFullSizeChart.ChartJsConfig.Data = chartViewModelLine.ChartJsConfig.Data;
-        CurrentFullSizeChart.ChartJsConfig.Options = chartViewModelLine.ChartJsConfig.Options;
-        CurrentFullSizeChart.ChartJsConfig.Type = chartViewModelLine.ChartJsConfig.Type;
-
-        CurrentFullSizeChart.ChartJsConfig.ReinitializeChart();
-        showModal = true;
-    }
-    public void HideModal()
-    {
-        showModal = false;
     }
 }

@@ -108,24 +108,35 @@ namespace OnlineCalibrator.Shared
             {
                 ChartJsConfig.Options.Scales = !differentAxes ? null : new ChartJsOptionsScales
                 {
-                    Y = new ChartJsAxis
+                    Y = new CartesianAxis
                     {
                         Type = "linear",
+                        Display = true,
+                        Position = "left",
+                        Ticks=new ChartJsAxisTick { Color = "blue" }
                     },
-                    Y1 = new ChartJsAxis
+                    Y1 = new CartesianAxis
                     {
                         Type = "linear",
-                    }
+                        Display = true,
+                        Position = "right",
+                        Grid = new ChartJsGrid { DrawOnChartArea = false },
+                        Ticks = new ChartJsAxisTick
+                        {
+                            Color = "red"
+                        }
+                    },
+
                 };
                 for(int i=0;i< ChartJsConfig.Data.Datasets.Count;i++)
                 {
                     if (i == 0)
                     {
-                        (ChartJsConfig.Data.Datasets[i] as ScatterDataset).YAxisID = "Y";
+                        (ChartJsConfig.Data.Datasets[i] as ScatterDataset).YAxisID = "y";
                     }
                     else
                     {
-                        (ChartJsConfig.Data.Datasets[i] as ScatterDataset).YAxisID = "Y1";
+                        (ChartJsConfig.Data.Datasets[i] as ScatterDataset).YAxisID = "y1";
                     }
                 }
             }
@@ -315,12 +326,12 @@ namespace OnlineCalibrator.Shared
             {
                 Annotations = new List<Annotation>
                 {
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=1, yMin=0.995, backgroundColor="rgba(255, 0, 0, 0.5)",borderColor="rgb(255, 0, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=0.005, yMin=0.005, backgroundColor="rgba(255, 0, 0, 0.5)",borderColor="rgb(255, 0, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=0.025, yMin=0.005, backgroundColor="rgba(255, 165, 0, 0.5)",borderColor="rgb(255, 165, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=0.995, yMin=0.975, backgroundColor="rgba(255, 165, 0, 0.5)",borderColor="rgb(255, 165, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=0.05, yMin=0.025, backgroundColor="rgba(255, 255, 0, 0.5)",borderColor="rgb(255, 255, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
-                    new Annotation { xMin=points.Select(x=>x.X).Min(), xMax=points.Select(x=>x.X).Max(), yMax=0.975, yMin=0.95, backgroundColor="rgba(255, 255, 0, 0.5)",borderColor="rgb(255, 255, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation {  yMax=1, yMin=0.995, backgroundColor="rgba(255, 0, 0, 0.5)",borderColor="rgb(255, 0, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation {  yMax=0.005, yMin=0, backgroundColor="rgba(255, 0, 0, 0.5)",borderColor="rgb(255, 0, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation {  yMax=0.025, yMin=0.005, backgroundColor="rgba(255, 165, 0, 0.5)",borderColor="rgb(255, 165, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation { yMax=0.995, yMin=0.975, backgroundColor="rgba(255, 165, 0, 0.5)",borderColor="rgb(255, 165, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation { yMax=0.05, yMin=0.025, backgroundColor="rgba(255, 255, 0, 0.5)",borderColor="rgb(255, 255, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
+                    new Annotation {  yMax=0.975, yMin=0.95, backgroundColor="rgba(255, 255, 0, 0.5)",borderColor="rgb(255, 255, 0)", borderWidth=1,drawTime="beforeDatasetsDraw", type="box"},
                 }
             };  
         }

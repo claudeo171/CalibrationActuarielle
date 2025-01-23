@@ -1,11 +1,11 @@
 ﻿@if(Height.HasValue)
 {
-    <canvas height="@Height" @ref="CanvasElement" id="@ChartJsConfig.ChartJsConfigGuid">
+    <canvas @onclick="()=>Clicked()" height="@Height" @ref="CanvasElement" id="@ChartJsConfig.ChartJsConfigGuid">
 
 </canvas>
 }
 else
 {
-    <canvas @ref="CanvasElement" id="@ChartJsConfig.ChartJsConfigGuid">
+    <canvas @onclick="()=>Clicked()" @ref="CanvasElement" id="@ChartJsConfig.ChartJsConfigGuid">
     </canvas>
 }

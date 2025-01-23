@@ -12,6 +12,7 @@
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @page "/TestNormalite"
+<ModalChart @ref="modal" />
 <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
@@ -86,7 +87,7 @@
                 </div>
                 <div class="card-body divChart chart-container">
                     <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
-                        <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig" >
+                        <ChartComponent @ref="c1" ChartJsConfig="QQPlot.ChartJsConfig" >
                         </ChartComponent>
                 </div>
             </div>
@@ -156,6 +157,12 @@
     DonneesImportes.ActualData?.GetQQPlot(TypeDistribution.Normal),
     new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
     new List<SolidColorPaint>() { null, null }, new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+    }
+    private ModalChart modal;
+    private ChartComponent c1;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        c1.Modal = modal;
     }
 
 }

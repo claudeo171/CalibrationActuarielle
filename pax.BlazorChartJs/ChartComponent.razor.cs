@@ -33,9 +33,17 @@ public partial class ChartComponent : ComponentBase, IAsyncDisposable
     /// </summary>
     [Parameter]
     public EventCallback<ChartJsEvent> OnEventTriggered { get; set; }
+    public ModalChart? Modal { get; set; }
+    [Parameter]
+    public EventCallback<ModalChart?>? ModalChanged { get; set; }
 
     [Parameter]
     public int? Height { get; set; }
+
+    public void Clicked()
+    {
+        Modal?.ShowFullScreen(ChartJsConfig);
+    }
 
     /// <summary>
     /// ChartJsInterop
