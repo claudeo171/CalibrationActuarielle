@@ -85,9 +85,11 @@
                     {
                         <div> <b>Log-Vraissemblance de la copule :</b> @DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.First(a => a.Copule.Type == DonneesImportes.ActualDonneesPourAnalyseConjointe.CalibratedCopule.Type).LogLikelihood.ToString("N4") </div>
                         <div> <b>Graphique des Rang</b> (copule en rouge et données en bleu): </div>
-                        <CartesianChart Series="QQPlot.Series" DrawMarginFrame="QQPlot.DrawMarginFrame" />
-                        <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig">
-                        </ChartComponent>
+
+                        <div class="chart-container300">
+                            <ChartComponent ChartJsConfig="QQPlot.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
                     }
                 </div>
             </div>
@@ -105,13 +107,13 @@
                     <table class="table">
                         <thead>
 
-                            <th>Loi</th>
-                            <th>LogLikelihood</th>
-                            <th>AIC</th>
-                            <th>BIC</th>
+                        <th>Loi</th>
+                        <th>LogLikelihood</th>
+                        <th>AIC</th>
+                        <th>BIC</th>
                             @for (int i = 0; i < copules.Max(a => a.Copule.AllParameters().Count()); i++)
                             {
-                                <th>Parametre @(i + 1)</th>
+                            <th>Parametre @(i + 1)</th>
                             }
                         </thead>
                         <tbody>

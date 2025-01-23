@@ -32,7 +32,8 @@ namespace OnlineCalibrator.Shared
                 Type = ChartType.scatter,
                 Options = new ChartJsOptions
                 {
-                    AspectRatio = 1,
+                    Responsive = true,
+                    MaintainAspectRatio = false,
                     Plugins = new Plugins
                     {
                         Legend = new Legend
@@ -76,7 +77,8 @@ namespace OnlineCalibrator.Shared
                 Options = new ChartJsOptions
                 {
 
-                    AspectRatio = 1,
+                    Responsive = true,
+                    MaintainAspectRatio = false,
                     Plugins = new Plugins
                     {
                         Legend = new Legend
@@ -200,7 +202,8 @@ namespace OnlineCalibrator.Shared
                 Type = ChartType.scatter,
                 Options = new ChartJsOptions
                 {
-                    AspectRatio = 1,
+                    Responsive = true,
+                    MaintainAspectRatio=false,
                     Plugins = new Plugins
                     {
                         Legend = new Legend
@@ -376,7 +379,8 @@ namespace OnlineCalibrator.Shared
                 Type = ChartType.scatter,
                 Options = new ChartJsOptions
                 {
-                    AspectRatio = 1,
+                    Responsive = true,
+                    MaintainAspectRatio = false,
                     Plugins = new Plugins
                     {
                         Legend = new Legend
@@ -416,7 +420,8 @@ namespace OnlineCalibrator.Shared
                     Type = ChartType.scatter,
                     Options = new ChartJsOptions
                     {
-                        AspectRatio = 1,
+                        Responsive = true,
+                        MaintainAspectRatio = false,
                         Plugins = new Plugins
                         {
                             Legend = new Legend

@@ -20,6 +20,26 @@ html, body {
     margin-right: auto;
     width:auto;
 }
+.chart-container500 {
+    position: relative;
+    margin: auto;
+    height: 500px;
+    max-height :500px;
+    width: 100%;
+}
+.chart-container300 {
+    position: relative;
+    margin: auto;
+    height: 300px;
+    max-height :300px;
+    width: 100%;
+}
+.chart-containerFull {
+    position: relative;
+    margin: auto;
+    height: 100%;
+    width: 100%;
+}
 
 h1:focus {
     outline: none;

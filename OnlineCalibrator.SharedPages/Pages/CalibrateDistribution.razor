@@ -32,11 +32,11 @@
                     <div class="card-header">
                         Fonction de répartition empirique
                     </div>
-                    <div class="card-body divChart chart-container">
-                        <CartesianChart Series="ChartCDF.Series" DrawMarginFrame="ChartCDF.DrawMarginFrame">
-                        </CartesianChart>
-                        <ChartComponent ChartJsConfig="ChartCDF.ChartJsConfig" >
-                        </ChartComponent>
+                    <div class="card-body">
+                        <div class="chart-container500">
+                            <ChartComponent ChartJsConfig="ChartCDF.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -48,11 +48,11 @@
                     <div class="card-header">
                         Estimateur à noyau de la Densité
                     </div>
-                    <div class="card-body divChart chart-container">
-                        <CartesianChart Series="ChartKDE.Series" DrawMarginFrame="ChartKDE.DrawMarginFrame">
-                        </CartesianChart>
-                        <ChartComponent ChartJsConfig="ChartKDE.ChartJsConfig" >
-                        </ChartComponent>
+                    <div class="card-body">
+                        <div class="chart-container500">
+                            <ChartComponent ChartJsConfig="ChartKDE.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                 DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
             }
 
-            if (DonneesImportes != null && DonneesImportes.ActualData!=null)
+            if (DonneesImportes != null && DonneesImportes.ActualData != null)
             {
                 ChartKDE = new ChartViewModelLine(DonneesImportes.ActualData.PointsKDE);
                 ChartCDF = new ChartViewModelLine(DonneesImportes.ActualData.PointsCDF);

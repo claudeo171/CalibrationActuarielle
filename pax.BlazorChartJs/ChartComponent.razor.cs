@@ -34,6 +34,9 @@ public partial class ChartComponent : ComponentBase, IAsyncDisposable
     [Parameter]
     public EventCallback<ChartJsEvent> OnEventTriggered { get; set; }
 
+    [Parameter]
+    public int? Height { get; set; }
+
     /// <summary>
     /// ChartJsInterop
     /// </summary>

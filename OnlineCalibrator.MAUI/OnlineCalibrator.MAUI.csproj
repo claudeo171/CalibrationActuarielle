@@ -20,7 +20,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <EnableDefaultCssItems>false</EnableDefaultCssItems>
         <Nullable>enable</Nullable>
-
+      <CompressionEnabled>false</CompressionEnabled>
         <!-- Display name -->
         <ApplicationTitle>OnlineCalibrator.MAUI</ApplicationTitle>
 
