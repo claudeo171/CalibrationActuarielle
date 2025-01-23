@@ -5,6 +5,7 @@ using OnlineCalibrator.Shared;
 using SpawnDev.BlazorJS.WebWorkers;
 using SpawnDev.BlazorJS;
 using pax.BlazorChartJs;
+using OnlineCalibrator.SharedPages;
 
 namespace OnlineCalibrator.MAUI
 {
@@ -19,7 +20,7 @@ namespace OnlineCalibrator.MAUI
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
-
+            EnvironementCalibration.EstMAUI = true;
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddSingleton<DonneeContainer>();

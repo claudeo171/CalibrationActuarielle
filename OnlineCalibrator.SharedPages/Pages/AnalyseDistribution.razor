@@ -175,8 +175,11 @@
                     }
 
 
-
-                    <!--A réactiver quand je ferais le ml en full js <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>-->
+                    @if(EnvironementCalibration.EstMAUI)
+                    {
+                        <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                    }
+                   
                 </div>
             </div>
             <div class="card">

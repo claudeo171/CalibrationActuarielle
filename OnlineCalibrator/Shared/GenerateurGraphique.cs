@@ -11,7 +11,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Stochastique;
-using LiveChartsCore.Painting;
 
 namespace OnlineCalibrator.Shared
 {

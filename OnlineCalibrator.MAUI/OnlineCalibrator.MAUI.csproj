@@ -61,13 +61,25 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="$(MauiVersion)" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+      <None Remove="tensorflow_inception_graph.pb" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Maui.Controls" Version="9.0.30" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="9.0.30" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.1" />
+        <PackageReference Include="SciSharp.TensorFlow.Redist" Version="2.16.0" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.9" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\OnlineCalibrator.SharedPages\OnlineCalibrator.SharedPages.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="tensorflow_inception_graph.pb">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>

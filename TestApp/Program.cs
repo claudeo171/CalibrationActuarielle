@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using LiveChartsCore.Painting;
+
 using LiveChartsCore.SkiaSharpView.Painting;
 using MathNet.Numerics.Random;
 using MathNet.Numerics.Statistics;

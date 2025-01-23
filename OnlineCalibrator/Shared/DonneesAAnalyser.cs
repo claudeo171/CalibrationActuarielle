@@ -326,7 +326,6 @@ namespace OnlineCalibrator.Shared
 
         public void CalibrerMLI()
         {
-            /*
             var rand=MersenneTwister.MTRandom.Create(15376869);
             DateTime date=DateTime.Now;
             StringBuilder sbTags = new StringBuilder();
@@ -351,15 +350,6 @@ namespace OnlineCalibrator.Shared
             File.WriteAllText($"tags{date.Ticks}.tsv", sbTags.ToString());
             File.WriteAllText($"tags_test{date.Ticks}.tsv", sbTagsTest.ToString());
             MLContext mlContext = new MLContext();
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "OnlineCalibrator.Shared.tensorflow_inception_graph.pb";
-            byte[] bytes;
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
-            using (BinaryReader reader = new BinaryReader(stream))
-            {
-                bytes = reader.ReadBytes((int)stream.Length);
-            }
-            File.WriteAllBytes("./tensorflow_inception_graph.pb", bytes);
             var model=MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", $"tags_test{date.Ticks}.tsv", "./");
             GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}");
             var predictions=MachineLearningHelper.ClassifySingleImage(mlContext, model, $"image{date.Ticks}.png");
@@ -378,7 +368,7 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
-            */
+            
         }
 
 
