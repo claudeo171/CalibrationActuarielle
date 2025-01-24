@@ -5,7 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86;x64</Platforms>
-    
+    <CompressionEnabled>false</CompressionEnabled>
+    <RunAOTCompilation>false</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +16,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" />
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.9" />
+    <PackageReference Include="System.Formats.Nrbf" Version="9.0.1" />
     <TrimmerRootAssembly Include="LiveChartsCore" />
+    <TrimmerRootAssembly Include="Microsoft.ML.Data" />
+    <TrimmerRootAssembly Include="Microsoft.JSInterop" />
   </ItemGroup>
 
   <ItemGroup>

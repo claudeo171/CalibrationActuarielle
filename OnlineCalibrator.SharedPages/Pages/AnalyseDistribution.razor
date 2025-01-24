@@ -34,7 +34,6 @@
         <li class="breadcrumb-item active">Identification de la loi</li>
     </ol>
 </nav>
-<!-- Modal -->
 
 <div class="row">
     @if (DonneesImportes != null)
@@ -132,7 +131,7 @@
 
                             <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
                             <div class="chart-container300">
-                                <ChartComponent @ref="c3" @ref="quntileEELChart" ChartJsConfig="QuantileEEL.ChartJsConfig">
+                                <ChartComponent @ref="c3" ChartJsConfig="QuantileEEL.ChartJsConfig">
                                 </ChartComponent>
                             </div>
 
