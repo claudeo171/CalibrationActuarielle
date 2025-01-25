@@ -17,7 +17,7 @@ namespace OnlineCalibrator.Shared
     public class GenerationGraphique
     {
 
-        public static Point[] GetDensity(double[] valeurs, int nbStep)
+        public static Point[] GetDensity(double[] valeurs, int nbStep, double? min=null,double? max = null)
         {
             Point[] result = new Point[nbStep];
 
@@ -26,13 +26,19 @@ namespace OnlineCalibrator.Shared
             int N = valeurs.Length; // number of data points
             double racineN = Math.Sqrt(N);
             var valOrdered = valeurs.OrderBy(a => a).ToArray();
-            var min = valOrdered[0] - (valOrdered[valOrdered.Length - 1] - valOrdered[0]) / nbStep;
-            var max = valOrdered[valOrdered.Length - 1] + (valOrdered[valOrdered.Length - 1] - valOrdered[0]) / nbStep;
+            if(min==null)
+            {
+                min = valOrdered[0] - (valOrdered[valOrdered.Length - 1] - valOrdered[0]) / nbStep;
+            }
+            if(max==null)
+            {
+                max = valOrdered[valOrdered.Length - 1] + (valOrdered[valOrdered.Length - 1] - valOrdered[0]) / nbStep;
+            }
 
 
             for (int i = 0; i < nbStep; i++)
             {
-                result[i] = new Point { X = min + (max - min) * i / nbStep, Y = 0 };
+                result[i] = new Point { X = (min + (max - min) * i / nbStep).Value, Y = 0 };
             }
 
             // kernel density estimation
@@ -61,6 +67,15 @@ namespace OnlineCalibrator.Shared
                     j++;
                 }
 
+            }
+            return result;
+        }
+        public static Point[] GetRank(List<List<double>> valeurs)
+        {
+            Point[] result = new Point[valeurs[0].Count];
+            for (int i = 0; i < valeurs[0].Count; i++)
+            {
+                result[i] = new Point { X = valeurs[0][i], Y = valeurs[1][i] };
             }
             return result;
         }

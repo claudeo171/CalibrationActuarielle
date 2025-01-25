@@ -1,6 +1,10 @@
 ﻿
 using MathNet.Numerics.Statistics;
+using MathNet.Symbolics;
 using MessagePack;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using OnlineCalibrator.Shared.MachineLearning;
 using Stochastique;
 using Stochastique.Copule;
 using Stochastique.Distributions;
@@ -11,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Tensorflow.Keras.Engine;
 //using Tensorflow;
 
 namespace OnlineCalibrator.Shared
@@ -63,7 +68,10 @@ namespace OnlineCalibrator.Shared
 
             }
         }
-
+        [IgnoreMember]
+        public ITransformer? Model { get; set; }
+        [IgnoreMember]
+        public ConfusionMatrix? ConfusionMatrixML { get; set; }
         public List<CopuleWithData> GetAllCopula()
         {
             var distributions = Enum.GetValues(typeof(TypeCopule)).Cast<TypeCopule>().Where(a => Copule.CreateCopula(a) != null).ToList();
@@ -112,6 +120,9 @@ namespace OnlineCalibrator.Shared
                     case MethodeCalibrationRetenue.Vraisemblance:
                         CalibratedCopule = Copules.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.LogLikelihood).First().Copule;
                         break;
+                    case MethodeCalibrationRetenue.MachineLearningImage:
+                        CalibratedCopule = Copules.Where(a => !double.IsNaN(a.ProbabiliteMachineLearningImage)).OrderBy(a => -a.ProbabiliteMachineLearningImage).First().Copule;
+                        break;
                 }
             }
 
@@ -137,5 +148,55 @@ namespace OnlineCalibrator.Shared
             }
             return rst;
         }
+        public void CalibrerMLI()
+        {
+            var rand = MersenneTwister.MTRandom.Create(15376869);
+            DateTime date = DateTime.Now;
+            StringBuilder sbTags = new StringBuilder();
+            StringBuilder sbTagsTest = new StringBuilder();
+
+
+            foreach (var distrib in Copules)
+            {
+                Directory.CreateDirectory($"./{distrib.Copule.Type}/");
+                for (int i = 0; i < 1000; i++)
+                {
+                    var path = $"./{distrib.Copule.Type}/Image {i + 1}";
+                    GenerationGraphique.SaveChartImage(GenerationGraphique.GetRank(distrib.Copule.SimulerCopule(rand, ScatterPlotRank.Length)), path, 500, 500);
+                    if (i < 700)
+                    {
+                        sbTags.AppendLine($"{path}.png\t{distrib.Copule.Type}");
+                    }
+                    else
+                    {
+                        sbTagsTest.AppendLine($"{path}.png\t{distrib.Copule.Type}");
+                    }
+                }
+            }
+            File.WriteAllText($"tags{date.Ticks}.tsv", sbTags.ToString());
+            File.WriteAllText($"tags_test{date.Ticks}.tsv", sbTagsTest.ToString());
+            MLContext mlContext = new MLContext();
+            Model = MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", "./");
+            GenerationGraphique.SaveChartImage(ScatterPlotRank, $"image{date.Ticks}", 500, 500);
+            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model);
+            var predictions = MachineLearningHelper.ClassifySingleImage(mlContext, Model, $"image{date.Ticks}.png");
+
+            for (int i = 0; i < Copules.Count; i++)
+            {
+                Copules[i].ProbabiliteMachineLearningImage = predictions.Score[i];
+            }
+            foreach (var distrib in Copules)
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    File.Delete($"./image_PDF_{date.Ticks}_{distrib.Copule.Type}_{i}.png");
+                }
+            }
+            File.Delete($"./image{date.Ticks}.png");
+            File.Delete($"tags{date.Ticks}.tsv");
+            File.Delete($"tags_test{date.Ticks}.tsv");
+
+        }
+
     }
 }

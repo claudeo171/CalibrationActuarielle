@@ -6,6 +6,7 @@
 @using System.IO
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
+@using OnlineCalibrator.SharedPages.ViewModel
 @using SkiaSharp;
 @using SpawnDev.BlazorJS.WebWorkers
 @using Stochastique.Distributions
@@ -138,13 +139,6 @@
                         }
 
                     }
-
-
-                    @if (EnvironementCalibration.EstMAUI)
-                    {
-                        <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
-                    }
-
                 </div>
             </div>
             <div class="card">
@@ -192,6 +186,28 @@
                     }
                 </div>
             </div>
+            @if (EnvironementCalibration.EstMAUI)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        Machine Learning
+                    </div>
+                    <div class="card-body">
+                        @if (DonneesImportes.ActualData.ConfusionMatrixML == null)
+                        {
+                            <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                        }
+                        @if (DonneesImportes.ActualData.ConfusionMatrixML != null)
+                        {
+                            <div> Matrice de confusion </div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c6" ChartJsConfig="ChartMatrix.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     }
 
@@ -290,6 +306,7 @@
     private ChartViewModelLine? PDFCDF;
     private ChartViewModelLine? QuantileEEL;
     private ChartViewModelLine? QuantileBeta;
+    private ChartMatrixViewModel? ChartMatrix;
     public ChartComponent quntileEELChart;
 
     private ChartViewModelLine? CurrentFullSizeChart;
@@ -315,6 +332,10 @@
             ChangeSelectionMethod(DonneesImportes.ActualData.MethodeCalibration, true);
             SaveData();
             StateHasChanged();
+            if (DonneesImportes.ActualData.ConfusionMatrixML != null)
+            {
+                AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
+            }
         }
     }
 
@@ -356,6 +377,10 @@
     }
     public async void UpdateChart()
     {
+        if (DonneesImportes.ActualData.ConfusionMatrixML != null && ChartMatrix == null)
+        {
+            ChartMatrix = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        }
         if (QQPlot == null)
         {
             QQPlot = new ChartViewModelLine(
@@ -379,6 +404,7 @@
             {
                 QuantileEEL = new ChartViewModelLine().InitialiseQuantile(DonneesImportes.ActualData?.GetQuantilePlot());
             }
+
         }
         else
         {
@@ -452,6 +478,7 @@
             Notifications.Add($"La calibration est terminée");
             StateHasChanged();
         });
+        ChartMatrix = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
 
     }
 
@@ -466,6 +493,7 @@
     private ChartComponent c3;
     private ChartComponent c4;
     private ChartComponent c5;
+    private ChartComponent c6;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (c1 != null)
@@ -479,6 +507,10 @@
 
             c4.Modal = modal;
             c5.Modal = modal;
+            if (c6 != null)
+            {
+                c6.Modal = modal;
+            }
         }
     }
 }

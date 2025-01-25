@@ -18,7 +18,21 @@ let isLoaded = false;
 export async function initChart(setupOptions, chartId, dotnetConfig, dotnetRef) {
     await lock.promise
     lock.enable();
-
+    if (dotnetConfig.type == 'matrix') {
+        dotnetConfig.options.plugins.tooltip = {
+            callbacks: {
+                title() {
+                    return '';
+                },
+                label(context) {
+                    const v = context.dataset.data[context.dataIndex];
+                    return ['x: ' + v.x, 'y: ' + v.y, 'v: ' + v.v];
+                }
+            }
+        };
+        dotnetConfig.data.datasets[0].width = ({ chart }) => (chart.chartArea || {}).width / dotnetConfig.options.scales.x.labels.length - 1;
+        dotnetConfig.data.datasets[0].height = ({ chart }) => (chart.chartArea || {}).height / dotnetConfig.options.scales.x.labels.length - 1;
+    }
     try {
         if (!isLoaded) {
             if (setupOptions?.chartJsLocation) {
@@ -65,11 +79,12 @@ async function loadPlugins(setupOptions, dotnetConfig) {
 
         if (dotnetConfig['options'].plugins.datalabels != undefined) {
             if (setupOptions?.['chartJsPluginDatalabelsLocation']) {
-                await import(setupOptions['chartJsPluginDatalabelsLocation']);
+                ChartDataLabels =await import(setupOptions['chartJsPluginDatalabelsLocation']);
             }
             plugins.push(ChartDataLabels);
         }
-
+        const chartMatrix = await import(setupOptions['chartJsMatrixPlugin']);
+        plugins.push(chartMatrix);
         const ChartDataLabels = await import(setupOptions['chartJsPluginAnnotation']);
         plugins.push(ChartDataLabels);
 

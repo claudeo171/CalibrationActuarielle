@@ -43,7 +43,6 @@ namespace OnlineCalibrator.Shared
 
         [Key(7)]
         public string? Comment { get; set; }
-
-
+        public float ProbabiliteMachineLearningImage { get; internal set; }
     }
 }

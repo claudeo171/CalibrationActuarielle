@@ -75,8 +75,9 @@ public class ChartJsInterop : IAsyncDisposable
             return await module.InvokeAsync<bool>("initChart", setupOptions, config.ChartJsConfigGuid, serializedConfig, dotnetRef)
                 .ConfigureAwait(false);
         }
-        catch
+        catch(Exception exp)
         {
+            Console.WriteLine(exp.Message);
             return false;
         }
     }

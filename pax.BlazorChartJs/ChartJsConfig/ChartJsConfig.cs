@@ -141,5 +141,6 @@ public enum ChartType
     radar = 5,
     polarArea = 6,
     scatter = 7,
-    bubble = 8
+    bubble = 8,
+    matrix
 }

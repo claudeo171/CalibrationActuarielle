@@ -62,6 +62,10 @@
                                 <li>@item.Name : @item.Value</li>
                             }
                         </ul>
+                        @if (EnvironementCalibration.EstMAUI)
+                        {
+                            <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                        }
                     }
                 </div>
             </div>
@@ -254,4 +258,16 @@
         c1.Modal = modal;
     }
 
+    public async void CalibrateMLI()
+    {
+        Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{""}");
+        StateHasChanged();
+        var service = new MLService();
+        await service.Train(DonneesImportes.ActualData, () =>
+        {
+            AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
+            Notifications.Add($"La calibration est terminée");
+            StateHasChanged();
+        });
+    }
 }

@@ -36,4 +36,6 @@ public record ChartJsSetupOptions
     public string ChartJsPluginDatalabelsLocation { get; set; } = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
 
     public string ChartJsPluginAnnotation { get; set; } = "https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation";
+
+    public string ChartJsMatrixPlugin { get; set; } = "https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2";
 }

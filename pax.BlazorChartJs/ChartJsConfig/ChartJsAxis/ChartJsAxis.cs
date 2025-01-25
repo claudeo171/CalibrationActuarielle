@@ -33,6 +33,12 @@ public record ChartJsAxis
     public Title? Title { get; set; }
 }
 
+public record ChartJSCategoryAxis: ChartJsAxis
+{
+    public string[]? Labels { get; set; }
+    public bool Offset {  get; set; }
+}
+
 public record ChartJsAxisBorder
 {
     public bool? Display { get; set; }

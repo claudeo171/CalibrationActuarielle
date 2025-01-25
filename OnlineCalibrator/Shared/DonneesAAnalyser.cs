@@ -36,10 +36,10 @@ namespace OnlineCalibrator.Shared
         public Point[]? PointsCDF { get; set; }
 
         [Key(4)]
-        public double Moyenne => Values?.Average()??0;
+        public double Moyenne => Values?.Average() ?? 0;
 
         [Key(5)]
-        public double Variance => Values == null ? 0: Values.Select(a=>a*a).Mean() - Moyenne* Moyenne;
+        public double Variance => Values == null ? 0 : Values.Select(a => a * a).Mean() - Moyenne * Moyenne;
 
         [Key(6)]
         public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
@@ -73,7 +73,7 @@ namespace OnlineCalibrator.Shared
             get => valeurMinTrukated;
             set
             {
-                valeurMinTrukated = Math.Min( value, Values.Min());
+                valeurMinTrukated = Math.Min(value, Values.Min());
                 if (Distributions != null)
                 {
                     foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
@@ -99,12 +99,15 @@ namespace OnlineCalibrator.Shared
                 }
             }
         }
-
+        [IgnoreMember]
+        public ITransformer? Model { get; set; }
+        [IgnoreMember]
+        public ConfusionMatrix? ConfusionMatrixML { get; set; }
         public void MajCalibrationTronque()
         {
             foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
             {
-                ((TrunkatedDistribution)distribution.Distribution).Initialize(Values,TypeCalibration.MaximumLikelyhood);
+                ((TrunkatedDistribution)distribution.Distribution).Initialize(Values, TypeCalibration.MaximumLikelyhood);
             }
         }
 
@@ -117,7 +120,7 @@ namespace OnlineCalibrator.Shared
             }
             set
             {
-                CalibratedDistribution= VisisbleData.FirstOrDefault(a=>a.Distribution.Type == value)?.Distribution;
+                CalibratedDistribution = VisisbleData.FirstOrDefault(a => a.Distribution.Type == value)?.Distribution;
 
             }
         }
@@ -125,12 +128,12 @@ namespace OnlineCalibrator.Shared
         public DistributionWithDatas CurrentDistribution => Distributions.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution);
 
         public DonneesAAnalyser() { }
-        public void Initialize() 
+        public void Initialize()
         {
             ValeurMinTrukated = Values.Min();
             ValeurMaxTrukated = Values.Max();
-            PointsCDF= GenerationGraphique.GetCDF(Values);
-            PointsKDE= GenerationGraphique.GetDensity(Values,100);
+            PointsCDF = GenerationGraphique.GetCDF(Values);
+            PointsKDE = GenerationGraphique.GetDensity(Values, 100);
         }
 
 
@@ -182,7 +185,7 @@ namespace OnlineCalibrator.Shared
             double min = Values.Min();
             double max = Values.Max();
 
-            for(int i=0;i<=100; i++)
+            for (int i = 0; i <= 100; i++)
             {
                 double x = min + i * (max - min) / 100;
                 rst[1][i] = new Point() { X = x, Y = loi.PDF(x) };
@@ -207,17 +210,17 @@ namespace OnlineCalibrator.Shared
         }
         public Point[] GetQuantilePlot()
         {
-            Point[] rst =new Point[Values.Length];
+            Point[] rst = new Point[Values.Length];
             Distribution loi;
             var values = Values.Order().ToArray();
-            for (int i=0;i<Values.Length;i++)
+            for (int i = 0; i < Values.Length; i++)
             {
                 rst[i] = new Point() { X = values[i], Y = CurrentDistribution.EELQuantileTest.PValues[i] };
 
             }
             return rst;
         }
-        public List<Point[]> GetQQPlot(TypeDistribution? typeDistribution=null)
+        public List<Point[]> GetQQPlot(TypeDistribution? typeDistribution = null)
         {
             List<Point[]> rst = new List<Point[]>();
             rst.Add(new Point[Values.Length]);
@@ -233,13 +236,13 @@ namespace OnlineCalibrator.Shared
             }
 
             int i = 0;
-            foreach(var elts in Values.Order())
+            foreach (var elts in Values.Order())
             {
                 double x = elts;
                 double y = loi.InverseCDF((i + 0.5) / Values.Length);
 
-                rst[1][i] =i< Values.Length/2? new Point() { X = Math.Min(x, y), Y = Math.Min(x, y) } : new Point() { X = Math.Max(x,y), Y = Math.Max(x, y) };
-                rst[0][i]=new Point() { X = x, Y = y };
+                rst[1][i] = i < Values.Length / 2 ? new Point() { X = Math.Min(x, y), Y = Math.Min(x, y) } : new Point() { X = Math.Max(x, y), Y = Math.Max(x, y) };
+                rst[0][i] = new Point() { X = x, Y = y };
                 i++;
             }
             return rst;
@@ -247,23 +250,23 @@ namespace OnlineCalibrator.Shared
 
         public void AddMonteCarloTest()
         {
-            if(CalibratedDistribution!=null)
+            if (CalibratedDistribution != null)
             {
-                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new EELQuantileTest( Values,CalibratedDistribution,0.995));
+                VisisbleData.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution).TestStatistiques.Add(new EELQuantileTest(Values, CalibratedDistribution, 0.995));
             }
-        }    
+        }
 
         [Key(14)]
         public List<DistributionWithDatas> VisisbleData { get; set; }
 
         public List<DistributionWithDatas> GetAllDistributions()
         {
-            var distributions= Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a=> Distribution.CreateDistribution(a)!=null && Distribution.CreateDistribution(a).IsDiscreet==IsDiscreteDistribution).ToList();
-            var rst=distributions.Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
+            var distributions = Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a => Distribution.CreateDistribution(a) != null && Distribution.CreateDistribution(a).IsDiscreet == IsDiscreteDistribution).ToList();
+            var rst = distributions.Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
 
             if (IncludeTrunkatedDistributions)
             {
-                rst.AddRange(distributions.Where(a=> Distribution.CreateDistribution(a).IsTrunkable).Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood,true)));
+                rst.AddRange(distributions.Where(a => Distribution.CreateDistribution(a).IsTrunkable).Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood, true)));
             }
             VisisbleData = rst;
             return rst;
@@ -271,14 +274,14 @@ namespace OnlineCalibrator.Shared
         }
 
 
-        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration,bool isTrunkated=false)
+        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration, bool isTrunkated = false)
         {
-            var distrib= Distribution.CreateDistribution(typeDistribution);
-            if(isTrunkated)
+            var distrib = Distribution.CreateDistribution(typeDistribution);
+            if (isTrunkated)
             {
-                distrib=new TrunkatedDistribution(distrib);
+                distrib = new TrunkatedDistribution(distrib);
             }
-            if (calibration!=null && !Distributions.Any(a => a.Distribution.Type == distrib.Type && a.Calibration == calibration))
+            if (calibration != null && !Distributions.Any(a => a.Distribution.Type == distrib.Type && a.Calibration == calibration))
             {
                 distrib.Initialize(Values, calibration.GetValueOrDefault());
                 if (Distributions.Any(a => a.Distribution.Type == distrib.Type))
@@ -288,14 +291,14 @@ namespace OnlineCalibrator.Shared
                 }
                 else
                 {
-                    Distributions.Add(new DistributionWithDatas(distrib,Values) { Calibration=calibration.Value});
+                    Distributions.Add(new DistributionWithDatas(distrib, Values) { Calibration = calibration.Value });
                 }
             }
-            else if(calibration ==null  && !Distributions.Any(a =>distrib!=null && a.Distribution.Type == distrib.Type || distrib==null && a.Distribution.Type == typeDistribution))
+            else if (calibration == null && !Distributions.Any(a => distrib != null && a.Distribution.Type == distrib.Type || distrib == null && a.Distribution.Type == typeDistribution))
             {
                 return GetDistribution(typeDistribution, default(TypeCalibration));
             }
-            return Distributions.First(a => distrib != null && a.Distribution.Type == distrib.Type || distrib == null && a.Distribution.Type == typeDistribution); 
+            return Distributions.First(a => distrib != null && a.Distribution.Type == distrib.Type || distrib == null && a.Distribution.Type == typeDistribution);
         }
         public void ChangeSelectionMethod(MethodeCalibrationRetenue m)
         {
@@ -305,7 +308,7 @@ namespace OnlineCalibrator.Shared
                 switch (m)
                 {
                     case MethodeCalibrationRetenue.AIC:
-                        CalibratedDistribution = VisisbleData.Where(a=>!double.IsNaN(a.AIC)).OrderBy(a => a.AIC).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.AIC)).OrderBy(a => a.AIC).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.BIC:
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.BIC)).OrderBy(a => a.BIC).First().Distribution;
@@ -317,7 +320,7 @@ namespace OnlineCalibrator.Shared
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.ProbabiliteMachineLearningImage).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.KSTest:
-                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.TestStatistiques.FirstOrDefault(a=>a.TypeTestStatistique==TypeTestStatistique.KolmogorovSmirnov)?.PValue??0)).OrderBy(a => -a.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue ?? 0).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue ?? 0)).OrderBy(a => -a.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue ?? 0).First().Distribution;
                         break;
                 }
             }
@@ -326,18 +329,20 @@ namespace OnlineCalibrator.Shared
 
         public void CalibrerMLI()
         {
-            var rand=MersenneTwister.MTRandom.Create(15376869);
-            DateTime date=DateTime.Now;
+            var rand = MersenneTwister.MTRandom.Create(15376869);
+            DateTime date = DateTime.Now;
             StringBuilder sbTags = new StringBuilder();
             StringBuilder sbTagsTest = new StringBuilder();
+
+
             foreach (var distrib in VisisbleData)
             {
                 Directory.CreateDirectory($"./{distrib.Distribution.Type}/");
-                for (int i=0;i<1000;i++)
+                for (int i = 0; i < 1000; i++)
                 {
-                    var path = $"./{distrib.Distribution.Type}/Image {i+1}";
-                    GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(distrib.Distribution.Simulate(rand, Values.Length),Math.Min(100,Values.Length)),path,500,500);
-                    if(i<800)
+                    var path = $"./{distrib.Distribution.Type}/Image {i + 1}";
+                    GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(distrib.Distribution.Simulate(rand, Values.Length), Math.Min(100, Values.Length), PointsKDE.Select(a => a.X).Min(), PointsKDE.Select(a => a.X).Max()), path, 500, 500);
+                    if (i < 700)
                     {
                         sbTags.AppendLine($"{path}.png\t{distrib.Distribution.Type}");
                     }
@@ -350,13 +355,14 @@ namespace OnlineCalibrator.Shared
             File.WriteAllText($"tags{date.Ticks}.tsv", sbTags.ToString());
             File.WriteAllText($"tags_test{date.Ticks}.tsv", sbTagsTest.ToString());
             MLContext mlContext = new MLContext();
-            var model=MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", $"tags_test{date.Ticks}.tsv", "./");
-            GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}");
-            var predictions=MachineLearningHelper.ClassifySingleImage(mlContext, model, $"image{date.Ticks}.png");
-            
-            for (int i= 0;i < VisisbleData.Count;i++)
+            Model = MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", "./");
+            GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}", 500, 500);
+            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model);
+            var predictions = MachineLearningHelper.ClassifySingleImage(mlContext, Model, $"image{date.Ticks}.png");
+
+            for (int i = 0; i < VisisbleData.Count; i++)
             {
-                VisisbleData[i].ProbabiliteMachineLearningImage= predictions.Score[i];
+                VisisbleData[i].ProbabiliteMachineLearningImage = predictions.Score[i];
             }
             foreach (var distrib in VisisbleData)
             {
@@ -368,7 +374,7 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
-            
+
         }
 
 

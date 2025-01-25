@@ -34,6 +34,7 @@ namespace OnlineCalibrator.MAUI
                 options.ChartJsLocation = "https://cdn.jsdelivr.net/npm/chart.js";
                 options.ChartJsPluginDatalabelsLocation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
                 options.ChartJsPluginAnnotation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation";
+                options.ChartJsMatrixPlugin = "https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2";
             });
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();
