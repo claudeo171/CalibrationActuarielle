@@ -64,5 +64,17 @@ namespace Stochastique.Distributions.Discrete
             }
             return -1 / Math.Log(1 - P) * Math.Pow(P, k) / k;
         }
+
+        public override double CDF(double k)
+        {
+            return SpecialFunctions.BetaIncomplete((int)k+1,0,P)/Math.Log(1-P);
+        }
+        public override double Simulate(Random r)
+        {
+            var u = r.NextDouble();
+            var v = r.NextDouble();
+            return Math.Truncate(1 + (Math.Log(v) / Math.Log(1 - Math.Pow(1 - P, u))));
+        }
+
     }
 }
