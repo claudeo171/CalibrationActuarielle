@@ -37,7 +37,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double PDF(double x)
         {
-            return SpecialFunctions.Gamma((n + 1) / 2) / (SpecialFunctions.Gamma(n / 2) * Math.Sqrt(Math.PI * n)) * Math.Pow(1 + x * x / n, -(n + 1) / 2);
+            return 1/Math.Sqrt(Math.PI * n) * Math.Exp( SpecialFunctions.GammaLn((n + 1) / 2) - SpecialFunctions.GammaLn(n / 2)  + Math.Log(1 + x * x / n)* (-(n + 1) / 2));
         }
 
         public override double ExpextedValue()

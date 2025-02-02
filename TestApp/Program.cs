@@ -13,6 +13,26 @@ using Stochastique.Distributions.Continous;
 using Stochastique.SpecialFunction;
 using System.Text;
 using TestApp;
+WeibullDistribution fd = new WeibullDistribution(2, 4);
+GammaDistribution GD = new GammaDistribution(100, 12);
+Khi2Distribution k2 = new Khi2Distribution(100);
+var mmmmm= fd.Simulate(new Random(13465), 100000).Mean();
+var vvvvvv = fd.Simulate(new Random(134665), 100000).Variance();
+var SSSSS = fd.Simulate(new Random(134665), 100000).Skewness();
+var KKKK = fd.Simulate(new Random(13465), 100000).Kurtosis();
+
+#region Test Confusion Matrix MLD
+var testMatrice = FileService.GetDataFromFile(new FileStream("./test.csv", FileMode.Open, FileAccess.Read), "tes.csv");
+
+
+testMatrice.NomData = testMatrice.Donnees.First().Name;
+
+testMatrice.ActualData.IsDiscreteDistribution = false;
+
+testMatrice.ActualData.GetAllDistributions();
+testMatrice.ActualData.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
+testMatrice.ActualData.ComputeMLEConfusionMatrix();
+#endregion
 
 #region test copule
 var testCopule = FileService.GetDataFromFile(new FileStream("C:\\users\\parent.claude\\Documents\\Classeur1.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv");

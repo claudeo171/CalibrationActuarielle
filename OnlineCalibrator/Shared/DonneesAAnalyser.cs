@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OnlineCalibrator.Shared.MachineLearning;
 using Stochastique;
+using Stochastique.Copule;
 using Stochastique.Distributions;
 using Stochastique.Enums;
 using Stochastique.Test;
@@ -101,8 +102,14 @@ namespace OnlineCalibrator.Shared
         }
         [IgnoreMember]
         public ITransformer? Model { get; set; }
-        [IgnoreMember]
-        public ConfusionMatrix? ConfusionMatrixML { get; set; }
+        [Key(17)]
+        public double[][]? ConfusionMatrixML { get; set; }
+        [Key(18)]
+        public double[][]? ConfusionMatrixMaximumVraissemblance { get; set; }
+        [Key(19)]
+        public double[][]? ConfusionMatrixMaximumVraissemblanceAIC { get; set; }
+        [Key(20)]
+        public double[][]? ConfusionMatrixMaximumVraissemblanceBIC { get; set; }
         public void MajCalibrationTronque()
         {
             foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
@@ -357,7 +364,7 @@ namespace OnlineCalibrator.Shared
             MLContext mlContext = new MLContext();
             Model = MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", "./");
             GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}", 500, 500);
-            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model);
+            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model).GetProba();
             var predictions = MachineLearningHelper.ClassifySingleImage(mlContext, Model, $"image{date.Ticks}.png");
 
             for (int i = 0; i < VisisbleData.Count; i++)
@@ -374,9 +381,48 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
-
+            ComputeMLEConfusionMatrix();
         }
 
+        public void ComputeMLEConfusionMatrix()
+        {
+            double[][] rstVraissemblance = new double[VisisbleData.Count][];
+            double[][] rstVraissemblanceAIC = new double[VisisbleData.Count][];
+            double[][] rstVraissemblanceBIC = new double[VisisbleData.Count][];
+            for (int i = 0; i < VisisbleData.Count; i++)
+            {
+                rstVraissemblance[i] = new double[VisisbleData.Count];
+                rstVraissemblanceAIC[i] = new double[VisisbleData.Count];
+                rstVraissemblanceBIC[i] = new double[VisisbleData.Count];
+            }
+            var random = new Random(1535664);
+            int nbSimulations = 1000;
+            for (int i = 0; i < nbSimulations; i++)
+            {
+                for (int j = 0; j < VisisbleData.Count; j++)
+                {
+                    var values = VisisbleData[j].Distribution.Simulate(random, Values.Length);
+                    var distrib = VisisbleData.MaxObject(a => a.Distribution.GetLogLikelihood(values));
+                    rstVraissemblance[j][VisisbleData.IndexOf(distrib)]++;
+                    distrib = VisisbleData.MaxObject(a =>- 2 * a.Distribution.AllParameters().Count() + 2 * a.Distribution.GetLogLikelihood(values));
+                    rstVraissemblanceAIC[j][VisisbleData.IndexOf(distrib)]++;
+                    distrib = VisisbleData.MaxObject(a =>- Math.Log(values.Length) * a.Distribution.AllParameters().Count() + 2 * a.Distribution.GetLogLikelihood(values));
+                    rstVraissemblanceBIC[j][VisisbleData.IndexOf(distrib)]++;
 
+                }
+            }
+            for (int i = 0; i < VisisbleData.Count; i++)
+            {
+                for (int j = 0; j < VisisbleData.Count; j++)
+                {
+                    rstVraissemblance[i][j] /= nbSimulations;
+                    rstVraissemblanceAIC[i][j] /= nbSimulations;
+                    rstVraissemblanceBIC[i][j] /= nbSimulations;
+                }
+            }
+            ConfusionMatrixMaximumVraissemblance = rstVraissemblance;
+            ConfusionMatrixMaximumVraissemblanceAIC = rstVraissemblanceAIC;
+            ConfusionMatrixMaximumVraissemblanceBIC = rstVraissemblanceBIC;
+        }
     }
 }

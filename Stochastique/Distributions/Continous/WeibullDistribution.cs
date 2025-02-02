@@ -93,7 +93,16 @@ namespace Stochastique.Distributions.Continous
                 return Math.Pow(mm - (SpecialFunctions.Gamma(1 + 2 / a) - SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)) / (SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)), 2);
             })));
             var k = result[0].Value;
-            result.Add(new Parameter(ParametreName.lambda, Math.Pow(ev / (SpecialFunctions.Gamma(1 / k) + 1), k)));
+            if(double.IsNaN(k))
+            {
+                result[0].Value = 1;
+                result.Add(new Parameter(ParametreName.lambda, 1));
+            }
+            else
+            {
+                result.Add(new Parameter(ParametreName.lambda, Math.Pow(ev / (SpecialFunctions.Gamma(1 / k) + 1), k)));
+            }
+            
 
             return result;
         }
@@ -102,7 +111,7 @@ namespace Stochastique.Distributions.Continous
         {
             double[] result = new double[nbSimulations];
             for (int i = 0; i < nbSimulations; i++)
-                result[i] = K * Math.Pow(-Math.Log(r.NextDouble()), Lambda);
+                result[i] = Lambda * Math.Pow(-Math.Log(r.NextDouble()) , 1.0 / K);
             return result;
         }
 

@@ -34,34 +34,34 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
-            if(x<0) return 0;
+            if (x < 0) return 0;
             return SpecialFunctions.BetaRegularized(D1 / 2, D2 / 2, D1 * x / (D1 * x + D2));
         }
 
         public override double ExpextedValue()
         {
-            return D2>2? D2 / (D2 - 2):double.NaN;
+            return D2 > 2 ? D2 / (D2 - 2) : double.NaN;
         }
 
         public override double PDF(double x)
         {
 
 
-            return Math.Exp( 0.5*( Math.Log(D1*x)*D1+ Math.Log(D2)*D2 -Math.Log(D1*x+D2)*(D1+D2))-(Math.Log(x)+SpecialFunctions.BetaLn(D1/2,D2/2)));
+            return Math.Exp(0.5 * (Math.Log(D1 * x) * D1 + Math.Log(D2) * D2 - Math.Log(D1 * x + D2) * (D1 + D2)) - (Math.Log(x) + SpecialFunctions.BetaLn(D1 / 2, D2 / 2)));
         }
 
         public override double Variance()
         {
-            return D2 > 4 ? 2*D2*D2*(D1+D2-2) / (D1*(D2 - 2)* (D2 - 2)* (D2 - 4)) : double.NaN;
+            return D2 > 4 ? 2 * D2 * D2 * (D1 + D2 - 2) / (D1 * (D2 - 2) * (D2 - 2) * (D2 - 4)) : double.NaN;
         }
         public override double Skewness()
         {
-            return (2*D1+D2-2)*Math.Sqrt(8*(D2-4))/((D2-6)*Math.Sqrt(D1*(D1+D2-2)));
+            return (2 * D1 + D2 - 2) * Math.Sqrt(8 * (D2 - 4)) / ((D2 - 6) * Math.Sqrt(D1 * (D1 + D2 - 2)));
         }
 
         public override double Kurtosis()
         {
-            return 12*(D1*(5*D2-22)*(D1+D2-2)+(D2-4)*(D2-2)*(D2-2))/(D1*(D2-6)*(D2-8)*(D1+D2-2));
+            return 12 * (D1 * (5 * D2 - 22) * (D1 + D2 - 2) + (D2 - 4) * (D2 - 2) * (D2 - 2)) / (D1 * (D2 - 6) * (D2 - 8) * (D1 + D2 - 2));
         }
 
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
@@ -73,12 +73,12 @@ namespace Stochastique.Distributions.Continous
 
         public override double[] Simulate(Random r, int nbSimulations)
         {
-            
-            double[] x = new GammaDistribution(D1 / 2.0,2).Simulate(r,nbSimulations);
-            double[] y = new GammaDistribution(D2 / 2.0, 2).Simulate(r, nbSimulations);
+
+            double[] x = new Khi2Distribution((int)D1).Simulate(r, nbSimulations);
+            double[] y = new Khi2Distribution((int)D2).Simulate(r, nbSimulations);
 
             for (int i = 0; i < x.Length; i++)
-                x[i] /= y[i];
+                x[i] /= y[i] * D1 / D2;
             return x;
         }
         public override double Simulate(Random r)

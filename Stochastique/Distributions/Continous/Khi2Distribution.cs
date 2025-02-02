@@ -86,7 +86,7 @@ namespace Stochastique.Distributions.Continous
         }
         public override double[] Simulate(Random r, int nbSimulations)
         {
-            return new GammaDistribution(2,K/2.0).Simulate(r,nbSimulations);
+            return new GammaDistribution(K/2.0,2).Simulate(r,nbSimulations);
         }
         public override double Simulate(Random r)
         {

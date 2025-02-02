@@ -15,6 +15,7 @@
 @using LiveChartsCore.SkiaSharpView.Painting;
 @using Stochastique.Test
 @using pax.BlazorChartJs
+@using OnlineCalibrator.Shared.MachineLearning
 @inject Blazored.SessionStorage.ISessionStorageService sessionStorage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
@@ -197,11 +198,31 @@
                         {
                             <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
                         }
-                        @if (DonneesImportes.ActualData.ConfusionMatrixML != null)
+                        @if (ChartMatrixMachineLearning != null)
                         {
-                            <div> Matrice de confusion </div>
+                            <div> Matrice de confusion Machine Learning </div>
                             <div class="chart-container300">
-                                <ChartComponent @ref="c6" ChartJsConfig="ChartMatrix.ChartJsConfig">
+                                <ChartComponent @ref="c6" ChartJsConfig="ChartMatrixMachineLearning.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <label class="form-select-label">
+                                Méthode de calibration comparé:
+                            </label>
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>valeurMethodeAlternative)" Value="@valeurMethodeAlternative" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethodComparaisonML(s,true)">
+                                @foreach (var item in AviableMethodAlternative)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                                )
+                            </InputSelect>
+                            <div> Matrice de confusion Maximum Vraissemblance</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c7" ChartJsConfig="ChartMatrixMaximumVraissemblance.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <div> Matrice de confusion Ecart</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c8" ChartJsConfig="ChartMatrixEcart.ChartJsConfig">
                                 </ChartComponent>
                             </div>
                         }
@@ -223,19 +244,19 @@
                         <table class="table">
                             <thead>
 
-                            <th class="text-center">Loi</th>
-                            <th class="text-center">LogLikelihood</th>
-                            <th class="text-center">AIC</th>
-                            <th class="text-center">BIC</th>
-                            <th class="text-center">KS-Test P-Value</th>
+                                <th class="text-center">Loi</th>
+                                <th class="text-center">LogLikelihood</th>
+                                <th class="text-center">AIC</th>
+                                <th class="text-center">BIC</th>
+                                <th class="text-center">KS-Test P-Value</th>
                                 @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
                                 {
-                                <th class="text-center">Parametre @(i + 1)</th>
+                                    <th class="text-center">Parametre @(i + 1)</th>
                                 }
-                            <th class="text-center">Esperance(%Ecart)</th>
-                            <th class="text-center">Variance(%Ecart)</th>
-                            <th class="text-center">Aplatissement(%Ecart)</th>
-                            <th class="text-center">Kurtosis(%Ecart)</th>
+                                <th class="text-center">Esperance(%Ecart)</th>
+                                <th class="text-center">Variance(%Ecart)</th>
+                                <th class="text-center">Aplatissement(%Ecart)</th>
+                                <th class="text-center">Kurtosis(%Ecart)</th>
                             </thead>
                             <tbody>
                                 @if (distributions != null)
@@ -306,9 +327,12 @@
     private ChartViewModelLine? PDFCDF;
     private ChartViewModelLine? QuantileEEL;
     private ChartViewModelLine? QuantileBeta;
-    private ChartMatrixViewModel? ChartMatrix;
+    private ChartMatrixViewModel? ChartMatrixMachineLearning;
+    private ChartMatrixViewModel? ChartMatrixMaximumVraissemblance;
+    private ChartMatrixViewModel? ChartMatrixEcart;
     public ChartComponent quntileEELChart;
-
+    private MethodeCalibrationRetenue valeurMethodeAlternative;
+    private List<MethodeCalibrationRetenue> AviableMethodAlternative = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC };
     private ChartViewModelLine? CurrentFullSizeChart;
     private bool showModal;
     private List<string> Notifications = new List<string>();
@@ -375,11 +399,33 @@
             SaveData();
         }
     }
+    protected void ChangeSelectionMethodComparaisonML(MethodeCalibrationRetenue m, bool update)
+    {
+        valeurMethodeAlternative = m;
+        double[][] val = null;
+        if(m == MethodeCalibrationRetenue.Vraisemblance)
+        {
+            val = DonneesImportes.ActualData.ConfusionMatrixMaximumVraissemblance;
+        }
+        else if(m == MethodeCalibrationRetenue.AIC)
+        {
+            val = DonneesImportes.ActualData.ConfusionMatrixMaximumVraissemblanceAIC;
+        }
+        else
+        {
+            val = DonneesImportes.ActualData.ConfusionMatrixMaximumVraissemblanceBIC;
+        }
+        ChartMatrixMaximumVraissemblance.UpdateData(val, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixEcart.UpdateData(DonneesImportes.ActualData.ConfusionMatrixML.Moins(val), DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixMaximumVraissemblance.ChartJsConfig.ReinitializeChart();
+        ChartMatrixEcart.ChartJsConfig.ReinitializeChart();
+        
+    }
     public async void UpdateChart()
     {
-        if (DonneesImportes.ActualData.ConfusionMatrixML != null && ChartMatrix == null)
+        if (DonneesImportes.ActualData.ConfusionMatrixML != null && ChartMatrixMachineLearning == null)
         {
-            ChartMatrix = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+            GraphiqueMachineLearning();
         }
         if (QQPlot == null)
         {
@@ -478,7 +524,15 @@
             Notifications.Add($"La calibration est terminée");
             StateHasChanged();
         });
-        ChartMatrix = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        GraphiqueMachineLearning();
+
+    }
+
+    private void GraphiqueMachineLearning()
+    {
+        ChartMatrixMachineLearning = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixMaximumVraissemblance = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixMaximumVraissemblance, DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixEcart = new ChartMatrixViewModel(DonneesImportes.ActualData.ConfusionMatrixML.Moins(DonneesImportes.ActualData.ConfusionMatrixMaximumVraissemblance), DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
 
     }
 
@@ -494,6 +548,8 @@
     private ChartComponent c4;
     private ChartComponent c5;
     private ChartComponent c6;
+    private ChartComponent c7;
+    private ChartComponent c8;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (c1 != null)
@@ -510,6 +566,8 @@
             if (c6 != null)
             {
                 c6.Modal = modal;
+                c7.Modal = modal;
+                c8.Modal = modal;
             }
         }
     }

@@ -123,7 +123,7 @@ namespace Stochastique.Distributions
                     case ParametreName.b:
                         return double.MaxValue;
                     case ParametreName.nStudent:
-                        return 100000;
+                        return 10000;
                     case ParametreName.aCauchy:
                         return double.MaxValue;
                     case ParametreName.bCauchy:

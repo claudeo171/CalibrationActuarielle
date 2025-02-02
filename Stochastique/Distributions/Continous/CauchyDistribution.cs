@@ -31,7 +31,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double CDF(double x)
         {
-            return 1 / Math.PI * Math.Atan((x-B)/A) +0.5;
+            return 1 / Math.PI * Math.Atan((x - B) / A) + 0.5;
         }
 
         public override double ExpextedValue()
@@ -76,9 +76,9 @@ namespace Stochastique.Distributions.Continous
         }
         public override double[] Simulate(Random r, int nbSimulations)
         {
-            var normal1= new NormalDistribution(0,1).Simulate(r, nbSimulations);
+            var normal1 = new NormalDistribution(0, 1).Simulate(r, nbSimulations);
             var normal2 = new NormalDistribution(0, 1).Simulate(r, nbSimulations);
-            return  normal1.Select((a,i)=> B + a.Divide( normal2[i],0)).ToArray();
+            return normal1.Select((a, i) => B + a.Divide(normal2[i], 0)).ToArray();
         }
         public override double Simulate(Random r)
         {
