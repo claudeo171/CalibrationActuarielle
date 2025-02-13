@@ -53,34 +53,7 @@ if (args.Length == 3)
 }
 else
 {
-    for (int i = 4; i <= 20; i++)
-    {
-
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseQuantilNormInf", Environment.ProcessorCount, true, i, true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseQuantilNorm1", Environment.ProcessorCount, true, i, true);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0, $"resultMMax{i}NormaliseVarianceNormInf", Environment.ProcessorCount, true, i, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, $"resultMMax{i}NormaliseVarianceNorm1", Environment.ProcessorCount, true, i, false);
-        /*OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, true, 0, "resultratioInf0", Environment.ProcessorCount,false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, true, 0, "resultRatioInf0", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, true, 0, "resultratioInf0", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, true, 0, "resultRatioInf0", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true,false,0,"resultEcartInf0", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0, "resultEcartUn0", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 1, "resultEcartInf1", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 1, "resultEcartUn1", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0.5, "resultEcartInf05", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0.5, "resultEcartUn05", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0.25, "resultEcartInf025", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0.25, "resultEcartUn025", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(true, false, 0.75, "resultEcartInf075", Environment.ProcessorCount, false);
-        OnlineCalibrator.Batch.TestHelper.LancerCalcul(false, false, 0.75, "resultEcartUn075", Environment.ProcessorCount, false);
-        */
-    }
-    var normal = new NormalDistribution(0, 1);
-    var laplace = new LaplaceDistribution(0, 1);
-    //var mlist = laplace.GetMomentList(10);
-    //var m2list = normal.GetMomentList(10);
-
+    TestHelper.LancerCalculAutre(true, false, 0, $"resultMMax{4}NormaliseQuantilNormInf", Environment.ProcessorCount, true, true);
 
 }
 

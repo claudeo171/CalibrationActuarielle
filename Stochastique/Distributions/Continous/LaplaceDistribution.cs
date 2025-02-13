@@ -102,12 +102,5 @@ namespace Stochastique.Distributions.Continous
             return result;
         }
 
-        public override SymbolicExpression FonctionGenerateurDesMoment()
-        {
-            var mu = SymbolicExpression.Variable("mu");
-            var beta = SymbolicExpression.Variable("beta");
-            var t = SymbolicExpression.Variable("t");
-            return SymbolicExpression.E.Pow(t * mu)/(1- beta.Pow(2) * t.Pow(2));
-        }
     }
 }

@@ -109,12 +109,5 @@ namespace Stochastique.Distributions.Continous
         {
             return 0;
         }
-        public override Expr FonctionGenerateurDesMoment()
-        {
-            var mu = Expr.Variable("mu");
-            var sigma = Expr.Variable("sigma");
-            var t = Expr.Variable("t");
-            return Expr.E.Pow(t*mu+0.5*sigma.Pow(2)*t.Pow(2));
-        }
     }
 }

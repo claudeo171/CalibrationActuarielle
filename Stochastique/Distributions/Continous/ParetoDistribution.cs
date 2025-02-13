@@ -24,6 +24,12 @@ namespace Stochastique.Distributions.Continous
         [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
+        public ParetoDistribution() { }
+        public ParetoDistribution(double k, double xm)
+        {
+            AddParameter(new Parameter(ParametreName.k, k));
+            AddParameter( new Parameter(ParametreName.xm, xm));
+        }
         public override double CDF(double x)
         {
             if (x < XM)

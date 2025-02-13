@@ -125,6 +125,7 @@ namespace Stochastique.Distributions
                 case TypeDistribution.Pascal: return new PascalDistribution();
                 case TypeDistribution.Uniform: return new UniformDistribution();
                 case TypeDistribution.LogNormal: return new LogNormalDistribution();
+                case TypeDistribution.Logarithmique: return new LogarithmiqueDistribution();
                 default:
                     return null;
             }
@@ -353,27 +354,9 @@ namespace Stochastique.Distributions
                 ParametresParNom.Add(parameter.Name, parameter);
             }
         }
-        public virtual double[] GetMomentList(int nb,bool estCentreReduit)
+        public virtual double[] GetMomentList()
         {
-            var rst=new double[nb];
-            var fct= FonctionGenerateurDesMoment();
-            var variable = SymbolicExpression.Variable("t");
-            var values= new Dictionary<string,FloatingPoint>();
-            values.Add("t",0);
-            foreach(var v in AllParameters())
-            {
-                values.Add(v.Name.ToString(), v.Value);
-            }
-            for (int i=0;i<nb;i++)
-            {
-                fct=fct.Differentiate(variable);
-                rst[i] = fct.Evaluate(values).RealValue;
-            }
-            return rst;
-        }
-        public virtual SymbolicExpression FonctionGenerateurDesMoment()
-        {
-            return SymbolicExpression.E;
+            return new double[] { ExpextedValue(), Variance(), Skewness(), Kurtosis() };
         }
         public void AddParameters(IEnumerable<Parameter> parameter)
         {
