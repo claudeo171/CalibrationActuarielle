@@ -31,10 +31,10 @@ namespace OnlineCalibrator.Shared
         [Key(1)]
         public double[]? Values { get; set; }
 
-        [Key(2)]
-        public Point[]? PointsKDE { get; set; }
-        [Key(3)]
-        public Point[]? PointsCDF { get; set; }
+        [IgnoreMember]
+        public Point[]? PointsKDE => GenerationGraphique.GetDensity(Values, 100);
+        [IgnoreMember]
+        public Point[]? PointsCDF => GenerationGraphique.GetCDF(Values);
 
         [Key(4)]
         public double Moyenne => Values?.Average() ?? 0;
@@ -139,8 +139,7 @@ namespace OnlineCalibrator.Shared
         {
             ValeurMinTrukated = Values.Min();
             ValeurMaxTrukated = Values.Max();
-            PointsCDF = GenerationGraphique.GetCDF(Values);
-            PointsKDE = GenerationGraphique.GetDensity(Values, 100);
+
         }
 
 
@@ -286,7 +285,10 @@ namespace OnlineCalibrator.Shared
             var distrib = Distribution.CreateDistribution(typeDistribution);
             if (isTrunkated)
             {
-                distrib = new TrunkatedDistribution(distrib);
+                var trunkDistrib = new TrunkatedDistribution(distrib);
+                distrib = trunkDistrib;
+                trunkDistrib.ValeurMin = ValeurMinTrukated;
+                trunkDistrib.ValeurMax = ValeurMaxTrukated;
             }
             if (calibration != null && !Distributions.Any(a => a.Distribution.Type == distrib.Type && a.Calibration == calibration))
             {

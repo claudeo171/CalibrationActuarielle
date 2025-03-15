@@ -113,6 +113,10 @@ namespace Stochastique.Distributions
                     return new CauchyDistribution();
                 case TypeDistribution.Exponential:
                     return new ExponentialDistribution();
+                case TypeDistribution.Pareto:
+                    return new ParetoDistribution();
+                case TypeDistribution.Gumbel:
+                    return new GumbelDistribution();
                 case TypeDistribution.Fisher:
                     return new FisherDistribution();
                 case TypeDistribution.Gamma:
@@ -362,7 +366,14 @@ namespace Stochastique.Distributions
         {
             foreach (var param in parameter)
             {
-                AddParameter(param);
+                if (ParametresParNom.ContainsKey(param.Name))
+                {
+                    GetParameter(param.Name).Value = param.Value;
+                }
+                else
+                {
+                    AddParameter(param);
+                }
             }
         }
         /// <summary>
@@ -403,7 +414,7 @@ namespace Stochastique.Distributions
         public virtual void SetParameter(double[] values)
         {
             int i = 0;
-            var parameters = AllParameters();
+            var parameters = AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList();
             foreach (var param in parameters)
             {
                 param.SetValue(values[i]);
@@ -470,7 +481,7 @@ namespace Stochastique.Distributions
         private void CreateConstraints(alglib.minbleicstate state)
         {
 
-            var parameters = AllParameters().ToList();
+            var parameters = AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList();
             double[] bndl = parameters.Select(p => p.MinValue).ToArray();
             double[] bndu = parameters.Select(p => p.MaxValue).ToArray();
             alglib.minbleicsetbc(state, bndl, bndu);
@@ -515,14 +526,10 @@ namespace Stochastique.Distributions
         /// <param name="typeCalibration"></param>
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
-            var parameters = AllParameters().ToList();
+            var parameters = AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList();
+            var originalParameterValues = AllParameters().Where(a=>a.Name!= ParametreName.ValeurMax && a.Name!= ParametreName.valeurMin).Select(a => a.Value).ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = Enumerable.Repeat(1.0, x.Length).ToArray();
-            if (this is TrunkatedDistribution)
-            {
-                s[0] = 0.1;
-                s[1] = 0.1;
-            }
 
             alglib.minbleicstate state;
             double epsg = 0;
@@ -549,7 +556,13 @@ namespace Stochastique.Distributions
                 alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
             }
             alglib.minbleicresults(state, out x, out rep);
-
+            if(x.Any(a=>double.IsNaN(a)))
+            {
+                for(int i=0;i< originalParameterValues.Count; i++)
+                {
+                    AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList()[i].Value = originalParameterValues[i];
+                }
+            }
             alglib.optguardreport ogrep;
             alglib.minbleicoptguardresults(state, out ogrep);
         }

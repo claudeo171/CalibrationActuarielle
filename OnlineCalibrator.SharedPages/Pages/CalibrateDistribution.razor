@@ -6,7 +6,7 @@
 @using Microsoft.Extensions.Logging
 @using Stochastique
 @using pax.BlazorChartJs
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inherits BasePage
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @page "/CalibrateDistribution"
@@ -109,8 +109,8 @@
             }
             else
             {
-                var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
-                DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+                var data = await GetData("donneesImportes");
+                DonneesImportes = DonneesImportes.FromMsgPack(data);
             }
 
             if (DonneesImportes != null && DonneesImportes.ActualData != null)

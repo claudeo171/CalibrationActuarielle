@@ -1,0 +1,42 @@
+﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@code {
+    public async Task<byte[]> GetData(string name)
+    {
+
+        List<byte> bytes = new List<byte>();
+        int i = 0;
+        var data = await sessionStorage.GetItemAsStringAsync(name + $"_{i}");
+        while(data!="Fin")
+        {
+            bytes.AddRange(Convert.FromBase64String(data));
+            data = await sessionStorage.GetItemAsStringAsync(name + $"_{i}");
+        }
+        return bytes.ToArray();
+    }
+    public async void SaveData(string name, byte[] values)
+    {
+        int indice = 0;
+        int i = 0;
+        while(values.Length-indice>0)
+        {
+            await sessionStorage.SetItemAsStringAsync(name + $"_{i}", Convert.ToBase64String(values.Skip(indice).Take(Math.Min(500000, values.Length - indice)).ToArray()));
+            i++;
+            indice += 500000;
+        }
+        await sessionStorage.SetItemAsStringAsync(name + $"_{i}", "Fin");
+    }
+    public async void RemoveData(string name)
+    {
+        int i = 0;
+        while (await sessionStorage.ContainKeyAsync(name + $"_{i}"))
+        {
+            await sessionStorage.RemoveItemAsync(name + $"_{i}");
+            i++;
+        }
+    }
+    public async Task<bool> HasData(string name)
+    {
+        return await sessionStorage.ContainKeyAsync(name + "_0");
+    }
+}

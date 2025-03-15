@@ -19,19 +19,16 @@ namespace OnlineCalibrator.Shared
             
             StateH0 = TypeDonnees.Normal;
             StateH1 = TypeDonnees.NotNormal;
-            Values = values;
-            Test = new ShapiroWilkTest(values);
-            PValue = Test.PValue;
+
+            var test = new ShapiroWilkTest(values);
+            PValue = test.PValue;
         }
         [Key(5)]
-        public double[] Values { get; set; }
-
-        [IgnoreMember]
-        public ShapiroWilkTest Test { get; set; }
+        public double Statistic { get; set; }
 
         public void OnAfterDeserialize()
         {
-            Test = new ShapiroWilkTest(Values);
+            //Test = new ShapiroWilkTest(Values);
         }
 
         public void OnBeforeSerialize()

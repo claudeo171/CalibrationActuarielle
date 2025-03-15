@@ -106,8 +106,9 @@ namespace Stochastique.Distributions.Continous
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)
         {
             List<Parameter> result = new List<Parameter>();
-            result.Add(new Parameter(ParametreName.k, 1 + Math.Sqrt(1 + Math.Pow(value.Mean(), 2) / value.Variance())));
-            result.Add(new Parameter(ParametreName.xm, value.Mean() * (K - 1) / K));
+            var k = 1 + Math.Sqrt(1 + Math.Pow(value.Mean(), 2) / value.Variance());
+            result.Add(new Parameter(ParametreName.k,k));
+            result.Add(new Parameter(ParametreName.xm, Math.Min(value.Min(), value.Mean() * (k - 1) / k)));
             return result;
         }
 

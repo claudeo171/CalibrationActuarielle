@@ -124,7 +124,8 @@ namespace OnlineCalibrator.Shared
                         Ticks = new ChartJsAxisTick
                         {
                             Color = "red"
-                        }
+                        },
+                        Max= valeurs[1].Select(a=>a.Y).Max()*1.1,
                     },
 
                 };

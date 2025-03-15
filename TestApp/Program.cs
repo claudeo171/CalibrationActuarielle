@@ -65,9 +65,9 @@ double[] statBeta2 = new double[nbSim];
 Random randdd= new Random(154365458);
 for(int i = 0; i < nbSim; i++)
 {
-    statNormale[i] = new ShapiroTest(loiNormale.Simulate(randdd, 50)).Test.Statistic;
-    statBeta[i] = new ShapiroTest(loiBeta.Simulate(randdd, 50)).Test.Statistic;
-    statBeta2[i] = new ShapiroTest(loiBeta2.Simulate(randdd, 50)).Test.Statistic;
+    statNormale[i] = new ShapiroTest(loiNormale.Simulate(randdd, 50)).Statistic;
+    statBeta[i] = new ShapiroTest(loiBeta.Simulate(randdd, 50)).Statistic;
+    statBeta2[i] = new ShapiroTest(loiBeta2.Simulate(randdd, 50)).Statistic;
 }
 
 GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDensity(statNormale, 100), GenerationGraphique.GetDensity(statBeta, 100), GenerationGraphique.GetDensity(statBeta2, 100) },

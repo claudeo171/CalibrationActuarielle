@@ -14,6 +14,13 @@ namespace Stochastique.Distributions.Discrete
     [MessagePackObject]
     public class LogarithmiqueDistribution : DiscreteDistribution
     {
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            AddParameters(CalibrateWithMoment(value));
+
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
+        }
         public LogarithmiqueDistribution() { }
         public LogarithmiqueDistribution(double p)
         {
@@ -67,7 +74,7 @@ namespace Stochastique.Distributions.Discrete
 
         public override double CDF(double k)
         {
-            return SpecialFunctions.BetaIncomplete((int)k+1,0,P)/Math.Log(1-P);
+            return SpecialFunctions.BetaIncomplete((int)k+1,0.000000001,P)/Math.Log(1-P);
         }
         public override double Simulate(Random r)
         {

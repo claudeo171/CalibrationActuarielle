@@ -50,6 +50,8 @@ namespace Stochastique.Distributions
                 switch (Name)
                 {
                     case ParametreName.aAfine:
+                    case ParametreName.valeurMin:
+                    case ParametreName.ValeurMax:
                         return double.MinValue;
                     case ParametreName.bAfine:
                         return double.MinValue;
@@ -67,7 +69,11 @@ namespace Stochastique.Distributions
                          return double.MinValue;
                     case ParametreName.b:
                         return double.MinValue;
+                    case ParametreName.xm:
+                        return double.MinValue;
                     case ParametreName.aBeta:
+                        return Math.Pow(10, -5);
+                    case ParametreName.beta:
                         return Math.Pow(10, -5);
                     case ParametreName.bBeta:
                         return Math.Pow(10, -5);
@@ -105,6 +111,8 @@ namespace Stochastique.Distributions
                 switch (Name)
                 {
                     case ParametreName.aAfine:
+                    case ParametreName.valeurMin:
+                    case ParametreName.ValeurMax:
                         return double.MaxValue;
                     case ParametreName.bAfine:
                         return double.MaxValue;
@@ -144,6 +152,8 @@ namespace Stochastique.Distributions
                         return double.MaxValue;
                     case ParametreName.aBeta:
                     case ParametreName.bBeta:
+                    case ParametreName.beta:
+                    case ParametreName.xm:
                         return double.MaxValue;
                     default:
                         return 0;

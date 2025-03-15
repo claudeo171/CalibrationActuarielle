@@ -6,7 +6,7 @@
 @using System.Text;
 @using OnlineCalibrator.Service;
 
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inherits BasePage
 @inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject DonneeContainer donneeContainer
@@ -256,11 +256,15 @@
         {
             DonneesImportes = donneeContainer.Value;
         }
-        else if (await sessionStorage.ContainKeyAsync("donneesImportes"))
+        else
         {
 
-            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
-            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+            bool hasData = await HasData("donneesImportes");
+            if (hasData)
+            {
+                var data = await GetData("donneesImportes");
+                DonneesImportes = DonneesImportes.FromMsgPack(data);
+            }
         }
         StateHasChanged();
     }
@@ -268,7 +272,7 @@
     private async void SaveData()
     {
         donneeContainer.SetValue(DonneesImportes);
-        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(DonneesImportes.ToMsgPack()));
+        SaveData("donneesImportes", DonneesImportes.ToMsgPack());
     }
 
     private void CalibrerDonne()
@@ -295,7 +299,7 @@
     private void SupprimerDonnee()
     {
         DonneesImportes = null;
-        sessionStorage.RemoveItemAsync("donneesImportes");
+        RemoveData("donneesImportes");
     }
 
     private async void SauvegarderDonnee()

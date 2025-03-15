@@ -15,11 +15,6 @@ namespace Stochastique.Test
     [MessagePackObject]
     public class BetaQuantileTest : TestStatistique
     {
-        [Key(5)]
-        public double[] Values { get; set; }
-        [Key(6)]
-        public Distribution Distribution { get; set; }
-
         [Key(8)]
         public List<double> PValues { get; set; }
 
@@ -46,14 +41,13 @@ namespace Stochastique.Test
         {
 
         }
-        public BetaQuantileTest(double[] values,Distribution distribution, double alpha)
+        public BetaQuantileTest(double[] values, Distribution distribution, double alpha)
         {
             TypeTestStatistique = TypeTestStatistique.BetaQuantile;
-            Values=values.Order().ToArray();
-            Distribution = distribution;
+            values = values.Order().ToArray();
             Alpha=alpha;
-            ComputePValues();
-            switch (Distribution.Type)
+            ComputePValues(values,distribution);
+            switch (distribution.Type)
             {
                 case Enums.TypeDistribution.Normal:
                     StateH0 = TypeDonnees.Normal;
@@ -69,9 +63,9 @@ namespace Stochastique.Test
 
         }
 
-        private void ComputePValues()
+        private void ComputePValues(double[] values, Distribution distribution)
         {
-            List<double> quantiles = Values.Select(a=>Distribution.CDF(a)).ToList();
+            List<double> quantiles = values.Select(a=>distribution.CDF(a)).ToList();
             PValues = new List<double>();
             for(int i = 0; i < quantiles.Count; i++)
             {

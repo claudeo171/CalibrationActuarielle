@@ -68,6 +68,13 @@ namespace Stochastique.Distributions.Continous
         {
             return Math.PI * Math.PI * Beta * Beta / 6;
         }
+        public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
+        {
+            AddParameters(CalibrateWithMoment(value));
+            base.Initialize(value, typeCalibration);
+            IntervaleForDisplay = new Intervale(0, Math.Sqrt(Variance()));
+
+        }
 
     }
 }

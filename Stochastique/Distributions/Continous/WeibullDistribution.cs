@@ -88,9 +88,9 @@ namespace Stochastique.Distributions.Continous
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
             var mm = variance / ev / ev;
-            result.Add(new Parameter(ParametreName.k, OptimHelper.OptimHelper.GetOptimalParametre(ev, new Parameter(ParametreName.k, 0).MinValue, new Parameter(ParametreName.k, 0).MaxValue, (a) =>
+            result.Add(new Parameter(ParametreName.k, OptimHelper.OptimHelper.GetOptimalParametre(mm, new Parameter(ParametreName.k, 0).MinValue, new Parameter(ParametreName.k, 0).MaxValue, (a) =>
             {
-                return Math.Pow(mm - (SpecialFunctions.Gamma(1 + 2 / a) - SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)) / (SpecialFunctions.Gamma(1 + 1 / a) * SpecialFunctions.Gamma(1 + 1 / a)), 2);
+                return -Math.Pow(mm + 1 - (SpecialFunctions.Gamma(1 + 2 / a) / Math.Pow(SpecialFunctions.Gamma(1 + 1 / a),2)), 2);
             })));
             var k = result[0].Value;
             if(double.IsNaN(k))
@@ -100,7 +100,7 @@ namespace Stochastique.Distributions.Continous
             }
             else
             {
-                result.Add(new Parameter(ParametreName.lambda, Math.Pow(ev / (SpecialFunctions.Gamma(1 / k) + 1), k)));
+                result.Add(new Parameter(ParametreName.lambda, ev / SpecialFunctions.Gamma(1 + 1 / k) ));
             }
             
 
@@ -117,7 +117,7 @@ namespace Stochastique.Distributions.Continous
 
         public override double Simulate(Random r)
         {
-            return base.Simulate(r, 1)[0];
+            return Simulate(r, 1)[0];
         }
 
     }

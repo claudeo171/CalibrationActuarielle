@@ -69,6 +69,10 @@ namespace Stochastique.Distributions.Discrete
             List<Parameter> result = new List<Parameter>();
             var ev = Statistics.Mean(value);
             var variance = Statistics.Variance(value);
+            if(variance>=ev)
+            {
+                variance = 0.999 * ev;
+            }
             result.Add(new Parameter(ParametreName.p, Math.Min(1, Math.Max(0, (1 - variance / ev)))));
             result.Add(new Parameter(ParametreName.n, ev / result[0].Value));
             return result;

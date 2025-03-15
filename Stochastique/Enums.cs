@@ -16,7 +16,7 @@ namespace Stochastique.Enums
         k,
         p,lambda,r,N,a,b,d1,d2,
         theta,aCauchy,bCauchy,
-        Np,xm,aBeta,bBeta,beta,s
+        Np,xm,aBeta,bBeta,beta,s,valeurMin,ValeurMax
     }
 
     public enum MethodeCalibrationRetenue
@@ -76,7 +76,8 @@ namespace Stochastique.Enums
         TrunkatedUniform = 1016,
         TrunkatedWeibull = 1017,
         TrunkatedLogNormal = 1018,
-        TrunkatedPareto = 1019
+        TrunkatedPareto = 1019,
+        TrunkatedGumbel = 1002
     }
 
     public enum TypeCopule

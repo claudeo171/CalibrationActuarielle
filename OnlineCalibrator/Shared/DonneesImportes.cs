@@ -59,14 +59,16 @@ namespace OnlineCalibrator.Shared
 
         public byte[] ToMsgPack()
         {
-            return MessagePack.MessagePackSerializer.Serialize(this);
+            var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+            return MessagePack.MessagePackSerializer.Serialize(this, lz4Options);
         }
 
         public static DonneesImportes? FromMsgPack(byte[] json)
         {
             try
             {
-                return MessagePack.MessagePackSerializer.Deserialize<DonneesImportes?>(json);
+                var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
+                return MessagePack.MessagePackSerializer.Deserialize<DonneesImportes?>(json, lz4Options);
             }
             catch (Exception e)
             {

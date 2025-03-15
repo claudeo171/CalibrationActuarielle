@@ -23,7 +23,7 @@ namespace Stochastique.Distributions
         {
             BaseDistribution = distrib;
         }
-        public TrunkatedDistribution(Distribution d, double valeurMin,double valeurMax)
+        public TrunkatedDistribution(Distribution d, double valeurMin, double valeurMax)
         {
             BaseDistribution = d;
             ValeurMax = valeurMax;
@@ -46,16 +46,48 @@ namespace Stochastique.Distributions
         /// </summary>
 
         [Key(10)]
-        public double ValeurMin { get; set; }
+        public double ValeurMin
+        {
+            get
+            {
+                return GetParameter(ParametreName.valeurMin).Value;
+            }
+            set 
+            {
+                if (!ParametresParNom.ContainsKey(ParametreName.valeurMin) )
+                {
+                    AddParameter(new Parameter(ParametreName.valeurMin, value));
+                }
+                else
+                {
+                    GetParameter(ParametreName.valeurMin).Value = value;
+                }
+            }
+        }
 
         [Key(11)]
-        public double ValeurMax { get; set; }
+        public double ValeurMax
+        {
+            get
+            {
+                return GetParameter(ParametreName.ValeurMax).Value;
+            }
+            set
+            {
+                if (!ParametresParNom.ContainsKey(ParametreName.ValeurMax))
+                {
+                    AddParameter(new Parameter(ParametreName.ValeurMax, value));
+                }
+                else
+                {
+                    GetParameter(ParametreName.ValeurMax).Value = value;
+                }
+            }
+        }
         [IgnoreMember]
         public double QuantileUp => BaseDistribution.CDF(ValeurMax);
         [IgnoreMember]
         public double QuantileDown => BaseDistribution.CDF(ValeurMin);
-        [IgnoreMember]
-        public override int NumberOfParameter => AllParameters().Count()+2;
 
         [Key(12)]
         public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
@@ -76,18 +108,18 @@ namespace Stochastique.Distributions
             }
             else
             {
-                return (baseCDF - QuantileDown).Divide(QuantileUp - QuantileDown,1);
+                return (baseCDF - QuantileDown).Divide(QuantileUp - QuantileDown, 1);
             }
         }
 
 
-        [Key(17)]
+        [IgnoreMember]
         public double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {
             if (SimulatedValue == null)
             {
-                
+
                 SimulatedValue = Simulate(new Random(3433), 100000);
             }
         }
@@ -113,7 +145,7 @@ namespace Stochastique.Distributions
             }
             else
             {
-                if(QuantileUp - QuantileDown< 1e-10)
+                if (QuantileUp - QuantileDown < 1e-10)
                 {
                     return 0;
                 }
@@ -159,8 +191,6 @@ namespace Stochastique.Distributions
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
-            ValeurMin=value.Min();
-            ValeurMax=value.Max();
             List<double> ll = new List<double>();
             var mean = value.Mean();
             var ecartType = value.StandardDeviation();
@@ -169,7 +199,7 @@ namespace Stochastique.Distributions
             List<List<double>> param = new List<List<double>>();
             BaseDistribution.Initialize(value, typeCalibration);
             var initialParameters = BaseDistribution.AllParameters().Select(a => a.Value).ToList();
-            List<(double, double)> ratios = new List<(double, double)>() 
+            List<(double, double)> ratios = new List<(double, double)>()
             {
                 (-ecartType,3),
                 (ecartType,3),
@@ -180,10 +210,10 @@ namespace Stochastique.Distributions
             };
             foreach (var ratio in ratios)
             {
-                var parametres = BaseDistribution.GetParameterValues(value,ratio.Item1,ratio.Item2);
+                var parametres = BaseDistribution.GetParameterValues(value, ratio.Item1, ratio.Item2);
                 for (int i = 0; i < parametres.Length; i++)
                 {
-                    BaseDistribution.AllParameters().ElementAt(i).SetValue( parametres[i]);
+                    BaseDistribution.AllParameters().ElementAt(i).SetValue(parametres[i]);
 
                 }
                 try
@@ -205,7 +235,7 @@ namespace Stochastique.Distributions
                 var allParam = AllParameters().ToList();
                 for (int i = 0; i < allParam.Count; i++)
                 {
-                    allParam[i].SetValue( newParam[i]);
+                    allParam[i].SetValue(newParam[i]);
                 }
             }
             else
@@ -228,10 +258,10 @@ namespace Stochastique.Distributions
         {
             double[] rst = new double[nbSimulations];
             int i = 0;
-            while(i<nbSimulations)
+            while (i < nbSimulations)
             {
                 var baseSimulated = BaseDistribution.Simulate(r);
-                if(baseSimulated >= ValeurMin && baseSimulated <= ValeurMax)
+                if (baseSimulated >= ValeurMin && baseSimulated <= ValeurMax)
                 {
                     rst[i] = baseSimulated;
                     i++;
@@ -255,11 +285,7 @@ namespace Stochastique.Distributions
 
         public override void SetParameter(double[] values)
         {
-            for (int i = 0; i < ParametresParNom.Count; i++)
-            {
-                ParametresParNom.ElementAt(i).Value.SetValue(values[i]);
-            }
-            BaseDistribution.SetParameter(values.Skip(ParametresParNom.Count).ToArray());
+            BaseDistribution.SetParameter(values);
             RAZComputedMoment();
         }
 
@@ -270,7 +296,7 @@ namespace Stochastique.Distributions
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
         {
-            var param=BaseDistribution.CalibrateWithMoment(values).ToList();
+            var param = BaseDistribution.CalibrateWithMoment(values).ToList();
             return param;
         }
     }

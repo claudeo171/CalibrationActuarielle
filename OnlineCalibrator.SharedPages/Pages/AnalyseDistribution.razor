@@ -16,10 +16,11 @@
 @using Stochastique.Test
 @using pax.BlazorChartJs
 @using OnlineCalibrator.Shared.MachineLearning
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
 @inject NavigationManager NavManager
 @inject IJSRuntime js
 @inject DonneeContainer donneeContainer
+@inherits BasePage
 @page "/AnalyseDistribution"
 <ModalChart @ref="modal" />
 <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
@@ -48,13 +49,13 @@
                 <div class="card-body">
                     <div class="form-group">
                         <label>
-                            Valeur Minimale distribution tronqué
+                            Valeur Minimale distribution tronquée
                         </label>
                         <InputNumber class="form-control" @bind-value="DonneesImportes.ActualData.ValeurMinTrukated" />
                     </div>
                     <div class="form-group">
                         <label>
-                            Valeur Maximale distribution tronqué
+                            Valeur Maximale distribution tronquée
                         </label>
                         <InputNumber class="form-control" @bind-value="DonneesImportes.ActualData.ValeurMaxTrukated" />
                     </div>
@@ -273,7 +274,18 @@
                                             {
                                                 if (i < distrib.Distribution.AllParameters().Count())
                                                 {
-                                                    <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString()</td>
+                                                    if (distrib.Distribution.AllParameters().ElementAt(i).Name== ParametreName.valeurMin)
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TrunkatedDistribution).QuantileDown)</td>
+                                                    }
+                                                    else if (distrib.Distribution.AllParameters().ElementAt(i).Name == ParametreName.ValeurMax)
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TrunkatedDistribution).QuantileUp)</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString()</td>
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -346,8 +358,8 @@
         }
         else
         {
-            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
-            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+            var data =  await GetData("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(data);
         }
         if (DonneesImportes.ActualData != null)
         {
@@ -367,7 +379,7 @@
     {
         donneeContainer.SetValue(DonneesImportes);
         var data = DonneesImportes.ToMsgPack();
-        await sessionStorage.SetItemAsStringAsync("donneesImportes", Convert.ToBase64String(data));
+        SaveData("donneesImportes", data);
     }
 
     protected void UpdateCalibration(bool b, bool isTrunkated)

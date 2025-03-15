@@ -6,7 +6,7 @@
 @using Microsoft.Extensions.Logging
 @using Stochastique
 @using pax.BlazorChartJs
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inherits BasePage
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @page "/CalibrateDistributionConjointe"
@@ -17,7 +17,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
-            <li class="breadcrumb-item active">Calibration des données conjointe (@DonneesImportes.NomDataConjointe1 - @DonneesImportes.NomDataConjointe2)</li>
+            <li class="breadcrumb-item active">Calibration conjointe des données (@DonneesImportes.NomDataConjointe1 - @DonneesImportes.NomDataConjointe2)</li>
         </ol>
     </nav>
 
@@ -67,7 +67,7 @@
                     <div class="card-body">
                         <ul>
                             <li> Correlation : @DonneesImportes.ActualDonneesPourAnalyseConjointe.Correlation.ToBeautifulString() </li>
-                            <li> Correlation des rang : @DonneesImportes.ActualDonneesPourAnalyseConjointe.RankCorrelation.ToBeautifulString() </li>
+                            <li> Correlation des rangsm : @DonneesImportes.ActualDonneesPourAnalyseConjointe.RankCorrelation.ToBeautifulString() </li>
                             <li data-toggle="tooltip" data-html="true" title="Réalisation d'un test de fisher'"> P-Value Significativité correlation : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
                         </ul>
                     </div>
@@ -102,8 +102,8 @@
             }
             else
             {
-                var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
-                DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+                var data = await GetData("donneesImportes");
+                DonneesImportes = DonneesImportes.FromMsgPack(data);
             }
 
             if (DonneesImportes != null && DonneesImportes.ActualData != null)

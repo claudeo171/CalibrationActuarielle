@@ -54,12 +54,13 @@ namespace Stochastique.Distributions.Discrete
 
         private void CalculerProbabiliteCummulees()
         {
+            List<double> probabilites = new List<double>();
             if (ProbabilitesCummulees == null)
             {
                 double probabilite = 0;
                 int i = 0;
                 ProbabilitesCummulees = new List<double>();
-                while (probabilite < 1 - 1e-5)
+                while (probabilite < 1 - 1e-5 && (probabilite<0.99 || PDF(i)!=0))
                 {
                     probabilite += PDF(i);
                     ProbabilitesCummulees.Add(probabilite);

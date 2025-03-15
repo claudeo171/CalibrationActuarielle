@@ -1,6 +1,7 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
 using MessagePack;
+using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,12 @@ namespace Stochastique.Distributions.Discrete
 
         protected override double PDFInt(int k)
         {
-            return Math.Exp(SpecialFunctions.FactorialLn((int)(k + R - 1)) - SpecialFunctions.FactorialLn(k) - SpecialFunctions.FactorialLn((int)(R - 1)) + R * Math.Log(P) + k * Math.Log(1 - P));
+            return Math.Exp(
+                SpecialFunctions.GammaLn(k + R ) 
+                - SpecialFunctions.GammaLn(k+1) 
+                - SpecialFunctions.GammaLn(R) 
+                + R * Math.Log(P) 
+                + k * Math.Log(1 - P));
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
@@ -61,6 +67,21 @@ namespace Stochastique.Distributions.Discrete
             var p = result[0].Value;
             result.Add(new Parameter(ParametreName.r, Math.Max(1, p == 1 ? 0 : ev * p / (1 - p))));
             return result;
+        }
+
+        public override double Simulate(Random r)
+        {
+            var lambda = new GammaDistribution(R, P / (1 - P)).Simulate(r) ;
+            var c = Math.Exp(-lambda);
+            var p1 = 1.0;
+            var k = 0;
+            do
+            {
+                k = k + 1;
+                p1 = p1 * r.NextDouble();
+            }
+            while (p1 >= c);
+            return k - 1;
         }
     }
 }

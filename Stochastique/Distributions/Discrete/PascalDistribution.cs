@@ -50,13 +50,14 @@ namespace Stochastique.Distributions.Discrete
             }
             else
             {
-                return Math.Exp(SpecialFunctions.FactorialLn(k - 1) - SpecialFunctions.FactorialLn((int)(R - 1)) - SpecialFunctions.FactorialLn((int)(k - R)) + R * Math.Log(P) + (k - R) * Math.Log(1 - P));
+                return Math.Exp(SpecialFunctions.FactorialLn(k - 1) - SpecialFunctions.GammaLn(R) - SpecialFunctions.GammaLn(k - R+1) + R * Math.Log(P) + (k - R) * Math.Log(1 - P));
             }
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
             AddParameters(CalibrateWithMoment(value));
             base.Initialize(value, typeCalibration);
+            
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
         }
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> value)

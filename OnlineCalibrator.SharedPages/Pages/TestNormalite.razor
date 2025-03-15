@@ -8,7 +8,7 @@
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
 @using pax.BlazorChartJs
-@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+@inherits BasePage
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @page "/TestNormalite"
@@ -134,8 +134,8 @@
         }
         else
         {
-            var data = await sessionStorage.GetItemAsStringAsync("donneesImportes");
-            DonneesImportes = DonneesImportes.FromMsgPack(Convert.FromBase64String(data));
+            var data = await GetData("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(data);
         }
         DonneesImportes.ActualData?.CalculerTest();
         UpdateCalibration(null);

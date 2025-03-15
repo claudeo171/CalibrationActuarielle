@@ -16,10 +16,6 @@ namespace Stochastique.Test
     public class EELQuantileTest : TestStatistique
     {
         private double[] valuesSeuil=new double[] { 0.9, 0.7, 0.5, 0.3, 0.1, 0.05, 0.02, 0.01, 0.002, 0.0005 };
-        [Key(5)]
-        public double[] Values { get; set; }
-        [Key(6)]
-        public Distribution Distribution { get; set; }
 
         [Key(8)]
         public List<double> PValues { get; set; }
@@ -50,11 +46,10 @@ namespace Stochastique.Test
         public EELQuantileTest(double[] values, Distribution distribution, double alpha)
         {
             TypeTestStatistique = TypeTestStatistique.EELQuantile;
-            Values = values.Order().ToArray();
-            Distribution = distribution;
+            values = values.Order().ToArray();
             Alpha = alpha;
-            ComputePValues();
-            switch (Distribution.Type)
+            ComputePValues(values,distribution);
+            switch (distribution.Type)
             {
                 case Enums.TypeDistribution.Normal:
                     StateH0 = TypeDonnees.Normal;
@@ -70,10 +65,10 @@ namespace Stochastique.Test
 
         }
 
-        private void ComputePValues()
+        private void ComputePValues(double[] values, Distribution d)
         {
             PValues = new List<double>();
-            List<double> quantiles = Values.Select(a => Distribution.CDF(a)).ToList();
+            List<double> quantiles = values.Select(a => d.CDF(a)).ToList();
             for (int i = 0; i < quantiles.Count; i++)
             {
                 var quantileBeta = new Stochastique.Distributions.Continous.LoiBeta(i + 1, quantiles.Count -i).CDF(quantiles[i]);
