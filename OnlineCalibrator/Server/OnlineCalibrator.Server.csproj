@@ -5,8 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86;x64</Platforms>
-    <CompressionEnabled>false</CompressionEnabled>
-    <RunAOTCompilation>false</RunAOTCompilation>
+    <CompressionEnabled>true</CompressionEnabled>
+    <RunAOTCompilation>true</RunAOTCompilation>
   </PropertyGroup>
 
   <ItemGroup>

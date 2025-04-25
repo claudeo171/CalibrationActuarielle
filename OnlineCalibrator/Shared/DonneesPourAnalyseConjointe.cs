@@ -1,6 +1,5 @@
 ﻿
 using MathNet.Numerics.Statistics;
-using MathNet.Symbolics;
 using MessagePack;
 using Microsoft.ML;
 using Microsoft.ML.Data;
@@ -44,6 +43,8 @@ namespace OnlineCalibrator.Shared
         [Key(2)]
         public double Correlation => Statistics.Covariance(DonneesAAnalyser1.Values, DonneesAAnalyser2.Values) / Math.Sqrt(DonneesAAnalyser1.Variance * DonneesAAnalyser2.Variance);
 
+        [IgnoreMember]
+        public double PValueCorrel => new StudentDistribution(DonneesAAnalyser1.Values.Length - 2).CDF(Math.Abs(Correlation) / Math.Sqrt(1 - Correlation * Correlation / (DonneesAAnalyser1.Values.Length - 2)));
         [Key(3)]
         public double RankCorrelation => Statistics.Covariance(DonneesAAnalyser1.Values.Rang().Select(a=>a*1.0), DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0)) / Math.Sqrt(DonneesAAnalyser1.Values.Rang().Select(a => a * 1.0).Variance() * DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0).Variance());
 

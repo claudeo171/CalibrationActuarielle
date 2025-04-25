@@ -1,4 +1,6 @@
-﻿using Stochastique.Enums;
+﻿using Accord;
+using NWaves.Utils;
+using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,18 +47,26 @@ namespace Stochastique.Distributions.Continous
 
             double x = 0.0, temp = 0.0;
 
-            if (Alpha == 1)
+            if (Alpha != 1)
             {
-                temp = 1 + C3 * U;
-                x = temp * Math.Tan(U) - C3 * Math.Log(E * Math.Cos(U) / temp);
+                var theta = (1.0 / Alpha) * Math.Atan(Beta * Math.Tan(Math.PI / 2 * Alpha));
+                var angle = Alpha * (U + theta);
+                var part1 = Beta * Math.Tan(Math.PI/2 * Alpha);
+
+                var factor = Math.Pow(1.0 + (part1 * part1), 1.0 / (2.0 * Alpha));
+                var factor1 = Math.Sin(angle) / Math.Pow(Math.Cos(U), 1.0 / Alpha);
+                var factor2 = Math.Pow(Math.Cos(U - angle) / E, (1 - Alpha) / Alpha);
+
+                return Mu + Sigma * (factor * factor1 * factor2);
             }
             else
             {
-                temp = Beta * (U + C2);
-                x = C1 * Math.Sin(temp) * Math.Pow(Math.Cos(U), -C4) * Math.Pow(Math.Cos(U - temp) / E, C4 - 1);
-            }
+                var part1 = Math.PI/2 + (Beta * U);
+                var summand = part1 * Math.Tan(U);
+                var subtrahend = Beta * Math.Log(Math.PI / 2 * E * Math.Cos(U) / part1);
 
-            return Mu + Sigma * x;
+                return Mu + Sigma * 2/Math.PI * (summand - subtrahend);
+            }
         }
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)

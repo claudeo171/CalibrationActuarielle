@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics.Statistics;
 using MathNet.Numerics;
-using MathNet.Symbolics;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;

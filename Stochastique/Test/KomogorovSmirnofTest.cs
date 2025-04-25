@@ -1,6 +1,5 @@
 ﻿using Accord.Statistics.Distributions.Univariate;
 using Accord.Statistics.Testing;
-using MathNet.Symbolics;
 using MessagePack;
 using Newtonsoft.Json.Linq;
 using OnlineCalibrator.Shared;

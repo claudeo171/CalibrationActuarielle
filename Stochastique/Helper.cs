@@ -1,5 +1,4 @@
 ﻿using Accord.Statistics;
-using MathNet.Symbolics;
 using Stochastique.Autre;
 using System;
 using System.Collections.Generic;

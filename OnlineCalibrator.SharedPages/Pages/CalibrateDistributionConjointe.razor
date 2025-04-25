@@ -24,7 +24,7 @@
 
     <div class="card">
         <div class="card-header main-card-header">
-            Calibrer de la distribution conjointe de deux Variables Aléatoires
+            Calibration de la distribution conjointe de deux Variables Aléatoires
         </div>
         <div class="card-body row">
             @if (ChartScatterPlot != null)
@@ -67,8 +67,8 @@
                     <div class="card-body">
                         <ul>
                             <li> Correlation : @DonneesImportes.ActualDonneesPourAnalyseConjointe.Correlation.ToBeautifulString() </li>
-                            <li> Correlation des rangsm : @DonneesImportes.ActualDonneesPourAnalyseConjointe.RankCorrelation.ToBeautifulString() </li>
-                            <li data-toggle="tooltip" data-html="true" title="Réalisation d'un test de fisher'"> P-Value Significativité correlation : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
+                            <li> Correlation des rangs : @DonneesImportes.ActualDonneesPourAnalyseConjointe.RankCorrelation.ToBeautifulString() </li>
+                            <li data-toggle="tooltip" data-html="true" title="Réalisation d'un test de fisher'"> P-Value Significativité correlation : @DonneesImportes.ActualDonneesPourAnalyseConjointe.PValueCorrel.ToBeautifulString() </li>
                         </ul>
                     </div>
                 </div>

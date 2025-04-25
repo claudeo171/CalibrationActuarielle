@@ -1,11 +1,4 @@
 ﻿using Stochastique.Distributions.Discrete;
-using Expr = MathNet.Symbolics.SymbolicExpression;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MathNet.Symbolics;
 using Stochastique.Enums;
 using Stochastique.SpecialFunction;
 
@@ -35,23 +28,14 @@ namespace Stochastique.Copule
             return 1 - Math.Pow((1 - Math.Exp(-t)), 1.0 / Theta);
         }
 
-        protected override Expr InverseGenerator(SymbolicExpression param,List<SymbolicExpression> copuleParameter)
-        {
-            
-            return 1- (1-(-param).Exp()).Pow(1 / copuleParameter[0]);
-        }
 
-        protected override Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParameter)
-        {
-            return -(1 - (1 - param).Pow(copuleParameter[0])).Ln();
-        }
 
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaJoe, CopuleHelper.RechercheDichotomique(1.00001, 50, (a) => FonctionTau(tau, a))));
             base.Initialize(value, typeCalibration);
-            Distribution = new JoeDistribution(1 - GetParameter(CopuleParameterName.thetaJoe).Value);
+            Distribution = new JoeDistribution(GetParameter(CopuleParameterName.thetaJoe).Value);
         }
 
         private double FonctionTau(double tau, double theta)
@@ -61,23 +45,16 @@ namespace Stochastique.Copule
         
         public override double DensityCopula(IEnumerable<double> u)
         {
-            SymbolicExpression  val= SymbolicExpression.Variable("u");
-            SymbolicExpression theta = SymbolicExpression.Variable("theta");
-            var generator= Generator(val, new List<Expr> { theta });
-            var generatorDerivative= generator.Differentiate(val);
-            var generatorXDerivative = generatorDerivative;
-            for (int i = 0; i < Dimension - 1; i++)
-            {
-                generatorXDerivative= generatorXDerivative.Differentiate(val);
-            }
-            var rst = 1.0;
-            foreach(var valeur in u)
-            {
-                rst *= generatorDerivative.Evaluate(new Dictionary<string, FloatingPoint> { { "u",valeur }, { "theta", Theta } }).RealValue;
-            }
-            rst *= generatorXDerivative.Evaluate(new Dictionary<string, FloatingPoint> { { "u", CDFCopula(u.ToList()) }, { "theta", Theta } }).RealValue;
-            rst /= Math.Pow(generatorDerivative.Evaluate(new Dictionary<string, FloatingPoint> { { "u", CDFCopula(u.ToList()) }, { "theta", Theta } }).RealValue,Dimension);
-            return rst;
+            if (u.Count() != 2) { throw new NotImplementedException(); }
+            var a = 1-u.First();
+            var b =1- u.Last();
+            var atheta = Math.Pow(a, Theta );
+            var btheta = Math.Pow(b, Theta );
+
+            return
+                Math.Pow(atheta + btheta - atheta * btheta, 1 / Theta - 2) *
+                Math.Pow(a, Theta - 1) * Math.Pow(b, Theta - 1) * 
+                ( Theta - 1 + atheta + btheta - atheta * btheta);
         }
     }
 }

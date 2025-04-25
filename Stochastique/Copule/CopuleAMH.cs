@@ -1,14 +1,5 @@
-﻿using Stochastique.Distributions.Continous;
-using Stochastique.Distributions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Stochastique.Distributions.Discrete;
-using Expr = MathNet.Symbolics.SymbolicExpression;
+﻿using Stochastique.Distributions.Discrete;
 using Stochastique.Enums;
-using MathNet.Symbolics;
 
 namespace Stochastique.Copule
 {
@@ -67,10 +58,6 @@ namespace Stochastique.Copule
             return (1 - Theta) / (Math.Exp(t) - Theta);
         }
 
-        protected override Expr InverseGenerator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
-        {
-            return (1- copuleParam[0]) /(Expr.E.Pow(param) - copuleParam[0]);
-        }
 
         private int B(int n,int k)
         {
@@ -88,9 +75,13 @@ namespace Stochastique.Copule
             }
         }
 
-        protected override Expr Generator(Expr param, List<Expr> copuleParameter)
+        public override double DensityCopula(IEnumerable<double> u)
         {
-            return (1 - copuleParameter[0] * (1 - param) / param).Log();
+            if (u.Count() != 2) { throw new NotImplementedException(); }
+            var a = u.First();
+            var b = u.Last();
+            var y = (1 - Theta * (1 - a) * (1 - b));
+            return (y*(1 - Theta)+2 * Theta * a * b) / Math.Pow(y, 3);
         }
     }
 }

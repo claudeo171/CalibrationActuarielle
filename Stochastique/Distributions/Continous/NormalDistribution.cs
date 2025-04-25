@@ -1,7 +1,6 @@
 ﻿using Accord.Math;
 using LiveChartsCore.Defaults;
 using MathNet.Numerics;
-using Expr = MathNet.Symbolics.SymbolicExpression;
 using MessagePack;
 using Newtonsoft.Json.Linq;
 using Stochastique.Enums;

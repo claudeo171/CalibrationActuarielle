@@ -1,12 +1,6 @@
 ﻿using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
-using Expr = MathNet.Symbolics.SymbolicExpression;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MathNet.Symbolics;
+
 
 namespace Stochastique.Copule
 {
@@ -59,20 +53,19 @@ namespace Stochastique.Copule
            return Math.Pow(Math.Max(0,u.Sum(a=>Math.Pow(a,-Theta))-1),-1/Theta);
         }
 
-        protected override Expr InverseGenerator(SymbolicExpression param,List<SymbolicExpression> copuleParam)
-        {
-            return (1 + copuleParam[0] * param).Pow(-1/ copuleParam[0]);
-        }
-        protected override Expr Generator(SymbolicExpression param, List<SymbolicExpression> copuleParam)
-        {
-            return 1 / copuleParam[0] * (param.Pow(-copuleParam[0]) - 1);
-        }
         public override void Initialize(IEnumerable<IEnumerable<double>> value, TypeCalibration typeCalibration)
         {
             double tau = value.First().TauKendall(value.Last());
             AddParameter(new CopuleParameter(CopuleParameterName.thetaClayton, 2 * tau / (1 - tau)));
             base.Initialize(value, typeCalibration);
             Distribution = new GammaDistribution(1 / GetParameter(CopuleParameterName.thetaClayton).Value, GetParameter(CopuleParameterName.thetaClayton).Value);
+        }
+        public override double DensityCopula(IEnumerable<double> u)
+        {
+            if (u.Count() != 2) { throw new NotImplementedException(); }
+            var a = u.First();
+            var b = u.Last();
+            return (1+Theta)*(Math.Pow(a*b,-1-Theta))*Math.Pow((-1+Math.Pow(b,-Theta)+ Math.Pow(a,-Theta)),-2-(1/Theta));
         }
     }
 }

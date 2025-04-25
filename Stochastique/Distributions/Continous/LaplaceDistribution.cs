@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MathNet.Symbolics;
 using MessagePack;
 using Stochastique.Enums;
 using System;

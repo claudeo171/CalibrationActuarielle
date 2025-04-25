@@ -62,6 +62,18 @@ namespace Stochastique.Distributions.Discrete
             result.Add(new Parameter(ParametreName.p, Math.Min(1, Math.Max(0, 1 / ev))));
             return result;
         }
-
+        public override double Simulate(Random r)
+        {
+            return Math.Ceiling(Math.Log(r.NextDouble()) / Math.Log(1 - P));
+        }
+        public override double[] Simulate(Random r, int nbSimulations)
+        {
+            double[] rst = new double[nbSimulations];
+            for(int i=0;i<nbSimulations;i++)
+            {
+                rst[i] = Simulate(r);
+            }
+            return rst;
+        }
     }
 }

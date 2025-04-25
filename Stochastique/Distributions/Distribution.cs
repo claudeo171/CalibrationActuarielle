@@ -2,8 +2,6 @@
 using Accord.Statistics.Distributions;
 using Accord.Statistics.Distributions.Fitting;
 using LiveChartsCore.Defaults;
-
-using MathNet.Symbolics;
 using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Distributions.Discrete;
@@ -212,7 +210,7 @@ namespace Stochastique.Distributions
                 {
                     v.Value.SetValue(v.Value.MaxValue - Math.Pow(10, -10));
                 }
-                if(double.IsNaN(v.Value.Value))
+                if (double.IsNaN(v.Value.Value))
                 {
                     v.Value.SetValue(v.Value.MinValue + Math.Pow(10, -10));
                 }
@@ -309,7 +307,7 @@ namespace Stochastique.Distributions
             double ordonne = CDF(abs);
             int maxIteration = 1000;
             int iteration = 0;
-            while (Math.Abs(ordonne - x) > 1e-6 && iteration< maxIteration)
+            while (Math.Abs(ordonne - x) > 1e-6 && iteration < maxIteration)
             {
                 if (x < ordonne)
                 {
@@ -527,7 +525,7 @@ namespace Stochastique.Distributions
         public void Optim(IEnumerable<double> values, TypeCalibration typeCalibration)
         {
             var parameters = AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList();
-            var originalParameterValues = AllParameters().Where(a=>a.Name!= ParametreName.ValeurMax && a.Name!= ParametreName.valeurMin).Select(a => a.Value).ToList();
+            var originalParameterValues = AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).Select(a => a.Value).ToList();
             double[] x = parameters.Select(p => p.Value).ToArray();
             double[] s = Enumerable.Repeat(1.0, x.Length).ToArray();
 
@@ -556,9 +554,9 @@ namespace Stochastique.Distributions
                 alglib.minbleicoptimize(state, (double[] xx, ref double yy, object zz) => GetLogVraissemblanceOptim(values, xx, ref yy, zz), null, null);
             }
             alglib.minbleicresults(state, out x, out rep);
-            if(x.Any(a=>double.IsNaN(a)))
+            if (x.Any(a => double.IsNaN(a)))
             {
-                for(int i=0;i< originalParameterValues.Count; i++)
+                for (int i = 0; i < originalParameterValues.Count; i++)
                 {
                     AllParameters().Where(a => a.Name != ParametreName.ValeurMax && a.Name != ParametreName.valeurMin).ToList()[i].Value = originalParameterValues[i];
                 }
@@ -607,12 +605,12 @@ namespace Stochastique.Distributions
         public abstract IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values);
         public double[] GetParameterValues(IEnumerable<double> values, double decalage, double ratio)
         {
-            return CalibrateWithMoment(values.Select(a=>(a+decalage)*ratio)).Select(a=> a.Value).ToArray();
+            return CalibrateWithMoment(values.Select(a => (a + decalage) * ratio)).Select(a => a.Value).ToArray();
         }
 
         public override string ToString()
         {
-            return Type +"("+string.Concat(AllParameters().Select(a=>a.Name +":"+a.Value))+")";
+            return Type + "(" + string.Concat(AllParameters().Select(a => a.Name + ":" + a.Value)) + ")";
         }
 
         public double DistributionFunction(double x)
@@ -654,7 +652,33 @@ namespace Stochastique.Distributions
         {
             return ComplementaryDistributionFunction(x[0]);
         }
-
+        public double[][] GetFisherInformation(double[] valeurs)
+        {
+            double h = 0.0001;
+            var parameters = AllParameters().ToArray();
+            var valeurParam= parameters.Select(a => a.Value).ToList();
+            double[][] rst = new double[parameters.Length][];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                rst[i] = new double[parameters.Length];
+                for (int j = 0; j < parameters.Length; j++)
+                {
+                    parameters[i].Value = valeurParam[i];
+                    parameters[j].Value = valeurParam[j];
+                    var e1 = LogProbabilityFunction(valeurs);
+                    parameters[i].Value += h;
+                    var e2 = LogProbabilityFunction(valeurs);
+                    parameters[i].Value -= h;
+                    parameters[j].Value += h;
+                    var e3 = LogProbabilityFunction(valeurs);
+                    parameters[i].Value += h;
+                    var e4 = LogProbabilityFunction(valeurs);
+                    rst[i][j] = e1 + e4 - e2 - e3;
+                }
+            }
+            return rst;
+        }
+        #region Elements pour implementation IDistribution
         public void Fit(Array observations)
         {
             throw new NotImplementedException();
@@ -689,6 +713,7 @@ namespace Stochastique.Distributions
         {
             return this.DeepClone();
         }
+        #endregion
     }
 
 }
