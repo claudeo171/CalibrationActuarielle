@@ -11,14 +11,14 @@ namespace TestApp
     {
         public static byte[] ToMsgPack<T>(this T obj)
         {
-            return MessagePack.MessagePackSerializer.Serialize(obj);
+            return MemoryPack.MemoryPackSerializer.Serialize(obj);
         }
 
         public static T? FromMsgPack<T>(this byte[] json) where T:class
         {
             try
             {
-                return MessagePack.MessagePackSerializer.Deserialize<T?>(json);
+                return MemoryPack.MemoryPackSerializer.Deserialize<T?>(json);
             }
             catch (Exception e)
             {

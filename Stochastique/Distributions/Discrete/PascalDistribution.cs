@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,16 +9,15 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class PascalDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class PascalDistribution : DiscreteDistribution
     {
-        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Pascal;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double P => GetParameter(ParametreName.p).Value;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double R => GetParameter(ParametreName.r).Value;
 
         public override double ExpextedValue()
@@ -50,7 +48,12 @@ namespace Stochastique.Distributions.Discrete
             }
             else
             {
-                return Math.Exp(SpecialFunctions.FactorialLn(k - 1) - SpecialFunctions.GammaLn(R) - SpecialFunctions.GammaLn(k - R+1) + R * Math.Log(P) + (k - R) * Math.Log(1 - P));
+                return Math.Exp(
+                    SpecialFunctions.FactorialLn(k - 1)
+                    - SpecialFunctions.GammaLn(R)
+                    - SpecialFunctions.GammaLn(k - R+1) 
+                    + R * Math.Log(P) 
+                    + (k - R) * Math.Log(1 - P));
             }
         }
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)

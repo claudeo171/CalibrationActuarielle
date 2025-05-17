@@ -3,7 +3,6 @@ using Accord.Statistics;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -14,10 +13,11 @@ using static alglib;
 
 namespace Stochastique.Distributions
 {
-    [MessagePackObject]
-    public class TrunkatedDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class TrunkatedDistribution : Distribution
     {
 
+        [MemoryPack.MemoryPackConstructor]
         public TrunkatedDistribution() { }
         public TrunkatedDistribution(Distribution? distrib)
         {
@@ -30,22 +30,21 @@ namespace Stochastique.Distributions
             ValeurMin = valeurMin;
         }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override bool CanComputeExpectedValueEasily => false;
-        [IgnoreMember]
         public override bool CanComputeVarianceEasily => false;
 
         /// <summary>
         /// The distribution which is trunkated
         /// </summary>
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public Distribution BaseDistribution { get; set; }
 
         /// <summary>
         /// Define if the distributtion is trunkated at is lower or upper bound
         /// </summary>
 
-        [Key(10)]
+        [MemoryPack.MemoryPackOrder(10)]
         public double ValeurMin
         {
             get
@@ -65,7 +64,7 @@ namespace Stochastique.Distributions
             }
         }
 
-        [Key(11)]
+        [MemoryPack.MemoryPackOrder(11)]
         public double ValeurMax
         {
             get
@@ -84,16 +83,14 @@ namespace Stochastique.Distributions
                 }
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double QuantileUp => BaseDistribution.CDF(ValeurMax);
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double QuantileDown => BaseDistribution.CDF(ValeurMin);
 
-        [Key(12)]
+        [MemoryPack.MemoryPackOrder(12)]
         public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
-        [IgnoreMember]
         public override double InconditionnalMaximumPossibleValue => BaseDistribution.InconditionnalMaximumPossibleValue;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => BaseDistribution.InconditionnalMinimumPossibleValue;
         public override double CDF(double x)
         {
@@ -113,7 +110,7 @@ namespace Stochastique.Distributions
         }
 
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {

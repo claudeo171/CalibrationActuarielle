@@ -2,7 +2,6 @@
 using Accord.Statistics.Distributions;
 using Accord.Statistics.Distributions.Fitting;
 using LiveChartsCore.Defaults;
-using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Distributions.Discrete;
 using Stochastique.Enums;
@@ -10,72 +9,72 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Stochastique.Distributions
 {
-    [MessagePackObject]
-    [MessagePack.Union(0, typeof(LoiBeta))]
-    [MessagePack.Union(1, typeof(CauchyDistribution))]
-    [MessagePack.Union(2, typeof(ExponentialDistribution))]
-    [MessagePack.Union(3, typeof(FisherDistribution))]
-    [MessagePack.Union(4, typeof(GammaDistribution))]
-    [MessagePack.Union(5, typeof(Khi2Distribution))]
-    [MessagePack.Union(6, typeof(LogNormalDistribution))]
-    [MessagePack.Union(7, typeof(NormalDistribution))]
-    [MessagePack.Union(8, typeof(StudentDistribution))]
-    [MessagePack.Union(9, typeof(UniformDistribution))]
-    [MessagePack.Union(10, typeof(WeibullDistribution))]
-    [MessagePack.Union(11, typeof(BernouliDistribution))]
-    [MessagePack.Union(12, typeof(BinomialDistribution))]
-    [MessagePack.Union(13, typeof(DiscreteDistribution))]
-    [MessagePack.Union(14, typeof(GeometricDistribution))]
-    [MessagePack.Union(15, typeof(HyperGeometricalDistribution))]
-    [MessagePack.Union(16, typeof(NegativeBinomialDistribution))]
-    [MessagePack.Union(17, typeof(PascalDistribution))]
-    [MessagePack.Union(18, typeof(PoissonDistribution))]
-    [MessagePack.Union(19, typeof(ParetoDistribution))]
-    [MessagePack.Union(20, typeof(TrunkatedDistribution))]
-    [MessagePack.Union(21, typeof(LoiAfine))]
-    [MessagePack.Union(22, typeof(MixtureDistribution))]
-    [MessagePack.Union(23, typeof(JoeDistribution))]
-    [MessagePack.Union(24, typeof(LogarithmiqueDistribution))]
-    [MessagePack.Union(25, typeof(PartieEntierePuissanceUniformeDistribution))]
-    [MessagePack.Union(26, typeof(TukeyDistribution))]
-    [MessagePack.Union(28, typeof(LogisticDistribution))]
-    [MessagePack.Union(29, typeof(LaplaceDistribution))]
-    [MessagePack.Union(30, typeof(GumbelDistribution))]
-    public abstract class Distribution : IMessagePackSerializationCallbackReceiver, IDistribution<double>
+    [MemoryPack.MemoryPackable(MemoryPack.SerializeLayout.Explicit)]
+    [MemoryPack.MemoryPackUnion(0, typeof(LoiBeta))]
+    [MemoryPack.MemoryPackUnion(1, typeof(CauchyDistribution))]
+    [MemoryPack.MemoryPackUnion(2, typeof(ExponentialDistribution))]
+    [MemoryPack.MemoryPackUnion(3, typeof(FisherDistribution))]
+    [MemoryPack.MemoryPackUnion(4, typeof(GammaDistribution))]
+    [MemoryPack.MemoryPackUnion(5, typeof(Khi2Distribution))]
+    [MemoryPack.MemoryPackUnion(6, typeof(LogNormalDistribution))]
+    [MemoryPack.MemoryPackUnion(7, typeof(NormalDistribution))]
+    [MemoryPack.MemoryPackUnion(8, typeof(StudentDistribution))]
+    [MemoryPack.MemoryPackUnion(9, typeof(UniformDistribution))]
+    [MemoryPack.MemoryPackUnion(10, typeof(WeibullDistribution))]
+    [MemoryPack.MemoryPackUnion(11, typeof(BernouliDistribution))]
+    [MemoryPack.MemoryPackUnion(12, typeof(BinomialDistribution))]
+    [MemoryPack.MemoryPackUnion(13, typeof(DiscreteDistribution))]
+    [MemoryPack.MemoryPackUnion(14, typeof(GeometricDistribution))]
+    [MemoryPack.MemoryPackUnion(15, typeof(HyperGeometricalDistribution))]
+    [MemoryPack.MemoryPackUnion(16, typeof(NegativeBinomialDistribution))]
+    [MemoryPack.MemoryPackUnion(17, typeof(PascalDistribution))]
+    [MemoryPack.MemoryPackUnion(18, typeof(PoissonDistribution))]
+    [MemoryPack.MemoryPackUnion(19, typeof(ParetoDistribution))]
+    [MemoryPack.MemoryPackUnion(20, typeof(TrunkatedDistribution))]
+    [MemoryPack.MemoryPackUnion(21, typeof(LoiAfine))]
+    [MemoryPack.MemoryPackUnion(22, typeof(MixtureDistribution))]
+    [MemoryPack.MemoryPackUnion(23, typeof(JoeDistribution))]
+    [MemoryPack.MemoryPackUnion(24, typeof(LogarithmiqueDistribution))]
+    [MemoryPack.MemoryPackUnion(25, typeof(PartieEntierePuissanceUniformeDistribution))]
+    [MemoryPack.MemoryPackUnion(26, typeof(TukeyDistribution))]
+    [MemoryPack.MemoryPackUnion(28, typeof(LogisticDistribution))]
+    [MemoryPack.MemoryPackUnion(29, typeof(LaplaceDistribution))]
+    [MemoryPack.MemoryPackUnion(30, typeof(GumbelDistribution))]
+    public  abstract partial class Distribution : IDistribution<double>
     {
         /// <summary>
         /// If true, the expected value can be computed easily.
         /// </summary>
-        [MessagePack.Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public virtual bool CanComputeExpectedValueEasily => true;
         /// <summary>
         /// If true, the variance can be computed easily.
         /// </summary>
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public virtual bool CanComputeVarianceEasily => true;
         /// <summary>
         /// The expected value of the distribution.
         /// </summary>
 
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackIgnore]
         public abstract TypeDistribution Type { get; }
         /// <summary>
         /// If true, the distribution is discreet.
         /// </summary>
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackIgnore]
         public virtual bool IsDiscreet => false;
         /// <summary>
         /// If true, the distribution can be trukated. Useful for uniform distribution witch is not well defined with four parameter.
         /// </summary>
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public virtual bool IsTrunkable => true;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public virtual double InconditionnalMinimumPossibleValue => double.MinValue;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public virtual double InconditionnalMaximumPossibleValue => double.MaxValue;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public virtual int NumberOfParameter => AllParameters().Count();
 
         /// <summary>
@@ -135,7 +134,7 @@ namespace Stochastique.Distributions
         /// <summary>
         /// If true, the distribution can be calibrated with moment method. (for example cauchy or hypergeometrical distribution can't be calibrated with moment method)
         /// </summary>
-        [MessagePack.Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public bool AllowMomentParameter { get; set; }
         /// <summary>
         /// Return the kernel density graph of the distribution.
@@ -326,19 +325,19 @@ namespace Stochastique.Distributions
         /// <summary>
         /// Intervale selected for displaying CDF and PDF. Must be set in all distributions. Necessary for displaing distribution on non finite interval.
         /// </summary>
-        [MessagePack.Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public Intervale? IntervaleForDisplay { get; set; }
 
 
         /// <summary>
         /// List of all parameter of the distribution in dictionary by parameter name
         /// </summary>
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         protected Dictionary<ParametreName, Parameter> ParametresParNom { get; set; } = new Dictionary<ParametreName, Parameter>();
         /// <summary>
         /// Storing the list of parameter for serialization purpose. (MessagePack doesn't serialize dictionnary properly. Maybe because of me^^)
         /// </summary>
-        [MessagePack.Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public List<Parameter> ParametersList { get; set; }
         /// <summary>
         /// Adding a parameter to the distribution. If a parameter with the same name already exists, an exception is thrown.
@@ -568,6 +567,7 @@ namespace Stochastique.Distributions
         /// <summary>
         /// Fonction called before serialization to store parameters in a list
         /// </summary>
+        [MemoryPack.MemoryPackOnSerializing]
         public void OnBeforeSerialize()
         {
             ParametersList = AllParameters()?.ToList();
@@ -575,6 +575,8 @@ namespace Stochastique.Distributions
         /// <summary>
         /// Fuction called after deserialization to store parameters in a dictionnary
         /// </summary>
+        /// 
+        [MemoryPack.MemoryPackOnDeserialized]
         public virtual void OnAfterDeserialize()
         {
             ParametresParNom = ParametersList.ToDictionary(a => a.Name, a => a);

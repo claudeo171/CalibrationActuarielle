@@ -5,28 +5,33 @@ using Stochastique.Distributions.Continous;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
-    [MessagePack.Union(0,typeof(CopuleAMH))]
-    [MessagePack.Union(1, typeof(CopuleClayton))]
-    [MessagePack.Union(2, typeof(CopuleFrank))]
-    [MessagePack.Union(3, typeof(CopuleGumbel))]
-    [MessagePack.Union(4, typeof(CopuleJoe))]
-    public abstract class CopuleArchimedienne:Copule
+    [MemoryPack.MemoryPackable(MemoryPack.SerializeLayout.Explicit)]
+    [MemoryPack.MemoryPackUnion(0,typeof(CopuleAMH))]
+    [MemoryPack.MemoryPackUnion(1, typeof(CopuleClayton))]
+    [MemoryPack.MemoryPackUnion(2, typeof(CopuleFrank))]
+    [MemoryPack.MemoryPackUnion(3, typeof(CopuleGumbel))]
+    [MemoryPack.MemoryPackUnion(4, typeof(CopuleJoe))]
+    public abstract partial class CopuleArchimedienne:Copule
     {
         //C(u,v) = inverseGenerateur(generateur(u)+generateur(v))
         protected abstract double Generateur(double t);
         
         protected abstract double InverseGenerateur(double t);
         //Loi dont la tranformée de Laplace est égale à la fonction "inverseGenerateur"
-        [MessagePack.Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         protected Distribution Distribution { get; set; }
 
-        [MessagePack.Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public int Dimension { get; set; }
         
         public CopuleArchimedienne(int dimention)
         {
             Dimension = dimention;
+        }
+        [MemoryPack.MemoryPackConstructor]
+        public CopuleArchimedienne()
+        {
+
         }
 
 

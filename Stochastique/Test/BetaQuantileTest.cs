@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics.Random;
 using MersenneTwister;
-using MessagePack;
 using OnlineCalibrator.Shared;
 using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
@@ -12,16 +11,16 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Test
 {
-    [MessagePackObject]
-    public class BetaQuantileTest : TestStatistique
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class BetaQuantileTest : TestStatistique
     {
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public List<double> PValues { get; set; }
 
-        [Key(9)]
+        [MemoryPack.MemoryPackOrder(9)]
         public double alpha;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Alpha
         {
             get
@@ -37,6 +36,7 @@ namespace Stochastique.Test
                 }
             }
         }
+        [MemoryPack.MemoryPackConstructor]
         public BetaQuantileTest()
         {
 

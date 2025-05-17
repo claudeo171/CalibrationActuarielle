@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Distributions;
+﻿using Stochastique.Distributions;
 using Stochastique.Enums;
 using Stochastique.Test;
 using System;
@@ -10,23 +9,23 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    [Union(0, typeof(ShapiroTest))]
-    [Union(1, typeof(JarqueBeraTest))]
-    [Union(2, typeof(KolmogorovSmirnovTest))]
-    [Union(3, typeof(BetaQuantileTest))]
-    [Union(4, typeof(EELQuantileTest))]
+    [MemoryPack.MemoryPackable(MemoryPack.SerializeLayout.Explicit)]
+    [MemoryPack.MemoryPackUnion(0, typeof(ShapiroTest))]
+    [MemoryPack.MemoryPackUnion(1, typeof(JarqueBeraTest))]
+    [MemoryPack.MemoryPackUnion(2, typeof(KolmogorovSmirnovTest))]
+    [MemoryPack.MemoryPackUnion(3, typeof(BetaQuantileTest))]
+    [MemoryPack.MemoryPackUnion(4, typeof(EELQuantileTest))]
 
-    public abstract class TestStatistique
+    public abstract partial class TestStatistique
     {
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double PValue { get; set; }
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public TypeTestStatistique TypeTestStatistique { get; set; }
 
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public TypeDonnees StateH0 { get; set; }
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public TypeDonnees StateH1 { get; set; }
         public TypeDonnees GetTypeDonnee(double alpha)
         {

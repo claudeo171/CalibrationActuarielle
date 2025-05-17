@@ -4,9 +4,10 @@ using Stochastique.SpecialFunction;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class CopuleJoe : CopuleArchimedienne
     {
+        [MemoryPack.MemoryPackConstructor]
         public CopuleJoe() : base(2)
         {
             Type = Enums.TypeCopule.Joe;
@@ -17,7 +18,7 @@ namespace Stochastique.Copule
             AddParameter(new CopuleParameter(CopuleParameterName.thetaJoe, theta));
             Distribution=new JoeDistribution(theta);
         }
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double Theta => GetParameter(CopuleParameterName.thetaJoe).Value;
         protected override double Generateur(double t)
         {

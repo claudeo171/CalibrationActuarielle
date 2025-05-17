@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Stochastique;
 using System;
 using System.Collections.Generic;
@@ -9,28 +8,28 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class DonneesImportes
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public List<DonneesAAnalyser>? Donnees { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public string? Nom { get; set; }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public string? NomData { get; set; }
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public DonneesAAnalyser? ActualData => Donnees?.FirstOrDefault(a => a.Name == NomData);
 
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         private List<DonneesPourAnalyseConjointe> DonneesPourAnalyseConjointes { get; set; } = new List<DonneesPourAnalyseConjointe>();
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public string? NomDataConjointe1 { get; set; }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public string? NomDataConjointe2 { get; set; }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public DonneesPourAnalyseConjointe? ActualDonneesPourAnalyseConjointe
         {
             get
@@ -59,16 +58,18 @@ namespace OnlineCalibrator.Shared
 
         public byte[] ToMsgPack()
         {
-            var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
-            return MessagePack.MessagePackSerializer.Serialize(this, lz4Options);
+            using var compressor = new MemoryPack.Compression.BrotliCompressor();
+            MemoryPack.MemoryPackSerializer.Serialize(compressor,this);
+            return compressor.ToArray();
         }
 
         public static DonneesImportes? FromMsgPack(byte[] json)
         {
             try
             {
-                var lz4Options = MessagePackSerializerOptions.Standard.WithCompression(MessagePackCompression.Lz4BlockArray);
-                return MessagePack.MessagePackSerializer.Deserialize<DonneesImportes?>(json, lz4Options);
+                using var decompressor = new MemoryPack.Compression.BrotliDecompressor();
+                var decompressedBuffer = decompressor.Decompress(json);
+                return MemoryPack.MemoryPackSerializer.Deserialize<DonneesImportes?>(decompressedBuffer);
             }
             catch (Exception e)
             {

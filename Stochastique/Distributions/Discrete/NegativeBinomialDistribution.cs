@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using System;
@@ -11,16 +10,15 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class NegativeBinomialDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class NegativeBinomialDistribution : DiscreteDistribution
     {
-        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.NegativeBinomial;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double R => GetParameter(ParametreName.r).Value;
 
         public override double ExpextedValue()

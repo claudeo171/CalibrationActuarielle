@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class UniformDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class UniformDistribution : Distribution
     {
-        [IgnoreMember]
         public override bool IsTrunkable => false;
-
+        [MemoryPack.MemoryPackConstructor]
         public UniformDistribution()
         {
 
@@ -25,13 +23,13 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.b, b));
         }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double A => GetParameter(ParametreName.a).Value;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double B => GetParameter(ParametreName.b).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public override TypeDistribution Type => TypeDistribution.Uniform;
 
         public override double CDF(double x)

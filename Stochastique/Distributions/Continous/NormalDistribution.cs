@@ -1,7 +1,6 @@
 ﻿using Accord.Math;
 using LiveChartsCore.Defaults;
 using MathNet.Numerics;
-using MessagePack;
 using Newtonsoft.Json.Linq;
 using Stochastique.Enums;
 using System;
@@ -13,11 +12,11 @@ using System.Linq.Expressions;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class NormalDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class NormalDistribution : Distribution
     {
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Normal;
+        [MemoryPack.MemoryPackConstructor]
         public NormalDistribution()
         {
         }
@@ -26,9 +25,9 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.mu, mu));
             AddParameter(new Parameter(ParametreName.sigma, sigma));
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Mu => GetParameter(ParametreName.mu).Value;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Sigma => GetParameter(ParametreName.sigma).Value;
 
         public override double CDF(double x)

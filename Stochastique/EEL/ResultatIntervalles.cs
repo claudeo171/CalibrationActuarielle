@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
-    [MessagePack.MessagePackObject]
-    public class ResultatIntervalles
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ResultatIntervalles
     {
-        [MessagePack.Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double[] BorneInf { get; set; }
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double[] BorneSup { get; set; }
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double[] Esperance { get; set; }
-        [MessagePack.Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double Alpha { get; set; }
-        [MessagePack.Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public double Eta { get; set; }
-        [MessagePack.Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public int N { get; set; }
     }
 }

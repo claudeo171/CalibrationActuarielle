@@ -20,6 +20,22 @@ var mmmmm= fd.Simulate(new Random(13465), 100000).Mean();
 var vvvvvv = fd.Simulate(new Random(134665), 100000).Variance();
 var SSSSS = fd.Simulate(new Random(134665), 100000).Skewness();
 var KKKK = fd.Simulate(new Random(13465), 100000).Kurtosis();
+var loiNormale = new NormalDistribution(0, 1);
+List<List<double[][]>> rstConfusionMatrix = new List<List<double[][]>>();
+foreach (var taille in new List<int> { 20,50,100})
+{
+    var rzzzd = new Random(13465);
+    var sample = loiNormale.Simulate(rzzzd, taille);
+    DonneesImportes data = new DonneesImportes();
+    data.Donnees = new List<DonneesAAnalyser> { new DonneesAAnalyser { Values = sample, Name="a" }};
+    data.NomData = "a";
+    data.ActualData.GetAllDistributions();
+    data.ActualData.CalibrerMLI();
+    rstConfusionMatrix.Add(new List<double[][]> { data.ActualData.ConfusionMatrixML, data.ActualData.ConfusionMatrixMaximumVraissemblance });
+
+}
+
+
 
 #region Test Confusion Matrix MLD
 var testMatrice = FileService.GetDataFromFile(new FileStream("./test.csv", FileMode.Open, FileAccess.Read), "tes.csv");
@@ -49,13 +65,13 @@ testCopule.ActualDonneesPourAnalyseConjointe?.ChangeSelectionMethod(Stochastique
 testCopule.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123));
 //testCopule.DonneesPourAnalyseConjointes = null;
 var trololo4864=testCopule.ToMsgPack();
-var totogggg= MessagePack.MessagePackSerializer.Serialize(testCopule.ActualDonneesPourAnalyseConjointe.Copules[2]);
+//var totogggg= MessagePack.MessagePackSerializer.Serialize(testCopule.ActualDonneesPourAnalyseConjointe.Copules[2]);
 DonneesImportes.FromMsgPack(trololo4864);
 #endregion
 
 #region Graphique Puissance test
 
-var loiNormale = new NormalDistribution(0, 1);
+loiNormale = new NormalDistribution(0, 1);
 var loiBeta = new LoiBeta(0.5, 0.5);
 var loiBeta2 = new GammaDistribution(5, 5);
 int nbSim = 1000;

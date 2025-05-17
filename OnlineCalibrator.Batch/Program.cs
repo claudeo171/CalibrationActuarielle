@@ -8,6 +8,13 @@ using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
 using System.Text;
 
+
+
+ErreurModeleRetraitement retraitement = new ErreurModeleRetraitement();
+retraitement.Import();
+retraitement.Calculer(1000);
+retraitement.CalibrateLoiNombre();
+retraitement.Export();
 if (args.Length == 3)
 {
     if (args.Length < 3)

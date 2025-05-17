@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePack.MessagePackObject]
-    [MessagePack.Union(0,typeof(BinomialDistribution))]
-    [MessagePack.Union(1, typeof(BernouliDistribution))]
-    [MessagePack.Union(2, typeof(GeometricDistribution))]
-    [MessagePack.Union(3, typeof(HyperGeometricalDistribution))]
-    [MessagePack.Union(4, typeof(LogarithmiqueDistribution))]
-    [MessagePack.Union(5, typeof(NegativeBinomialDistribution))]
-    [MessagePack.Union(6, typeof(PascalDistribution))]
-    [MessagePack.Union(7, typeof(PoissonDistribution))]
-    [MessagePack.Union(8, typeof(JoeDistribution))]
-    [MessagePack.Union(9, typeof(PartieEntierePuissanceUniformeDistribution))]
-    public abstract class DiscreteDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.SerializeLayout.Explicit)]
+    [MemoryPack.MemoryPackUnion(0,typeof(BinomialDistribution))]
+    [MemoryPack.MemoryPackUnion(1, typeof(BernouliDistribution))]
+    [MemoryPack.MemoryPackUnion(2, typeof(GeometricDistribution))]
+    [MemoryPack.MemoryPackUnion(3, typeof(HyperGeometricalDistribution))]
+    [MemoryPack.MemoryPackUnion(4, typeof(LogarithmiqueDistribution))]
+    [MemoryPack.MemoryPackUnion(5, typeof(NegativeBinomialDistribution))]
+    [MemoryPack.MemoryPackUnion(6, typeof(PascalDistribution))]
+    [MemoryPack.MemoryPackUnion(7, typeof(PoissonDistribution))]
+    [MemoryPack.MemoryPackUnion(8, typeof(JoeDistribution))]
+    [MemoryPack.MemoryPackUnion(9, typeof(PartieEntierePuissanceUniformeDistribution))]
+    public  abstract partial class DiscreteDistribution : Distribution
     {
-        [MessagePack.IgnoreMember]
         public override bool IsDiscreet => true;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         protected virtual double MaxValue => double.MaxValue;
         public override double CDF(double k)
         {
@@ -49,7 +47,7 @@ namespace Stochastique.Distributions.Discrete
             }
             return 0;
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public List<double> ProbabilitesCummulees { get; set; }
 
         private void CalculerProbabiliteCummulees()

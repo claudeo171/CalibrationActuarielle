@@ -1,7 +1,6 @@
 ﻿using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Random;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Newtonsoft.Json;
@@ -23,52 +22,52 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class DonneesAAnalyser
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DonneesAAnalyser
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public string? Name { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double[]? Values { get; set; }
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[]? PointsKDE => GenerationGraphique.GetDensity(Values, 100);
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[]? PointsCDF => GenerationGraphique.GetCDF(Values);
 
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public double Moyenne => Values?.Average() ?? 0;
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public double Variance => Values == null ? 0 : Values.Select(a => a * a).Mean() - Moyenne * Moyenne;
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public Dictionary<TestStatistique, bool>? ResultatStatistique { get; set; }
 
         /// <summary>
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
-        [Key(9)]
+        [MemoryPack.MemoryPackOrder(9)]
         public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>();
 
-        [Key(10)]
+        [MemoryPack.MemoryPackOrder(10)]
         public bool IsDiscreteDistribution { get; set; }
-        [Key(11)]
+        [MemoryPack.MemoryPackOrder(11)]
         public bool IncludeTrunkatedDistributions { get; set; }
-        [Key(13)]
+        [MemoryPack.MemoryPackOrder(13)]
         public MethodeCalibrationRetenue MethodeCalibration { get; set; }
-        [Key(12)]
+        [MemoryPack.MemoryPackOrder(12)]
         public Distribution CalibratedDistribution { get; set; }
 
         private double valeurMinTrukated;
         private double valeurMaxTrukated;
-        [Key(15)]
+        [MemoryPack.MemoryPackOrder(15)]
         public double ValeurMinTrukated
         {
             get => valeurMinTrukated;
@@ -84,7 +83,7 @@ namespace OnlineCalibrator.Shared
                 }
             }
         }
-        [Key(16)]
+        [MemoryPack.MemoryPackOrder(16)]
         public double ValeurMaxTrukated
         {
             get => valeurMaxTrukated;
@@ -100,15 +99,15 @@ namespace OnlineCalibrator.Shared
                 }
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public ITransformer? Model { get; set; }
-        [Key(17)]
+        [MemoryPack.MemoryPackOrder(17)]
         public double[][]? ConfusionMatrixML { get; set; }
-        [Key(18)]
+        [MemoryPack.MemoryPackOrder(18)]
         public double[][]? ConfusionMatrixMaximumVraissemblance { get; set; }
-        [Key(19)]
+        [MemoryPack.MemoryPackOrder(19)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceAIC { get; set; }
-        [Key(20)]
+        [MemoryPack.MemoryPackOrder(20)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceBIC { get; set; }
         public void MajCalibrationTronque()
         {
@@ -118,7 +117,7 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public TypeDistribution? CalibratedTypeDistribution
         {
             get
@@ -131,7 +130,7 @@ namespace OnlineCalibrator.Shared
 
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public DistributionWithDatas CurrentDistribution => Distributions.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution);
 
         public DonneesAAnalyser() { }
@@ -262,7 +261,7 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [Key(14)]
+        [MemoryPack.MemoryPackOrder(14)]
         public List<DistributionWithDatas> VisisbleData { get; set; }
 
         public List<DistributionWithDatas> GetAllDistributions()

@@ -1,5 +1,4 @@
 ﻿using Accord.Statistics.Testing;
-using MessagePack;
 using Stochastique.Distributions;
 using Stochastique.Enums;
 using Stochastique.Test;
@@ -13,9 +12,10 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class DistributionWithDatas
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DistributionWithDatas
     {
+        [MemoryPack.MemoryPackConstructor]
         public DistributionWithDatas()
         {
         }
@@ -33,24 +33,24 @@ namespace OnlineCalibrator.Shared
             N=data.Length;
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double N { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double LogLikelihood { get; set; }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double AIC=> 2*Distribution.NumberOfParameter - 2*LogLikelihood;
 
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double BIC => Math.Log(N) * Distribution.NumberOfParameter - 2 * LogLikelihood;
 
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public Distribution Distribution { get; set; }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public TypeCalibration Calibration { get; set; }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public string SeuilAlphaString
         {
             get
@@ -72,9 +72,9 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public double SeuilAlpha { get; set; } = 0.05;
-        [Key(9)]
+        [MemoryPack.MemoryPackOrder(9)]
         public string? Comment { get; set; }
 
         public void UpdateTest()
@@ -98,14 +98,14 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [Key(10)]
+        [MemoryPack.MemoryPackOrder(10)]
         public List<TestStatistique> TestStatistiques { get; set; }
-        [Key(11)]
+        [MemoryPack.MemoryPackOrder(11)]
         public Dictionary<TestStatistique, TypeDonnees> ResultatTest { get; set; }
 
-        [Key(12)]
+        [MemoryPack.MemoryPackOrder(12)]
         public double ProbabiliteMachineLearningImage { get; set; }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public EELQuantileTest EELQuantileTest => TestStatistiques?.FirstOrDefault(a => a is EELQuantileTest) as EELQuantileTest;
     }
 }

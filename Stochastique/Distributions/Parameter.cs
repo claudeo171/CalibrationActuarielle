@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Enums;
+﻿using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
-    [MessagePackObject]
-    public class Parameter
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class Parameter
     {
+        [MemoryPack.MemoryPackConstructor]
         public Parameter() { }
         public Parameter(ParametreName nom, double valeur)
         {
@@ -34,15 +34,15 @@ namespace Stochastique.Distributions
             Value = v;
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double Value { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public Distribution? Estimateur { get; set; }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public ParametreName Name { get; set; }
 
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double MinValue
         {
             get
@@ -103,7 +103,7 @@ namespace Stochastique.Distributions
             }
         }
 
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public double MaxValue
         {
             get

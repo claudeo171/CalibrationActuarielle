@@ -6,20 +6,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MessagePack;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class BernouliDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class BernouliDistribution : DiscreteDistribution
     {
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Bernouli;
 
-        [MessagePack.IgnoreMember]
         protected override double MaxValue => 1;
 
         public override double ExpextedValue()

@@ -1,6 +1,5 @@
 ﻿using Accord.Math;
 using Accord.Math.Optimization;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,15 +9,13 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class TukeyDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class TukeyDistribution : Distribution
     {
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
-
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Tukey;
-
+        [MemoryPack.MemoryPackConstructor]
         public TukeyDistribution()
         {
 

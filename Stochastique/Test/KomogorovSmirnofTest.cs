@@ -1,6 +1,5 @@
 ﻿using Accord.Statistics.Distributions.Univariate;
 using Accord.Statistics.Testing;
-using MessagePack;
 using Newtonsoft.Json.Linq;
 using OnlineCalibrator.Shared;
 using Stochastique.Distributions;
@@ -12,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Test
 {
-    [MessagePackObject]
-    public partial class KolmogorovSmirnovTest : TestStatistique, IMessagePackSerializationCallbackReceiver
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class KolmogorovSmirnovTest : TestStatistique
     {
-
+        [MemoryPack.MemoryPackConstructor]
         public KolmogorovSmirnovTest() {
             TypeTestStatistique = TypeTestStatistique.KolmogorovSmirnov;
         }
@@ -43,16 +42,8 @@ namespace Stochastique.Test
             }
             PValue = Test.PValue;
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Accord.Statistics.Testing.HypothesisTest<KolmogorovSmirnovDistribution> Test { get; set; }
-        public void OnAfterDeserialize()
-        {
 
-        }
-
-        public void OnBeforeSerialize()
-        {
-
-        }
     }
 }

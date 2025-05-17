@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Enums;
+﻿using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class PartieEntierePuissanceUniformeDistribution : DiscreteDistribution
     {
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.PartieEntierePuissanceUniforme;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Theta=> GetParameter(ParametreName.theta).Value;
+        [MemoryPack.MemoryPackConstructor]
         public PartieEntierePuissanceUniformeDistribution()
         {
 

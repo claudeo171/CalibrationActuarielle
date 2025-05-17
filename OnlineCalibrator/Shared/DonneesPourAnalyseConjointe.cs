@@ -1,6 +1,5 @@
 ﻿
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using OnlineCalibrator.Shared.MachineLearning;
@@ -19,16 +18,16 @@ using Tensorflow.Keras.Engine;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class DonneesPourAnalyseConjointe
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DonneesPourAnalyseConjointe
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public DonneesAAnalyser DonneesAAnalyser1 { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public DonneesAAnalyser DonneesAAnalyser2 { get; set; }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[] ScatterPlot => DonneesAAnalyser1.Values.Select((a, i) => new Point() { X = a, Y = DonneesAAnalyser2.Values[i] }).ToArray();
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[] ScatterPlotRank
         {
             get
@@ -40,23 +39,23 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double Correlation => Statistics.Covariance(DonneesAAnalyser1.Values, DonneesAAnalyser2.Values) / Math.Sqrt(DonneesAAnalyser1.Variance * DonneesAAnalyser2.Variance);
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double PValueCorrel => new StudentDistribution(DonneesAAnalyser1.Values.Length - 2).CDF(Math.Abs(Correlation) / Math.Sqrt(1 - Correlation * Correlation / (DonneesAAnalyser1.Values.Length - 2)));
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double RankCorrelation => Statistics.Covariance(DonneesAAnalyser1.Values.Rang().Select(a=>a*1.0), DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0)) / Math.Sqrt(DonneesAAnalyser1.Values.Rang().Select(a => a * 1.0).Variance() * DonneesAAnalyser2.Values.Rang().Select(a => a * 1.0).Variance());
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public List<CopuleWithData> Copules { get; set; } = new List<CopuleWithData>();
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public MethodeCalibrationRetenue MethodeCalibration { get; set; }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public Copule CalibratedCopule { get; set; }
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public TypeCopule? CalibratedCopuleType
         {
             get
@@ -69,9 +68,9 @@ namespace OnlineCalibrator.Shared
 
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public ITransformer? Model { get; set; }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public ConfusionMatrix? ConfusionMatrixML { get; set; }
         public List<CopuleWithData> GetAllCopula()
         {

@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,20 +8,21 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class ExponentialDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ExponentialDistribution : Distribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public ExponentialDistribution() { }
         public ExponentialDistribution(double lambda)
         {
             AddParameter(new Parameter(ParametreName.lambda, lambda));
         }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override TypeDistribution Type => TypeDistribution.Exponential;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
-        [IgnoreMember]
+        
         public override double InconditionnalMinimumPossibleValue => 0;
         public override double CDF(double x)
         {

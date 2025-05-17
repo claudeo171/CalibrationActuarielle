@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.LinearAlgebra.Double;
-using MessagePack;
 using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using Stochastique.Vecteur;
@@ -11,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
-    public partial class CopuleGaussienne : Copule, IMessagePackSerializationCallbackReceiver
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class CopuleGaussienne : Copule
     {
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private DenseMatrix matriceCorrelations;
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         private double[][] matrice;
+        [MemoryPack.MemoryPackConstructor]
         public CopuleGaussienne()
         {
             Type = Enums.TypeCopule.Gaussian;
@@ -106,12 +106,12 @@ namespace Stochastique.Copule
 
             return uniformes;
         }
-
+        [MemoryPack.MemoryPackOnSerializing]
         public void OnBeforeSerialize()
         {
             matrice = matriceCorrelations?.ToColumnArrays();
         }
-
+        [MemoryPack.MemoryPackOnDeserialized]
         public void OnAfterDeserialize()
         {
             matriceCorrelations = new DenseMatrix( matrice.Length, matrice[0].Length);
