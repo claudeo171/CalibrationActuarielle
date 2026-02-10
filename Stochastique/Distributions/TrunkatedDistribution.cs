@@ -3,7 +3,7 @@ using Accord.Statistics;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
 using MathNet.Numerics.Statistics;
-using MessagePack;
+using Stochastique.Copule;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -14,38 +14,38 @@ using static alglib;
 
 namespace Stochastique.Distributions
 {
-    [MessagePackObject]
-    public class TrunkatedDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class TruncatedDistribution : Distribution
     {
 
-        public TrunkatedDistribution() { }
-        public TrunkatedDistribution(Distribution? distrib)
+        [MemoryPack.MemoryPackConstructor]
+        public TruncatedDistribution() { }
+        public TruncatedDistribution(Distribution? distrib)
         {
             BaseDistribution = distrib;
         }
-        public TrunkatedDistribution(Distribution d, double valeurMin, double valeurMax)
+        public TruncatedDistribution(Distribution d, double valeurMin, double valeurMax)
         {
             BaseDistribution = d;
             ValeurMax = valeurMax;
             ValeurMin = valeurMin;
         }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override bool CanComputeExpectedValueEasily => false;
-        [IgnoreMember]
         public override bool CanComputeVarianceEasily => false;
 
         /// <summary>
         /// The distribution which is trunkated
         /// </summary>
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public Distribution BaseDistribution { get; set; }
 
         /// <summary>
         /// Define if the distributtion is trunkated at is lower or upper bound
         /// </summary>
 
-        [Key(10)]
+        [MemoryPack.MemoryPackOrder(10)]
         public double ValeurMin
         {
             get
@@ -65,7 +65,7 @@ namespace Stochastique.Distributions
             }
         }
 
-        [Key(11)]
+        [MemoryPack.MemoryPackOrder(11)]
         public double ValeurMax
         {
             get
@@ -84,16 +84,14 @@ namespace Stochastique.Distributions
                 }
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double QuantileUp => BaseDistribution.CDF(ValeurMax);
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double QuantileDown => BaseDistribution.CDF(ValeurMin);
 
-        [Key(12)]
-        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
-        [IgnoreMember]
+        [MemoryPack.MemoryPackOrder(12)]
+        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Truncated + (int)BaseDistribution.Type);
         public override double InconditionnalMaximumPossibleValue => BaseDistribution.InconditionnalMaximumPossibleValue;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => BaseDistribution.InconditionnalMinimumPossibleValue;
         public override double CDF(double x)
         {
@@ -111,9 +109,40 @@ namespace Stochastique.Distributions
                 return (baseCDF - QuantileDown).Divide(QuantileUp - QuantileDown, 1);
             }
         }
+        [MemoryPack.MemoryPackIgnore]
+        public double? QuantileUpTemp { get; set; }
+        [MemoryPack.MemoryPackIgnore]
+        public double? QuantileDownTemp { get; set; }
+        public double PDFFast(double x)
+        {
+            if (x > ValeurMax || x < ValeurMin)
+            {
+                return 0;
+            }
+            else
+            {
+                if (QuantileUpTemp - QuantileDownTemp < 1e-10)
+                {
+                    return 0;
+                }
+                return BaseDistribution.PDF(x) / (QuantileUpTemp.Value - QuantileDownTemp.Value);
+            }
+        }
+
+        public override double GetLogLikelihood(IEnumerable<double> values)
+        {
+            double rst = 0;
+            QuantileUpTemp = QuantileUp;
+            QuantileDownTemp = QuantileDown;
+            foreach (var val in values)
+            {
+                rst += Math.Log(PDFFast(val));
+            }
+            return rst;
+        }
 
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double[] SimulatedValue { get; set; }
         public void SimulateValue()
         {

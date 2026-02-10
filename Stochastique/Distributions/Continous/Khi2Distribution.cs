@@ -1,7 +1,6 @@
 ﻿using Accord.Math;
 using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,19 +10,19 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class Khi2Distribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class Khi2Distribution : Distribution
     {
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override TypeDistribution Type => TypeDistribution.Khi2;
+        [MemoryPack.MemoryPackConstructor]
         public Khi2Distribution()
         {
         }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double K => GetParameter(ParametreName.k).Value;
 
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
         public Khi2Distribution(int k) : base()

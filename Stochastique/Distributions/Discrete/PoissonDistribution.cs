@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,16 +9,14 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class PoissonDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class PoissonDistribution : DiscreteDistribution
     {
-        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Poisson;
 
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
 
-        [MessagePack.IgnoreMember]
         protected override double MaxValue => int.MaxValue;
 
         public override double ExpextedValue()

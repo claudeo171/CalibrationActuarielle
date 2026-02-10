@@ -1,5 +1,4 @@
 ﻿using LiveChartsCore.Defaults;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,14 +8,15 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
-    [MessagePackObject]
-    public class LoiAfine : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class LoiAfine : Distribution
     {
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public Distribution LoiBase { get; set; }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public override TypeDistribution Type => throw new NotImplementedException();
+        [MemoryPack.MemoryPackConstructor]
         public LoiAfine() { }
         public LoiAfine(Distribution loiBase, double a, double b)
         {

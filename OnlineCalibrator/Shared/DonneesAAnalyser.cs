@@ -1,7 +1,8 @@
-﻿using MathNet.Numerics.Distributions;
+﻿using Accord.IO;
+using Accord.Math;
+using MathNet.Numerics.LinearAlgebra.Double;
 using MathNet.Numerics.Random;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using Newtonsoft.Json;
@@ -10,9 +11,11 @@ using OnlineCalibrator.Shared.MachineLearning;
 using Stochastique;
 using Stochastique.Copule;
 using Stochastique.Distributions;
+using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using Stochastique.Test;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -23,52 +26,52 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class DonneesAAnalyser
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DonneesAAnalyser
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public string? Name { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double[]? Values { get; set; }
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[]? PointsKDE => GenerationGraphique.GetDensity(Values, 100);
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public Point[]? PointsCDF => GenerationGraphique.GetCDF(Values);
 
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public double Moyenne => Values?.Average() ?? 0;
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public double Variance => Values == null ? 0 : Values.Select(a => a * a).Mean() - Moyenne * Moyenne;
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public Dictionary<TestStatistique, bool>? ResultatStatistique { get; set; }
 
         /// <summary>
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
-        [Key(9)]
+        [MemoryPack.MemoryPackOrder(9)]
         public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>();
 
-        [Key(10)]
+        [MemoryPack.MemoryPackOrder(10)]
         public bool IsDiscreteDistribution { get; set; }
-        [Key(11)]
-        public bool IncludeTrunkatedDistributions { get; set; }
-        [Key(13)]
+        [MemoryPack.MemoryPackOrder(11)]
+        public bool IncludeTruncatedDistributions { get; set; }
+        [MemoryPack.MemoryPackOrder(13)]
         public MethodeCalibrationRetenue MethodeCalibration { get; set; }
-        [Key(12)]
+        [MemoryPack.MemoryPackOrder(12)]
         public Distribution CalibratedDistribution { get; set; }
 
         private double valeurMinTrukated;
         private double valeurMaxTrukated;
-        [Key(15)]
+        [MemoryPack.MemoryPackOrder(15)]
         public double ValeurMinTrukated
         {
             get => valeurMinTrukated;
@@ -77,14 +80,14 @@ namespace OnlineCalibrator.Shared
                 valeurMinTrukated = Math.Min(value, Values.Min());
                 if (Distributions != null)
                 {
-                    foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+                    foreach (var distribution in Distributions.Where(a => a.Distribution is TruncatedDistribution))
                     {
-                        ((TrunkatedDistribution)distribution.Distribution).ValeurMin = valeurMinTrukated;
+                        ((TruncatedDistribution)distribution.Distribution).ValeurMin = valeurMinTrukated;
                     }
                 }
             }
         }
-        [Key(16)]
+        [MemoryPack.MemoryPackOrder(16)]
         public double ValeurMaxTrukated
         {
             get => valeurMaxTrukated;
@@ -93,32 +96,33 @@ namespace OnlineCalibrator.Shared
                 valeurMaxTrukated = Math.Max(value, Values.Max());
                 if (Distributions != null)
                 {
-                    foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+                    foreach (var distribution in Distributions.Where(a => a.Distribution is TruncatedDistribution))
                     {
-                        ((TrunkatedDistribution)distribution.Distribution).ValeurMax = valeurMaxTrukated;
+                        ((TruncatedDistribution)distribution.Distribution).ValeurMax = valeurMaxTrukated;
                     }
                 }
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public ITransformer? Model { get; set; }
-        [Key(17)]
+        [MemoryPack.MemoryPackOrder(17)]
         public double[][]? ConfusionMatrixML { get; set; }
-        [Key(18)]
+        [MemoryPack.MemoryPackOrder(18)]
         public double[][]? ConfusionMatrixMaximumVraissemblance { get; set; }
-        [Key(19)]
+        [MemoryPack.MemoryPackOrder(19)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceAIC { get; set; }
-        [Key(20)]
+        [MemoryPack.MemoryPackOrder(20)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceBIC { get; set; }
         public void MajCalibrationTronque()
         {
-            foreach (var distribution in Distributions.Where(a => a.Distribution is TrunkatedDistribution))
+            foreach (var distribution in Distributions.Where(a => a.Distribution is TruncatedDistribution))
             {
-                ((TrunkatedDistribution)distribution.Distribution).Initialize(Values, TypeCalibration.MaximumLikelyhood);
+                ((TruncatedDistribution)distribution.Distribution).Initialize(Values, TypeCalibration.MaximumLikelyhood);
+                distribution.LogLikelihood = distribution.Distribution.GetLogLikelihood(Values);
             }
         }
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public TypeDistribution? CalibratedTypeDistribution
         {
             get
@@ -131,7 +135,7 @@ namespace OnlineCalibrator.Shared
 
             }
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public DistributionWithDatas CurrentDistribution => Distributions.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution);
 
         public DonneesAAnalyser() { }
@@ -262,7 +266,7 @@ namespace OnlineCalibrator.Shared
             }
         }
 
-        [Key(14)]
+        [MemoryPack.MemoryPackOrder(14)]
         public List<DistributionWithDatas> VisisbleData { get; set; }
 
         public List<DistributionWithDatas> GetAllDistributions()
@@ -270,7 +274,7 @@ namespace OnlineCalibrator.Shared
             var distributions = Enum.GetValues(typeof(TypeDistribution)).Cast<TypeDistribution>().Where(a => Distribution.CreateDistribution(a) != null && Distribution.CreateDistribution(a).IsDiscreet == IsDiscreteDistribution).ToList();
             var rst = distributions.Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood)).ToList();
 
-            if (IncludeTrunkatedDistributions)
+            if (IncludeTruncatedDistributions)
             {
                 rst.AddRange(distributions.Where(a => Distribution.CreateDistribution(a).IsTrunkable).Select(a => GetDistribution(a, TypeCalibration.MaximumLikelyhood, true)));
             }
@@ -278,14 +282,95 @@ namespace OnlineCalibrator.Shared
             return rst;
 
         }
+        public List<(Distribution dist, double proba)> GetDistributionAvecErreurDeModele()
+        {
+            List<(Distribution dist, double loglikelyhood,double proba)> rstIntermediaire=new List<(Distribution dist, double loglikelyhood, double proba)>();
+            List<double> quantilesNormal = new List<double>();
+            NormalDistribution normalDistribution = new NormalDistribution(0, 1);
+            for (int i = 0; i < 100; i++)
+            {
+                quantilesNormal.Add(normalDistribution.InverseCDF((i+0.5) / 100.0));
+            }
+            foreach (var dist in Distributions.Where(a=>a.Distribution.IsDiscreet== IsDiscreteDistribution && a.Distribution.Type!= TypeDistribution.TruncatedFisher && (!(a.Distribution is TruncatedDistribution t) || t.QuantileUp-t.QuantileDown>1e-4 )))
+            {
+                var fisher=dist.Distribution.GetFisherInformation(Values);
+                DenseMatrix denseMatrix = new DenseMatrix(fisher.Length);
+                var valeursParametres= dist.Distribution.AllParameters().Where(a => a.Name != ParametreName.valeurMin && a.Name != ParametreName.ValeurMax).Select(a => a.Value);
+                for(int i=0;i<fisher.Length;i++)
+                {
+                    for (int j = 0; j < fisher.Length; j++)
+                    {
+                        denseMatrix.At(i, j, fisher[i][j]);
+                    }
+                }
+                try
+                {
+                    var inverse = denseMatrix.Inverse();
+                    var diagonalisation = inverse.Evd();
+                    var vecteursPropres = diagonalisation.EigenVectors.ToArray().ToJagged();
+                    var valeurPorpres = diagonalisation.EigenValues;
+                    if (valeurPorpres.All(a => !double.IsInfinity(a.Real)))
+                    {
+                        List<List<bool>> directions = new List<List<bool>>();
+                        for (int i = 0; i < Math.Pow(2, fisher.Length - 1); i++)
+                        {
+                            List<bool> value = new List<bool>();
+                            BitArray bitArray = new BitArray(new[] { i });
+                            for (int j = 0; j < fisher.Length; j++)
+                            {
+                                if (j >= bitArray.Length)
+                                {
+                                    value.Add(false);
+                                }
+                                else
+                                {
+                                    value.Add(bitArray[j]);
+                                }
+                            }
+                            directions.Add(value);
+                        }
+                        foreach (var direction in directions)
+                        {
+                            for (int j = 0; j < quantilesNormal.Count; j++)
+                            {
 
+                                var vecteurMultiplie = vecteursPropres.Select(a => a.Select((b, i) => Math.Sqrt( valeurPorpres[i].Real/Values.Length) * b * (direction[i] ? 1.0 : -1.0) * quantilesNormal[j])).ToList();
+                                var newParam = valeursParametres.Select((a, i) => a + vecteurMultiplie[i].Sum());
+                                var newDist = (Distribution)dist.Distribution.Clone();
+                                newDist.SetParametersValue(newParam);
+                                rstIntermediaire.Add((newDist, newDist.GetLogLikelihood(Values), 1 / 100.0 / directions.Count));
+                            }
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
 
-        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration, bool isTrunkated = false)
+                }
+            }
+            rstIntermediaire = rstIntermediaire.Where(a=> a.dist.HaveValidParameter() && !double.IsNaN(a.loglikelyhood) && !double.IsInfinity(a.loglikelyhood)).OrderByDescending(a => a.loglikelyhood).ToList();
+            double d = 0;
+            int indice = 0;
+            var rst = new List<(Distribution dist, double proba)>();
+            while (d<1)
+            {
+                if (!(rstIntermediaire[indice].dist is TruncatedDistribution t) || t.QuantileUp - t.QuantileDown > 1e-4)
+                {
+                    d += rstIntermediaire[indice].proba;
+                    rst.Add((rstIntermediaire[indice].dist, d));
+                }
+                indice++;
+            }
+
+            return rst;
+        }
+
+        public DistributionWithDatas GetDistribution(TypeDistribution typeDistribution, TypeCalibration? calibration, bool isTruncated = false)
         {
             var distrib = Distribution.CreateDistribution(typeDistribution);
-            if (isTrunkated)
+            if (isTruncated)
             {
-                var trunkDistrib = new TrunkatedDistribution(distrib);
+                var trunkDistrib = new TruncatedDistribution(distrib);
                 distrib = trunkDistrib;
                 trunkDistrib.ValeurMin = ValeurMinTrukated;
                 trunkDistrib.ValeurMax = ValeurMaxTrukated;
@@ -323,7 +408,7 @@ namespace OnlineCalibrator.Shared
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.BIC)).OrderBy(a => a.BIC).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.Vraisemblance:
-                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.LogLikelihood).First().Distribution;
+                        CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood) && (!(a.Distribution is TruncatedDistribution t) || t.QuantileUp-t.QuantileDown>1e-4)).OrderBy(a => -a.LogLikelihood).First().Distribution;
                         break;
                     case MethodeCalibrationRetenue.MachineLearningImage:
                         CalibratedDistribution = VisisbleData.Where(a => !double.IsNaN(a.LogLikelihood)).OrderBy(a => -a.ProbabiliteMachineLearningImage).First().Distribution;
@@ -335,22 +420,30 @@ namespace OnlineCalibrator.Shared
             }
 
         }
-
+        //Méthode globale permettant de generer les les images et d'entrainer
         public void CalibrerMLI()
         {
+            //Création du générateur aléatoire
             var rand = MersenneTwister.MTRandom.Create(15376869);
+            //Récupération de la date
             DateTime date = DateTime.Now;
+            //Chaines de caractère pour alimentations des fichiers tsv
             StringBuilder sbTags = new StringBuilder();
             StringBuilder sbTagsTest = new StringBuilder();
 
-
+            //Parcours de l'ensemble des lois qui ont été calibré sur la donnée
             foreach (var distrib in VisisbleData)
             {
+                //Création du dossier pour sauvegarder les images de la distribution
                 Directory.CreateDirectory($"./{distrib.Distribution.Type}/");
+                //Boucle pour créer 1000 images pour entrainer le modèle de ML
                 for (int i = 0; i < 1000; i++)
                 {
+                    //Chemin pour sauvegarde l'image
                     var path = $"./{distrib.Distribution.Type}/Image {i + 1}";
+                    //Génération de l'estimateur à noyau de l'estimateur de la densité
                     GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(distrib.Distribution.Simulate(rand, Values.Length), Math.Min(100, Values.Length), PointsKDE.Select(a => a.X).Min(), PointsKDE.Select(a => a.X).Max()), path, 500, 500);
+                    //Spit des 1000 image entre les données d'apprentissage et les données de tests du modèle
                     if (i < 700)
                     {
                         sbTags.AppendLine($"{path}.png\t{distrib.Distribution.Type}");
@@ -361,18 +454,22 @@ namespace OnlineCalibrator.Shared
                     }
                 }
             }
+            //Ecriture des fichiers tsv
             File.WriteAllText($"tags{date.Ticks}.tsv", sbTags.ToString());
             File.WriteAllText($"tags_test{date.Ticks}.tsv", sbTagsTest.ToString());
+            //Entrainement du modèle
             MLContext mlContext = new MLContext();
             Model = MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", "./");
+            //Calcul du résultat du machine learning sur l'échantillon initial
             GenerationGraphique.SaveChartImage(GenerationGraphique.GetDensity(Values, Math.Min(100, Values.Length)), $"image{date.Ticks}", 500, 500);
-            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model).GetProba();
             var predictions = MachineLearningHelper.ClassifySingleImage(mlContext, Model, $"image{date.Ticks}.png");
-
             for (int i = 0; i < VisisbleData.Count; i++)
             {
                 VisisbleData[i].ProbabiliteMachineLearningImage = predictions.Score[i];
             }
+            //Calcul de la matrice de confusion sur les données de tests
+            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model).GetProba();
+            //Suppression des données utilisés pour la calibration du modèle
             foreach (var distrib in VisisbleData)
             {
                 for (int i = 0; i < 1000; i++)
@@ -383,6 +480,7 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
+            //Calcul de la matrice de confusion pour le maximum de vraissemblance
             ComputeMLEConfusionMatrix();
         }
 

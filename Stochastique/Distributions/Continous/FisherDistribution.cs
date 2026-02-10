@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,26 +9,25 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class FisherDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class FisherDistribution : Distribution
     {
         public FisherDistribution(int d1, int d2)
         {
             AddParameter(new Parameter(ParametreName.d1, d1));
             AddParameter(new Parameter(ParametreName.d2, d2));
         }
-
+        [MemoryPack.MemoryPackConstructor]
         public FisherDistribution() { }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double D1 => GetParameter(ParametreName.d1).Value;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double D2 => GetParameter(ParametreName.d2).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public override TypeDistribution Type => TypeDistribution.Fisher;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)

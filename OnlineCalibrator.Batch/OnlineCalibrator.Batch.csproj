@@ -17,4 +17,16 @@
     <ProjectReference Include="..\OnlineCalibrator.Service\OnlineCalibrator.Service.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Retraitements.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TriangleNombreSinistre.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ValeurCoutSto.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

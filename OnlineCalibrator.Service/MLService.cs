@@ -18,5 +18,10 @@ namespace OnlineCalibrator.Service
             donnees.CalibrerMLI();
             a();
         }
+        public async Task Train(DonneesPourAnalyseConjointe donnees, Action a)
+        {
+            donnees.CalibrerMLI();
+            a();
+        }
     }
 }

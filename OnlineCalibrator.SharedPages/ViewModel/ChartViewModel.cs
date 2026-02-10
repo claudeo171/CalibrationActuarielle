@@ -7,7 +7,6 @@ using LiveChartsCore.SkiaSharpView.Drawing;
 using LiveChartsCore.SkiaSharpView.Drawing.Geometries;
 using LiveChartsCore.SkiaSharpView.Painting;
 using MathNet.Numerics;
-using MessagePack;
 using SkiaSharp;
 using Stochastique;
 using System;
@@ -19,9 +18,16 @@ using pax.BlazorChartJs;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class ChartViewModelLine
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ChartViewModelLine
     {
+        [MemoryPack.MemoryPackConstructor]
+        public ChartViewModelLine()
+        {
+
+        }
+        [MemoryPack.MemoryPackOrder(4)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public ChartJsConfig ChartJsConfig { get; set; }
         public ChartViewModelLine(Point[] valeurs)
         {
@@ -57,20 +63,6 @@ namespace OnlineCalibrator.Shared
         }
         public ChartViewModelLine(List<Point[]> valeurs, List<SolidColorPaint> stroke, List<SolidColorPaint> fill, List<double> size, List<SolidColorPaint> color, bool differentAxes = false, bool rectangularSections = false)
         {
-            Series = new ISeries[0];
-            if (differentAxes)
-            {
-                YAxes = new Axis[valeurs.Count];
-            }
-            for (int i = 0; i < valeurs.Count; i++)
-            {
-                AddSerie(valeurs[i], stroke[i], fill[i], i, size[i], color[i], differentAxes);
-                if (differentAxes)
-                {
-                    YAxes[i] = new Axis();
-                }
-            }
-
             ChartJsConfig = new ChartJsConfig
             {
                 Type = ChartType.scatter,
@@ -169,10 +161,6 @@ namespace OnlineCalibrator.Shared
 
                         }
                     ).OfType<ChartJsDataset>().ToList();
-        }
-        public ChartViewModelLine()
-        {
-
         }
         public ChartViewModelLine InitialiseQuantile(Point[] valeurs)
         {
@@ -323,6 +311,7 @@ namespace OnlineCalibrator.Shared
                 },
             };
 
+            
             ChartJsConfig.Options.Plugins.Annotation = new AnnotationsData
             {
                 Annotations = new List<Annotation>
@@ -356,13 +345,16 @@ namespace OnlineCalibrator.Shared
             Series = serieAsList.ToArray();
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public ISeries[] Series { get; set; }
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public RectangularSection[] RectangularSection { get; set; }
 
         // Creates a gray background and border in the draw margin.
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public DrawMarginFrame DrawMarginFrame => new()
         {
 
@@ -370,17 +362,17 @@ namespace OnlineCalibrator.Shared
             Stroke = new SolidColorPaint(new SKColor(180, 180, 180), 1)
         };
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public Axis[] YAxes { get; set; }
 
     }
 
 
-    [MessagePackObject]
-    public class ChartViewModelScatter
+
+    public partial class ChartViewModelScatter
     {
         public ChartJsConfig ChartJsConfig { get; set; }
-
+        [MemoryPack.MemoryPackConstructor]
         public ChartViewModelScatter() { }
         public ChartViewModelScatter(Point[] valeurs)
         {
@@ -482,11 +474,11 @@ namespace OnlineCalibrator.Shared
             Series = serieAsList.ToArray();
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public ISeries[] Series { get; set; }
 
         // Creates a gray background and border in the draw margin.
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public DrawMarginFrame DrawMarginFrame => new()
         {
 

@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,18 +8,18 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class GeometricDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class GeometricDistribution : DiscreteDistribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public GeometricDistribution() { }
         public GeometricDistribution(double p)
         {
             AddParameter(new Parameter(ParametreName.p, p));
         }
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double P => GetParameter(ParametreName.p).Value;
 
-        [MessagePack.IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Geometric;
 
         public override double ExpextedValue()

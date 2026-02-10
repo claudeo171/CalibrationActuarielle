@@ -4,10 +4,10 @@ using Stochastique.Enums;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class CopuleClayton:CopuleArchimedienne
     {
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double Theta => GetParameter(CopuleParameterName.thetaClayton).Value;
 
         public CopuleClayton(int dimension, double theta) : base(dimension)
@@ -21,7 +21,7 @@ namespace Stochastique.Copule
             communConstructeurs(theta);
             Dimension = 2;
         }
-
+        [MemoryPack.MemoryPackConstructor]
         public CopuleClayton() : base(2)
         {
             Type = TypeCopule.Clayton;

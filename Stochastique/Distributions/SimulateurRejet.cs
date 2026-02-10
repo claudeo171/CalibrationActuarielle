@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
-    [MessagePack.MessagePackObject]
-    public class SimulateurRejet
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class  SimulateurRejet
     {
-        [MessagePack.Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public Distribution Distribution { get; set; }
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public Distribution DistributionAuxiliaire {  get; set; }
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double ConstanteMajoration { get; set; }
 
         public SimulateurRejet(Distribution distribution, Distribution distributionAuxiliaire, double constanteMajoration)

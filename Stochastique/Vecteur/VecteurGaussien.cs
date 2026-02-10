@@ -10,17 +10,22 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Vecteur
 {
-    [MessagePack.MessagePackObject]
-    public class VecteurGaussien : VecteurAleatoire
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class VecteurGaussien : VecteurAleatoire
     {
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public DenseVector VecteurEsperance { get; set; }
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackAllowSerialize]
+        [MemoryPack.MemoryPackOrder(2)]
         public DenseVector VecteurEcartType { get; set; }
-        [MessagePack.Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
+        [MemoryPack.MemoryPackAllowSerialize]
         public DenseMatrix MatriceCorrelation { get; set; }
-        [MessagePack.Key(4)]
+        [MemoryPack.MemoryPackAllowSerialize]
+        [MemoryPack.MemoryPackOrder(4)]
         public DenseMatrix TriangleInfCholesky { get; set; }
+        [MemoryPack.MemoryPackConstructor]
         public VecteurGaussien()
         {
 

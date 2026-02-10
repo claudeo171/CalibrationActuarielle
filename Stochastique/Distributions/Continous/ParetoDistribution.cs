@@ -1,6 +1,5 @@
 ﻿using Accord.Statistics.Distributions.Univariate;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,20 +9,18 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class ParetoDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ParetoDistribution : Distribution
     {
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Pareto;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double K => GetParameter(ParametreName.k).Value;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double XM => GetParameter(ParametreName.xm).Value;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
-
+        [MemoryPack.MemoryPackConstructor]
         public ParetoDistribution() { }
         public ParetoDistribution(double k, double xm)
         {
@@ -121,7 +118,7 @@ namespace Stochastique.Distributions.Continous
         }
         public override double Simulate(Random r)
         {
-            return base.Simulate(r, 1)[0];
+            return Simulate(r, 1)[0];
         }
     }
 }

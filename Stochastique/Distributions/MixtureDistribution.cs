@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions
 {
-    [MessagePack.MessagePackObject]
-    public class MixtureDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class MixtureDistribution : Distribution
     {
         public override TypeDistribution Type => throw new NotImplementedException();
 

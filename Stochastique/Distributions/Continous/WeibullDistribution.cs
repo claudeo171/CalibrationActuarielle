@@ -1,7 +1,6 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,24 +10,24 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class WeibullDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class WeibullDistribution : Distribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public WeibullDistribution() { }
         public WeibullDistribution(double k,double lambda)
         {
             AddParameter(new Parameter(ParametreName.lambda, lambda));
             AddParameter(new Parameter(ParametreName.k, k));
         }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double Lambda => GetParameter(ParametreName.lambda).Value;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double K => GetParameter(ParametreName.k).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public override TypeDistribution Type => TypeDistribution.Weibull;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)

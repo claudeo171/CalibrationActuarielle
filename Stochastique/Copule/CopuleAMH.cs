@@ -3,10 +3,10 @@ using Stochastique.Enums;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class CopuleAMH: CopuleArchimedienne
     {
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private double Theta => GetParameter(CopuleParameterName.thetaAMH).Value;
 
         public CopuleAMH(int dimension, double theta):base(dimension)
@@ -20,7 +20,7 @@ namespace Stochastique.Copule
             communConstructeurs(theta);
             Dimension = 2;
         }
-
+        [MemoryPack.MemoryPackConstructor]
         public CopuleAMH() : base(2)
         {
             Type = TypeCopule.CopuleAMH;

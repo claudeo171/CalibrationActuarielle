@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
-    [MessagePackObject]
-    public class Bound
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class Bound
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double Position { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public BoundType Type { get; set; }
     }
     public enum BoundType
