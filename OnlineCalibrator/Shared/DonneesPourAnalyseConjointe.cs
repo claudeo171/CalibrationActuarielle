@@ -1,8 +1,10 @@
 ﻿
+using LiveChartsCore.SkiaSharpView.Painting;
 using MathNet.Numerics.Statistics;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 using OnlineCalibrator.Shared.MachineLearning;
+using SkiaSharp;
 using Stochastique;
 using Stochastique.Copule;
 using Stochastique.Distributions;
@@ -71,7 +73,9 @@ namespace OnlineCalibrator.Shared
         [MemoryPack.MemoryPackIgnore]
         public ITransformer? Model { get; set; }
         [MemoryPack.MemoryPackIgnore]
-        public ConfusionMatrix? ConfusionMatrixML { get; set; }
+        public double[][]? ConfusionMatrixML { get; set; }
+        [MemoryPack.MemoryPackIgnore]
+        public double[][]? ConfusionMatrixMaximumVraissemblance { get; set; }
         public List<CopuleWithData> GetAllCopula()
         {
             var distributions = Enum.GetValues(typeof(TypeCopule)).Cast<TypeCopule>().Where(a => Copule.CreateCopula(a) != null).ToList();
@@ -80,7 +84,7 @@ namespace OnlineCalibrator.Shared
         }
 
 
-        public CopuleWithData GetCopule(TypeCopule typeDistribution, TypeCalibration? calibration, bool isTrunkated = false)
+        public CopuleWithData GetCopule(TypeCopule typeDistribution, TypeCalibration? calibration, bool isTruncated = false)
         {
             var distrib = Copule.CreateCopula(typeDistribution);
             var values = new List<double[]> { DonneesAAnalyser1.Values, DonneesAAnalyser2.Values };
@@ -162,7 +166,12 @@ namespace OnlineCalibrator.Shared
                 for (int i = 0; i < 1000; i++)
                 {
                     var path = $"./{distrib.Copule.Type}/Image {i + 1}";
-                    GenerationGraphique.SaveChartImage(GenerationGraphique.GetRank(distrib.Copule.SimulerCopule(rand, ScatterPlotRank.Length)), path, 500, 500);
+                    GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetRank(distrib.Copule.SimulerCopule(rand, ScatterPlotRank.Length)) },
+                        new List<SolidColorPaint>{ null },
+                        new List<SolidColorPaint>{ null },
+                        new List<SolidColorPaint>{ new SolidColorPaint(SKColors.Blue) { StrokeThickness = 4, Color = SKColors.Blue } },
+                        new List<int> { 5},
+                    path, 500, 500);
                     if (i < 700)
                     {
                         sbTags.AppendLine($"{path}.png\t{distrib.Copule.Type}");
@@ -178,7 +187,7 @@ namespace OnlineCalibrator.Shared
             MLContext mlContext = new MLContext();
             Model = MachineLearningHelper.GenerateModel(mlContext, $"tags{date.Ticks}.tsv", "./");
             GenerationGraphique.SaveChartImage(ScatterPlotRank, $"image{date.Ticks}", 500, 500);
-            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model);
+            ConfusionMatrixML = MachineLearningHelper.GetConfusionMatrix(mlContext, $"tags_test{date.Ticks}.tsv", "./", Model).GetProba();
             var predictions = MachineLearningHelper.ClassifySingleImage(mlContext, Model, $"image{date.Ticks}.png");
 
             for (int i = 0; i < Copules.Count; i++)
@@ -195,8 +204,43 @@ namespace OnlineCalibrator.Shared
             File.Delete($"./image{date.Ticks}.png");
             File.Delete($"tags{date.Ticks}.tsv");
             File.Delete($"tags_test{date.Ticks}.tsv");
+            ComputeMLEConfusionMatrix();
 
         }
+        public void ComputeMLEConfusionMatrix()
+        {
+            double[][] rstVraissemblance = new double[Copules.Count][];
+            for (int i = 0; i < Copules.Count; i++)
+            {
+                rstVraissemblance[i] = new double[Copules.Count];
+            }
+            var random = new Random(1535664);
+            int nbSimulations = 1000;
+            for (int i = 0; i < nbSimulations; i++)
+            {
+                for (int j = 0; j < Copules.Count; j++)
+                {
+                    var values = Copules[j].Copule.SimulerCopule(random, DonneesAAnalyser1.Values.Length);
+                    List<double[]> valeursMiseEnForme = new List<double[]>();
+                    for(int w = 0; w < values[0].Count;w++)
+                    {
+                        valeursMiseEnForme.Add(new double[] { values[0][w], values[1][w] });
+                    }
+                    var distrib = Copules.MaxObject(a =>  a.Copule.GetLogLikelihood(valeursMiseEnForme));
+                    rstVraissemblance[j][Copules.IndexOf(distrib)]++;
 
+                }
+            }
+            for (int i = 0; i < Copules.Count; i++)
+            {
+                for (int j = 0; j < Copules.Count; j++)
+                {
+                    rstVraissemblance[i][j] /= nbSimulations;
+                }
+            }
+            ConfusionMatrixMaximumVraissemblance = rstVraissemblance;
+        }
     }
+
 }
+

@@ -3,6 +3,7 @@ using Accord.Statistics;
 using MathNet.Numerics.Integration;
 using MathNet.Numerics.RootFinding;
 using MathNet.Numerics.Statistics;
+using Stochastique.Copule;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -14,16 +15,16 @@ using static alglib;
 namespace Stochastique.Distributions
 {
     [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
-    public partial class TrunkatedDistribution : Distribution
+    public partial class TruncatedDistribution : Distribution
     {
 
         [MemoryPack.MemoryPackConstructor]
-        public TrunkatedDistribution() { }
-        public TrunkatedDistribution(Distribution? distrib)
+        public TruncatedDistribution() { }
+        public TruncatedDistribution(Distribution? distrib)
         {
             BaseDistribution = distrib;
         }
-        public TrunkatedDistribution(Distribution d, double valeurMin, double valeurMax)
+        public TruncatedDistribution(Distribution d, double valeurMin, double valeurMax)
         {
             BaseDistribution = d;
             ValeurMax = valeurMax;
@@ -89,7 +90,7 @@ namespace Stochastique.Distributions
         public double QuantileDown => BaseDistribution.CDF(ValeurMin);
 
         [MemoryPack.MemoryPackOrder(12)]
-        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Trunkated + (int)BaseDistribution.Type);
+        public override TypeDistribution Type => (TypeDistribution)((int)TypeDistribution.Truncated + (int)BaseDistribution.Type);
         public override double InconditionnalMaximumPossibleValue => BaseDistribution.InconditionnalMaximumPossibleValue;
         public override double InconditionnalMinimumPossibleValue => BaseDistribution.InconditionnalMinimumPossibleValue;
         public override double CDF(double x)
@@ -107,6 +108,37 @@ namespace Stochastique.Distributions
             {
                 return (baseCDF - QuantileDown).Divide(QuantileUp - QuantileDown, 1);
             }
+        }
+        [MemoryPack.MemoryPackIgnore]
+        public double? QuantileUpTemp { get; set; }
+        [MemoryPack.MemoryPackIgnore]
+        public double? QuantileDownTemp { get; set; }
+        public double PDFFast(double x)
+        {
+            if (x > ValeurMax || x < ValeurMin)
+            {
+                return 0;
+            }
+            else
+            {
+                if (QuantileUpTemp - QuantileDownTemp < 1e-10)
+                {
+                    return 0;
+                }
+                return BaseDistribution.PDF(x) / (QuantileUpTemp.Value - QuantileDownTemp.Value);
+            }
+        }
+
+        public override double GetLogLikelihood(IEnumerable<double> values)
+        {
+            double rst = 0;
+            QuantileUpTemp = QuantileUp;
+            QuantileDownTemp = QuantileDown;
+            foreach (var val in values)
+            {
+                rst += Math.Log(PDFFast(val));
+            }
+            return rst;
         }
 
 

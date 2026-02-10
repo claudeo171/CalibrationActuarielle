@@ -50,7 +50,7 @@
                     Parametres
                 </div>
                 <div class="card-body">
-                    @if (isInit)
+@*                     @if (isInit)
                     {
                         <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>distribution.Calibration)" Value="@distribution.Calibration" ValueChanged="(TypeCalibration s)=>ChangeCalibration(s)">
                             @foreach (var item in Enum.GetValues(typeof(TypeCalibration)))
@@ -58,7 +58,7 @@
                                 <option value="@item">@item</option>
                             })
                         </InputSelect>
-                    }
+                    } *@
                     <table class="table">
                         <thead>
                             <tr>

@@ -80,7 +80,7 @@ namespace Stochastique.Distributions.Continous
         {
             var u1 = r.NextDouble();
             var u2 = r.NextDouble();
-            return Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2);
+            return Math.Sqrt(-2 * Math.Log(u1)) * Math.Cos(2 * Math.PI * u2)*Sigma+Mu;
         }
         public override double[] Simulate(Random r, int n)
         {

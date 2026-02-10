@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
 using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
@@ -69,7 +70,7 @@ namespace Stochastique.Distributions.Discrete
 
         public override double Simulate(Random r)
         {
-            var lambda = new GammaDistribution(R, P / (1 - P)).Simulate(r) ;
+            var lambda = Gamma.Sample(r,R, P / (1 - P)) ;
             var c = Math.Exp(-lambda);
             var p1 = 1.0;
             var k = 0;

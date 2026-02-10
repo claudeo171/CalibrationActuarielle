@@ -63,20 +63,6 @@ namespace OnlineCalibrator.Shared
         }
         public ChartViewModelLine(List<Point[]> valeurs, List<SolidColorPaint> stroke, List<SolidColorPaint> fill, List<double> size, List<SolidColorPaint> color, bool differentAxes = false, bool rectangularSections = false)
         {
-            Series = new ISeries[0];
-            if (differentAxes)
-            {
-                YAxes = new Axis[valeurs.Count];
-            }
-            for (int i = 0; i < valeurs.Count; i++)
-            {
-                AddSerie(valeurs[i], stroke[i], fill[i], i, size[i], color[i], differentAxes);
-                if (differentAxes)
-                {
-                    YAxes[i] = new Axis();
-                }
-            }
-
             ChartJsConfig = new ChartJsConfig
             {
                 Type = ChartType.scatter,

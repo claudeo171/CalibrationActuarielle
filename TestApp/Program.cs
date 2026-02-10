@@ -55,7 +55,7 @@ var testCopule = FileService.GetDataFromFile(new FileStream("C:\\users\\parent.c
 
 
 testCopule.NomData = testCopule.Donnees.First().Name;   
-testCopule.ActualData.IncludeTrunkatedDistributions = false;
+testCopule.ActualData.IncludeTruncatedDistributions = false;
 //var toto = elt.ActualData.GetAllDistributions();
 testCopule.ActualData.IsDiscreteDistribution = false;
 testCopule.NomDataConjointe1 = "A";
@@ -103,7 +103,7 @@ var testTronque = FileService.GetDataFromFile(new FileStream("./TestTronque.csv"
 
 
 testTronque.NomData = testTronque.Donnees.First().Name;
-testTronque.ActualData.IncludeTrunkatedDistributions = true;
+testTronque.ActualData.IncludeTruncatedDistributions = true;
 //var toto = elt.ActualData.GetAllDistributions();
 testTronque.ActualData.IsDiscreteDistribution = false;
 
@@ -152,7 +152,7 @@ for(int i = 0; i < ln2[0].Count;i++)
 }
 File.WriteAllText(@".\rstCorrel.csv",sb.ToString());
 
-var truncated = new TrunkatedDistribution(normal, 0.1, 0.75);
+var truncated = new TruncatedDistribution(normal, 0.1, 0.75);
 var student = new StudentDistribution(3);
 var afine = new LoiAfine(student, 2, 1);
 GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDensity(logNormal.Simulate(rand, 1000).ToArray(), 100) },
@@ -215,7 +215,7 @@ var elt=FileService.GetDataFromFile(new FileStream("C:\\users\\claude\\Documents
 
 
 elt.NomData= elt.Donnees.First().Name;
-elt.ActualData.IncludeTrunkatedDistributions = false;
+elt.ActualData.IncludeTruncatedDistributions = false;
 //var toto = elt.ActualData.GetAllDistributions();
 elt.ActualData.IsDiscreteDistribution = false;
 elt.NomDataConjointe1 = elt.Donnees.First().Name;

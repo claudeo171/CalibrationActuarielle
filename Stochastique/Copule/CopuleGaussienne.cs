@@ -1,4 +1,5 @@
-﻿using MathNet.Numerics.LinearAlgebra.Double;
+﻿using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra.Double;
 using Stochastique.Distributions.Continous;
 using Stochastique.Enums;
 using Stochastique.Vecteur;
@@ -83,13 +84,12 @@ namespace Stochastique.Copule
 
         public override double DensityCopula(IEnumerable<double> u)
         {
-            var distrib = new NormalDistribution(0,1);
             if(Dimension==2)
             {
                 var rho = matriceCorrelations.At(0, 1);
-                var a = distrib.InverseCDF(  u.First());
-                var b = distrib.InverseCDF(u.Last());
-                return 1 / Math.Sqrt(1 - rho * rho) * Math.Exp(-((a * a + b * b) * rho * rho - a * b * rho) / (2 * (1 - rho * rho)));
+                var a =Math.Sqrt(2) * SpecialFunctions.ErfInv( 2* u.First()-1);
+                var b = Math.Sqrt(2) * SpecialFunctions.ErfInv(2 *u.Last()-1);
+                return 1 / Math.Sqrt(1 - rho * rho) * Math.Exp(-((a * a + b * b) * rho * rho - 2 * a * b * rho) / (2 * (1 - rho * rho)));
             }
             throw new NotImplementedException();
         }

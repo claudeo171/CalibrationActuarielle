@@ -59,13 +59,13 @@
                         </label>
                         <InputNumber class="form-control" @bind-value="DonneesImportes.ActualData.ValeurMaxTrukated" />
                     </div>
-                    @if (DonneesImportes.ActualData.IncludeTrunkatedDistributions)
+                    @if (DonneesImportes.ActualData.IncludeTruncatedDistributions)
                     {
                         <button class="btn btn-primary" @onclick="()=>DonneesImportes.ActualData.MajCalibrationTronque()">MAJ Calibration distribution Tronquées</button>
                     }
                     else
                     {
-                        <button class="btn btn-primary" @onclick="()=>IncludeTrunkatedDistribution()">Inclure Distributions Tronquées</button>
+                        <button class="btn btn-primary" @onclick="()=>IncludeTruncatedDistribution()">Inclure Distributions Tronquées</button>
                     }
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration((bool)e.Value,false)" checked=@(DonneesImportes.ActualData.IsDiscreteDistribution) />
@@ -73,6 +73,7 @@
                             Distributions discrètes?
                         </label>
                     </div>
+
                     <div>
                         <label class="form-select-label">
                             Méthode de selection de loi:
@@ -109,9 +110,13 @@
                             </ul>
                         }
                     </div>
+
                     @if (DonneesImportes.ActualData != null && DonneesImportes.ActualData.CalibratedDistribution != null)
                     {
-
+                        @if (EnvironementCalibration.EstMAUI)
+                        {
+                            <button class="btn btn-primary" @onclick="()=>ExporterErreurModele()">Exporter Erreur Modèle</button>
+                        }
                         <h5> PDF + CDF </h5>
                         <div class="chart-container300">
                             <ChartComponent @ref="c1" ChartJsConfig="PDFCDF.ChartJsConfig">
@@ -276,11 +281,11 @@
                                                 {
                                                     if (distrib.Distribution.AllParameters().ElementAt(i).Name== ParametreName.valeurMin)
                                                     {
-                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TrunkatedDistribution).QuantileDown)</td>
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TruncatedDistribution).QuantileDown)</td>
                                                     }
                                                     else if (distrib.Distribution.AllParameters().ElementAt(i).Name == ParametreName.ValeurMax)
                                                     {
-                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TrunkatedDistribution).QuantileUp)</td>
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TruncatedDistribution).QuantileUp)</td>
                                                     }
                                                     else
                                                     {
@@ -382,11 +387,11 @@
         SaveData("donneesImportes", data);
     }
 
-    protected void UpdateCalibration(bool b, bool isTrunkated)
+    protected void UpdateCalibration(bool b, bool isTruncated)
     {
-        if (isTrunkated)
+        if (isTruncated)
         {
-            DonneesImportes.ActualData.IncludeTrunkatedDistributions = b;
+            DonneesImportes.ActualData.IncludeTruncatedDistributions = b;
         }
         else
         {
@@ -431,7 +436,7 @@
         ChartMatrixEcart.UpdateData(DonneesImportes.ActualData.ConfusionMatrixML.Moins(val), DonneesImportes.ActualData.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
         ChartMatrixMaximumVraissemblance.ChartJsConfig.ReinitializeChart();
         ChartMatrixEcart.ChartJsConfig.ReinitializeChart();
-        
+
     }
     public async void UpdateChart()
     {
@@ -502,9 +507,9 @@
         QuantileEEL?.ChartJsConfig.ReinitializeChart();
         StateHasChanged();
     }
-    public void IncludeTrunkatedDistribution()
+    public void IncludeTruncatedDistribution()
     {
-        DonneesImportes.ActualData.IncludeTrunkatedDistributions = true;
+        DonneesImportes.ActualData.IncludeTruncatedDistributions = true;
         UpdateCalibration(true, true);
     }
     public async void ExportSample()
@@ -551,6 +556,48 @@
     public void SuppressionNotification(string notif)
     {
         Notifications.Remove(notif);
+    }
+
+    public async void ExporterErreurModele()
+    {
+        var distribs = DonneesImportes.ActualData.GetDistributionAvecErreurDeModele();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < distribs.Count; i++)
+        {
+            stringBuilder.Append(distribs[i].dist.Type + ";");
+            foreach (var v in distribs[i].dist.AllParameters())
+            {
+                if (v.Name == ParametreName.valeurMin)
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";" + "Quantile Down" + ";" + (distribs[i].dist as TruncatedDistribution).QuantileDown + ";");
+                }
+                else if (v.Name == ParametreName.ValeurMax)
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";" + "Quantile Up" + ";" + (distribs[i].dist as TruncatedDistribution).QuantileUp + ";");
+                }
+                else
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";");
+                }
+
+            }
+            stringBuilder.Append( distribs[i].proba+ ";");
+            stringBuilder.Append(Environment.NewLine);
+        }
+        await FileUtil.SaveAs(js, "distributionAvecErreur.csv", System.Text.Encoding.UTF8.GetBytes(stringBuilder.ToString()));
+        Random random = new Random(41365454);
+        stringBuilder = new StringBuilder();
+        for (int i = 0; i < distribs.Count; i++)
+        {
+            for (int j = 0; j < 50; j++)
+            {
+                stringBuilder.Append(distribs[i].dist.Simulate(random));
+                stringBuilder.Append(Environment.NewLine);
+            }
+        }
+        await FileUtil.SaveAs(js, "sampleAvecErreur.csv", System.Text.Encoding.UTF8.GetBytes(stringBuilder.ToString()));
+
     }
 
     private ModalChart modal;

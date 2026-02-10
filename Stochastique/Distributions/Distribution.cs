@@ -2,6 +2,7 @@
 using Accord.Statistics.Distributions;
 using Accord.Statistics.Distributions.Fitting;
 using LiveChartsCore.Defaults;
+using MathNet.Numerics;
 using Stochastique.Distributions.Continous;
 using Stochastique.Distributions.Discrete;
 using Stochastique.Enums;
@@ -30,7 +31,7 @@ namespace Stochastique.Distributions
     [MemoryPack.MemoryPackUnion(17, typeof(PascalDistribution))]
     [MemoryPack.MemoryPackUnion(18, typeof(PoissonDistribution))]
     [MemoryPack.MemoryPackUnion(19, typeof(ParetoDistribution))]
-    [MemoryPack.MemoryPackUnion(20, typeof(TrunkatedDistribution))]
+    [MemoryPack.MemoryPackUnion(20, typeof(TruncatedDistribution))]
     [MemoryPack.MemoryPackUnion(21, typeof(LoiAfine))]
     [MemoryPack.MemoryPackUnion(22, typeof(MixtureDistribution))]
     [MemoryPack.MemoryPackUnion(23, typeof(JoeDistribution))]
@@ -424,7 +425,7 @@ namespace Stochastique.Distributions
         /// </summary>
         /// <param name="values">A set of double values</param>
         /// <returns>The likelihood</returns>
-        public double GetLogLikelihood(IEnumerable<double> values)
+        public virtual double GetLogLikelihood(IEnumerable<double> values)
         {
             double rst = 0;
             foreach (var val in values)
@@ -656,27 +657,40 @@ namespace Stochastique.Distributions
         }
         public double[][] GetFisherInformation(double[] valeurs)
         {
-            double h = 0.0001;
-            var parameters = AllParameters().ToArray();
-            var valeurParam= parameters.Select(a => a.Value).ToList();
+           
+            var parameters = AllParameters().Where(a=>a.Name!= ParametreName.valeurMin && a.Name != ParametreName.ValeurMax).ToArray();
+            double h = parameters.Min(a=>Math.Abs(a.Value))/10000.0;
+            var valeurParam= parameters.Select(a => a.Value).ToArray();
+            
             double[][] rst = new double[parameters.Length][];
             for (int i = 0; i < parameters.Length; i++)
             {
                 rst[i] = new double[parameters.Length];
                 for (int j = 0; j < parameters.Length; j++)
                 {
-                    parameters[i].Value = valeurParam[i];
-                    parameters[j].Value = valeurParam[j];
-                    var e1 = LogProbabilityFunction(valeurs);
-                    parameters[i].Value += h;
-                    var e2 = LogProbabilityFunction(valeurs);
-                    parameters[i].Value -= h;
-                    parameters[j].Value += h;
-                    var e3 = LogProbabilityFunction(valeurs);
-                    parameters[i].Value += h;
-                    var e4 = LogProbabilityFunction(valeurs);
-                    rst[i][j] = e1 + e4 - e2 - e3;
+                    rst[i][j] = 
+                        Differentiate.FirstPartialDerivativeFunc(
+                            Differentiate.FirstPartialDerivativeFunc(
+                            (a) =>
+                            {
+                                int w = 0;
+                                foreach(var param in parameters)
+                                {
+                                    param.Value = a[w];
+                                    w++;
+                                }
+                                return -valeurs.Sum(a=> LogProbabilityFunction(a))/valeurs.Length;
+                                },
+                            i),
+                            j
+                            )(valeurParam);
                 }
+            }
+            int w = 0;
+            foreach (var param in parameters)
+            {
+                param.Value = valeurParam[w];
+                w++;
             }
             return rst;
         }
@@ -713,7 +727,33 @@ namespace Stochastique.Distributions
 
         public object Clone()
         {
-            return this.DeepClone();
+            var rst= this.MemberwiseClone() as Distribution;
+            rst.ParametresParNom = new Dictionary<ParametreName, Parameter>();
+            if(rst is TruncatedDistribution trunk)
+            {
+                trunk.BaseDistribution = (Distribution)trunk.BaseDistribution.Clone();
+                
+            }
+            foreach(var v in ParametresParNom)
+            {
+                rst.ParametresParNom.Add(v.Key, new Parameter { Name = v.Key, Value = v.Value.Value });
+            }
+            return rst;
+        }
+
+        public void SetParametersValue(IEnumerable<double> newParam)
+        {
+            var param = AllParameters().Where(a => a.Name != ParametreName.valeurMin && a.Name != ParametreName.ValeurMax).ToList();
+            var np = newParam.ToList();
+            for(int i=0;i<param.Count;i++)
+            {
+                param[i].Value = np[i];
+            }
+        }
+
+        public bool HaveValidParameter()
+        {
+            return AllParameters().All(a=>a.Value>=a.MinValue && a.Value<=a.MaxValue);
         }
         #endregion
     }
