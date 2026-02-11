@@ -1,0 +1,135 @@
+﻿@using OnlineCalibrator.Service
+@using OnlineCalibrator.Shared;
+@using System
+@using System.IO
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
+@using Stochastique
+@using pax.BlazorChartJs
+@inherits BasePage
+@inject NavigationManager NavManager
+@inject DonneeContainer donneeContainer
+@page "/CalibrateDistributionFrequenceCout"
+
+<ModalChart @ref="modal" />
+@if (DonneesImportes != null)
+{
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+            <li class="breadcrumb-item active">Calibration des données (@DonneesImportes.NomData)</li>
+        </ol>
+    </nav>
+}
+
+<div class="card">
+    <div class="card-header main-card-header">
+        Calibrer la distribution d'une Variable Aléatoire
+    </div>
+    <div class="card-body row">
+        @if (ChartCout != null)
+        {
+            <div class="col-xl-6">
+                <div class="card ">
+                    <div class="card-header">
+                        FDR + CDF Coût
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container500">
+                            <ChartComponent @ref="c2" ChartJsConfig="ChartCout.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (ChartNombre != null)
+        {
+            <div class="col-xl-6">
+                <div class="card">
+                    <div class="card-header">
+                        FDR + CDF Nombre
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container500">
+                            <ChartComponent @ref="c1" ChartJsConfig="ChartNombre.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        }
+        @if (DonneesImportes.ActualData != null)
+        {
+            <div class="col-xl-6 col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        Caracteristiques Empiriques
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li> Moyenne Coût : @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout.Moyenne.ToBeautifulString() </li>
+                            <li> Variance Coût  : @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre.Variance.ToBeautifulString() </li>
+                            <li> Moyenne Nombre : @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout.Moyenne.ToBeautifulString() </li>
+                            <li> Variance Nombre : @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre.Variance.ToBeautifulString() </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        }
+        <div class="col-xl-6 col-sm-12">
+            <div class="card">
+                <div class="card-header">
+                    Etudes
+                </div>
+                <div class="card-body">
+                    <a class="btn btn-primary" href="/AnalyseFrequenceCout"> Etude Fréquence Coût </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartComponent c2;
+    private ChartViewModelLine ChartCout;
+    private ChartViewModelLine ChartNombre;
+    private DonneesImportes? DonneesImportes;
+    protected override async void OnInitialized()
+    {
+        try
+        {
+            if (donneeContainer.Value != null)
+            {
+                DonneesImportes = donneeContainer.Value;
+            }
+            else
+            {
+                var data = await GetData("donneesImportes");
+                DonneesImportes = DonneesImportes.FromMsgPack(data);
+            }
+
+            if (DonneesImportes != null && DonneesImportes.ActualData != null)
+            {
+                ChartNombre = new ChartViewModelLine(new List<Point[]?> { DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre.PointsKDE, DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre.PointsCDF }, true);
+                ChartCout = new ChartViewModelLine(new List<Point[]?> { DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout.PointsKDE, DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout.PointsCDF }, true);
+            }
+            StateHasChanged();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        c1.Modal = modal;
+        c2.Modal = modal;
+    }
+}
+

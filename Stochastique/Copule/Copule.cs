@@ -282,7 +282,49 @@ namespace Stochastique.Copule
                 RendreComonotone(uniformes[i], variablesAleatoires[i]);
             }
         }
+        public override string ToString()
+        {
+            return Type + "(" + string.Concat(AllParameters().Select(a => a.Name + ":" + a.Value)) + ")";
+        }
+        public int[] RankArray(double[] tableau)
+        {
+            List<Tuple<int, double>> list = tableau.Select((i, a) => new Tuple<int, double>(a, i)).ToList();
+            var sortList = list.OrderBy(a => a.Item2).ToList();
+            int[] simpleRankArray = new int[tableau.Length];
+            for (int i = 0; i < simpleRankArray.Length; i++)
+            {
+                simpleRankArray[sortList[i].Item1] = i;
+            }
 
-       
+
+            return simpleRankArray;
+        }
+        public void RendreDependant(Random r, double[] x, double[] y)
+        {
+            var variable = SimulerCopule(r,x.Length);
+            var rangEltSimule1 = RankArray(variable[0].ToArray()).ToList();
+            var inverseRangSimule = new int[rangEltSimule1.Count];
+            for (int i = 0; i < rangEltSimule1.Count; i++)
+            {
+                inverseRangSimule[rangEltSimule1[i]] = i;
+            }
+            var rangEltSimule2 = RankArray(variable[1].ToArray());
+            var rangElt1 = RankArray(x);
+            var rangElt2 = RankArray(y).ToList();
+            var inverseRangElt2 = new int[rangElt2.Count];
+            for (int i = 0; i < rangElt2.Count; i++)
+            {
+                inverseRangElt2[rangElt2[i]] = i;
+            }
+            double[] copieY = new double[y.Length];
+            for (int i = 0; i < y.Length; i++)
+            {
+                copieY[i] = y[i];
+            }
+            for (int i = 0; i < y.Length; i++)
+            {
+                y[i] = copieY[inverseRangElt2[rangEltSimule2[inverseRangSimule[rangElt1[i]]]]];
+            }
+        }
     }
 }

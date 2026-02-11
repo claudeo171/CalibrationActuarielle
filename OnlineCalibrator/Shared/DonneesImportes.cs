@@ -54,6 +54,39 @@ namespace OnlineCalibrator.Shared
             }
         }
 
+        [MemoryPack.MemoryPackOrder(8)]
+        private List<DonneesFrequenceCout> DonneesPourAnalyseFrequenceCout { get; set; } = new List<DonneesFrequenceCout>();
+
+        [MemoryPack.MemoryPackOrder(9)]
+        public string? NomDataCout { get; set; }
+        [MemoryPack.MemoryPackOrder(10)]
+        public string? NomDataCategorie { get; set; }
+
+        [MemoryPack.MemoryPackOrder(11)]
+        public DonneesFrequenceCout? ActualDonneesPourAnalyseFrequenceCout
+        {
+            get
+            {
+                if (NomDataCout == null || NomDataCategorie == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    if (DonneesPourAnalyseFrequenceCout.Any(a => a.Cout.Name == NomDataCout && a.Classification.Name == NomDataCategorie))
+                    {
+                        return DonneesPourAnalyseFrequenceCout.First(a => a.Cout.Name == NomDataCout && a.Classification.Name == NomDataCategorie);
+                    }
+                    else
+                    {
+                        var rst = new DonneesFrequenceCout ( Donnees.First(a => a.Name == NomDataCout), Donnees.First(a => a.Name == NomDataCategorie));
+                        DonneesPourAnalyseFrequenceCout.Add(rst);
+                        return rst;
+                    }
+                }
+            }
+        }
+
 
 
         public byte[] ToMsgPack()

@@ -61,7 +61,7 @@ namespace OnlineCalibrator.Shared
                 }
             };
         }
-        public ChartViewModelLine(List<Point[]> valeurs, List<SolidColorPaint> stroke, List<SolidColorPaint> fill, List<double> size, List<SolidColorPaint> color, bool differentAxes = false, bool rectangularSections = false)
+        public ChartViewModelLine(List<Point[]> valeurs, bool differentAxes = false)
         {
             ChartJsConfig = new ChartJsConfig
             {

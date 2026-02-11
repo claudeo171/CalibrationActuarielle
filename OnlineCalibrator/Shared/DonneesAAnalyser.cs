@@ -39,39 +39,39 @@ namespace OnlineCalibrator.Shared
         [MemoryPack.MemoryPackIgnore]
         public Point[]? PointsCDF => GenerationGraphique.GetCDF(Values);
 
-        [MemoryPack.MemoryPackOrder(4)]
+        [MemoryPack.MemoryPackIgnore]
         public double Moyenne => Values?.Average() ?? 0;
 
-        [MemoryPack.MemoryPackOrder(5)]
+        [MemoryPack.MemoryPackIgnore]
         public double Variance => Values == null ? 0 : Values.Select(a => a * a).Mean() - Moyenne * Moyenne;
 
-        [MemoryPack.MemoryPackOrder(6)]
+        [MemoryPack.MemoryPackIgnore]
         public double Kurtosis => Values == null ? 0 : Statistics.Kurtosis(Values);
 
-        [MemoryPack.MemoryPackOrder(7)]
+        [MemoryPack.MemoryPackIgnore]
         public double Skewness => Values == null ? 0 : Statistics.Skewness(Values);
 
-        [MemoryPack.MemoryPackOrder(8)]
+        [MemoryPack.MemoryPackOrder(2)]
         public Dictionary<TestStatistique, bool>? ResultatStatistique { get; set; }
 
         /// <summary>
         /// List of distribution with datas. Only one element for each distribution type.
         /// </summary>
-        [MemoryPack.MemoryPackOrder(9)]
+        [MemoryPack.MemoryPackOrder(3)]
         public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>();
 
-        [MemoryPack.MemoryPackOrder(10)]
+        [MemoryPack.MemoryPackOrder(4)]
         public bool IsDiscreteDistribution { get; set; }
-        [MemoryPack.MemoryPackOrder(11)]
+        [MemoryPack.MemoryPackOrder(5)]
         public bool IncludeTruncatedDistributions { get; set; }
-        [MemoryPack.MemoryPackOrder(13)]
+        [MemoryPack.MemoryPackOrder(6)]
         public MethodeCalibrationRetenue MethodeCalibration { get; set; }
-        [MemoryPack.MemoryPackOrder(12)]
+        [MemoryPack.MemoryPackOrder(7)]
         public Distribution CalibratedDistribution { get; set; }
 
         private double valeurMinTrukated;
         private double valeurMaxTrukated;
-        [MemoryPack.MemoryPackOrder(15)]
+        [MemoryPack.MemoryPackOrder(8)]
         public double ValeurMinTrukated
         {
             get => valeurMinTrukated;
@@ -87,7 +87,7 @@ namespace OnlineCalibrator.Shared
                 }
             }
         }
-        [MemoryPack.MemoryPackOrder(16)]
+        [MemoryPack.MemoryPackOrder(9)]
         public double ValeurMaxTrukated
         {
             get => valeurMaxTrukated;
@@ -105,13 +105,13 @@ namespace OnlineCalibrator.Shared
         }
         [MemoryPack.MemoryPackIgnore]
         public ITransformer? Model { get; set; }
-        [MemoryPack.MemoryPackOrder(17)]
+        [MemoryPack.MemoryPackOrder(10)]
         public double[][]? ConfusionMatrixML { get; set; }
-        [MemoryPack.MemoryPackOrder(18)]
+        [MemoryPack.MemoryPackOrder(11)]
         public double[][]? ConfusionMatrixMaximumVraissemblance { get; set; }
-        [MemoryPack.MemoryPackOrder(19)]
+        [MemoryPack.MemoryPackOrder(12)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceAIC { get; set; }
-        [MemoryPack.MemoryPackOrder(20)]
+        [MemoryPack.MemoryPackOrder(13)]
         public double[][]? ConfusionMatrixMaximumVraissemblanceBIC { get; set; }
         public void MajCalibrationTronque()
         {

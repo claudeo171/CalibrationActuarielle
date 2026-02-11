@@ -1,0 +1,609 @@
+﻿@using Newtonsoft.Json;
+@using OnlineCalibrator.Service
+@using OnlineCalibrator.Shared;
+@using System
+@using System.Text
+@using System.IO
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
+@using OnlineCalibrator.SharedPages.ViewModel
+@using SkiaSharp;
+@using SpawnDev.BlazorJS.WebWorkers
+@using Stochastique.Distributions
+@using Stochastique.Enums;
+@using Stochastique;
+@using LiveChartsCore.SkiaSharpView.Painting;
+@using Stochastique.Test
+@using pax.BlazorChartJs
+@using OnlineCalibrator.Shared.MachineLearning
+@inject NavigationManager NavManager
+@inject DonneeContainer donneeContainer
+@inject IJSRuntime js
+@inherits BasePage
+@if(IsVisible)
+{
+<ModalChart @ref="modal" />
+
+
+<div class="row">
+    @if (Donnees != null)
+    {
+        <div class="col-6 col-sm-12 col-xl-6 align-items-stretch">
+            <div class="card">
+                <div class="card-header">
+                    Paramétrage de la calibration
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>
+                            Valeur Minimale distribution tronquée
+                        </label>
+                        <InputNumber class="form-control" @bind-value="Donnees.ValeurMinTrukated" />
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            Valeur Maximale distribution tronquée
+                        </label>
+                        <InputNumber class="form-control" @bind-value="Donnees.ValeurMaxTrukated" />
+                    </div>
+                    @if (Donnees.IncludeTruncatedDistributions)
+                    {
+                        <button class="btn btn-primary" @onclick="()=>Donnees.MajCalibrationTronque()">MAJ Calibration distribution Tronquées</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-primary" @onclick="()=>IncludeTruncatedDistribution()">Inclure Distributions Tronquées</button>
+                    }
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="flexCheckDefault" @onchange="(ChangeEventArgs e) => UpdateCalibration((bool)e.Value,false)" checked=@(Donnees.IsDiscreteDistribution) />
+                        <label class="form-check-label" for="flexCheckDefault">
+                            Distributions discrètes?
+                        </label>
+                    </div>
+
+                    <div>
+                        <label class="form-select-label">
+                            Méthode de selection de loi:
+                        </label>
+                        @if (Donnees != null && Donnees.CalibratedDistribution != null)
+                        {
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>Donnees.MethodeCalibration)" Value="@Donnees.MethodeCalibration" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethod(s,true)">
+                                @foreach (var item in AviableMethod)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                                )
+                            </InputSelect>
+                            @if (Donnees.MethodeCalibration == MethodeCalibrationRetenue.Manuelle)
+                            {
+                                <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>Donnees.CalibratedTypeDistribution)" Value="@Donnees.CalibratedTypeDistribution" ValueChanged="(TypeDistribution? s)=>{Donnees.CalibratedTypeDistribution=s; UpdateChart();}">
+                                    @foreach (var item in Donnees.VisisbleData.Select(a => a.Distribution))
+                                    {
+                                        <option value="@item.Type">@item.Type</option>
+                                    }
+                                    )
+                                </InputSelect>
+                            }
+                            <div class="pt-3">
+                                <h5 class="fw-bold">
+                                    @Donnees.CalibratedDistribution?.Type
+                                </h5>
+                            </div>
+                            <ul>
+                                @foreach (var item in Donnees.CalibratedDistribution?.AllParameters())
+                                {
+                                    <li>@item.Name : @item.Value</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+
+                    @if (Donnees != null && Donnees.CalibratedDistribution != null)
+                    {
+                        @if (EnvironementCalibration.EstMAUI)
+                        {
+                            <button class="btn btn-primary" @onclick="()=>ExporterErreurModele()" toooltip="Exporte deux fichiers, un avec les caractéristiques des lois, un avec 10000 simulations.">Exporter Erreur Modèle</button>
+                        }
+                        <h5> PDF + CDF </h5>
+                        <div class="chart-container300">
+                            <ChartComponent @ref="c1" ChartJsConfig="PDFCDF.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
+                        <CartesianChart Series="PDFCDF.Series" DrawMarginFrame="PDFCDF.DrawMarginFrame" YAxes="PDFCDF.YAxes" />
+
+                        <h5>Probability of Quantile Plot</h5>
+                        <div class="chart-container300">
+                            <ChartComponent @ref="c2" ChartJsConfig="QuantileBeta.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
+
+                        @if (Donnees.CurrentDistribution.EELQuantileTest == null)
+                        {
+                            <button class="btn btn-primary" @onclick="AddMonteCarlo">Ajouter le graphique de probabilité des quantiles au niveau global (EEL).</button>
+                        }
+                        else
+                        {
+
+                            <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c3" ChartJsConfig="QuantileEEL.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+
+                        }
+
+                    }
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Simulation de la loi calibré (csv)
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-check-label">Nombre de ligne</label>
+                        <InputNumber @bind-Value="@NbRow" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label">Nombre de colonne</label>
+                        <InputNumber @bind-Value="@NbCol" />
+                    </div>
+                    <button class="btn btn-primary" @onclick="ExportSample">Exporter une simulation</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-sm-12 col-xl-6 align-items-stretch">
+            <div class="card">
+                <div class="card-header">
+                    Analyse de la loi sélectionnée
+                </div>
+                <div class="card-body">
+                    @if (Donnees != null && Donnees.CalibratedDistribution != null)
+                    {
+                        <div>
+                            QQPlot
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c4" ChartJsConfig="QQPlot.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                        </div>
+                    }
+                    @if (Donnees != null && Donnees.CalibratedDistribution != null)
+                    {
+                        <div>
+                            PPPlot
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c5" ChartJsConfig="PPPlot.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @if (EnvironementCalibration.EstMAUI)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        Machine Learning
+                    </div>
+                    <div class="card-body">
+                        @if (Donnees.ConfusionMatrixML == null)
+                        {
+                            <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                        }
+                        @if (ChartMatrixMachineLearning != null)
+                        {
+                            <div> Matrice de confusion Machine Learning </div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c6" ChartJsConfig="ChartMatrixMachineLearning.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <label class="form-select-label">
+                                Méthode de calibration comparé:
+                            </label>
+                            <InputSelect class="form-select form-select-lg" ValueExpression="@(()=>valeurMethodeAlternative)" Value="@valeurMethodeAlternative" ValueChanged="(MethodeCalibrationRetenue s)=>ChangeSelectionMethodComparaisonML(s,true)">
+                                @foreach (var item in AviableMethodAlternative)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                                )
+                            </InputSelect>
+                            <div> Matrice de confusion Maximum Vraissemblance</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c7" ChartJsConfig="ChartMatrixMaximumVraissemblance.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <div> Matrice de confusion Ecart</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c8" ChartJsConfig="ChartMatrixEcart.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (distributions != null)
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    Métriques des lois calibrés
+                </div>
+                <div class="card-body" style="max-width:100%;">
+                    <div class="table-responsive text-nowrap">
+                        <table class="table">
+                            <thead>
+
+                                <th class="text-center">Loi</th>
+                                <th class="text-center">LogLikelihood</th>
+                                <th class="text-center">AIC</th>
+                                <th class="text-center">BIC</th>
+                                <th class="text-center">KS-Test P-Value</th>
+                                @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
+                                {
+                                    <th class="text-center">Parametre @(i + 1)</th>
+                                }
+                                <th class="text-center">Esperance(%Ecart)</th>
+                                <th class="text-center">Variance(%Ecart)</th>
+                                <th class="text-center">Aplatissement(%Ecart)</th>
+                                <th class="text-center">Kurtosis(%Ecart)</th>
+                            </thead>
+                            <tbody>
+                                @if (distributions != null)
+                                {
+                                    @foreach (var distrib in distributions)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@distrib.Distribution.Type</td>
+                                            <td>@distrib.LogLikelihood.ToBeautifulString()</td>
+                                            <td>@distrib.AIC.ToBeautifulString()</td>
+                                            <td>@distrib.BIC.ToBeautifulString()</td>
+                                            <td>@distrib.TestStatistiques.FirstOrDefault(a => a.TypeTestStatistique == TypeTestStatistique.KolmogorovSmirnov)?.PValue.ToBeautifulString()</td>
+                                            @for (int i = 0; i < distributions.Max(a => a.Distribution.AllParameters().Count()); i++)
+                                            {
+                                                if (i < distrib.Distribution.AllParameters().Count())
+                                                {
+                                                    if (distrib.Distribution.AllParameters().ElementAt(i).Name== ParametreName.valeurMin)
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TruncatedDistribution).QuantileDown)</td>
+                                                    }
+                                                    else if (distrib.Distribution.AllParameters().ElementAt(i).Name == ParametreName.ValeurMax)
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString() (quantile = @((distrib.Distribution as TruncatedDistribution).QuantileUp)</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>@distrib.Distribution.AllParameters().ElementAt(i).ToString()</td>
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                }
+                                            }
+
+                                            <td>@distrib.Distribution.ExpextedValue().ToBeautifulString() (@(((Donnees.Moyenne - @distrib.Distribution.ExpextedValue()) / Math.Max(Donnees.Moyenne, @distrib.Distribution.ExpextedValue())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Variance().ToBeautifulString() (@(((Donnees.Variance - @distrib.Distribution.Variance()) / Math.Max(Donnees.Variance, @distrib.Distribution.Variance())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Skewness().ToBeautifulString() (@(((Donnees.Skewness - @distrib.Distribution.Skewness()) / Math.Max(Donnees.Skewness, @distrib.Distribution.Skewness())).ToBeautifulString(true)))</td>
+                                            <td>@distrib.Distribution.Kurtosis().ToBeautifulString() (@(((Donnees.Kurtosis - @distrib.Distribution.Kurtosis()) / Math.Max(Donnees.Kurtosis, @distrib.Distribution.Kurtosis())).ToBeautifulString(true)))</td>
+
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<div class="toast-container position-absolute p-3 bottom-0 end-0">
+    @foreach (var error in Notifications)
+    {
+        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+            <div class="toast-header">
+                <iconify-icon icon="oi:info" class="text-info"></iconify-icon>
+                <strong class="me-auto">Erreur</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" @onclick="@(()=>SuppressionNotification(error))" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                @error
+            </div>
+        </div>
+    }
+
+</div>
+
+}
+
+
+@code {
+
+    private bool isInit;
+    private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.KSTest, MethodeCalibrationRetenue.Manuelle };
+    private List<DistributionWithDatas>? distributions;
+    [Parameter]
+    public DonneesImportes? DonneesImportes { get; set; }
+    [Parameter]
+    public DonneesAAnalyser Donnees { get; set; }
+    [Parameter]
+    public bool IsVisible { get; set; }
+    private ChartViewModelLine? QQPlot;
+    private ChartViewModelLine? PPPlot;
+    private ChartViewModelLine? PDFCDF;
+    private ChartViewModelLine? QuantileEEL;
+    private ChartViewModelLine? QuantileBeta;
+    private ChartMatrixViewModel? ChartMatrixMachineLearning;
+    private ChartMatrixViewModel? ChartMatrixMaximumVraissemblance;
+    private ChartMatrixViewModel? ChartMatrixEcart;
+    public ChartComponent quntileEELChart;
+    private MethodeCalibrationRetenue valeurMethodeAlternative;
+    private List<MethodeCalibrationRetenue> AviableMethodAlternative = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC };
+    private ChartViewModelLine? CurrentFullSizeChart;
+    private bool showModal;
+    private List<string> Notifications = new List<string>();
+    private int NbRow = 1000;
+    private int NbCol = 10;
+    protected override async void OnInitialized()
+    {
+        if (Donnees != null)
+        {
+            distributions =Donnees?.GetAllDistributions();
+            isInit = true;
+            ChangeSelectionMethod(Donnees.MethodeCalibration, true);
+            SaveData();
+            StateHasChanged();
+            if (Donnees.ConfusionMatrixML != null)
+            {
+                AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
+            }
+        }
+    }
+
+    private async void SaveData()
+    {
+        donneeContainer.SetValue(DonneesImportes);
+        var data = DonneesImportes.ToMsgPack();
+        SaveData("donneesImportes", data);
+    }
+
+    protected void UpdateCalibration(bool b, bool isTruncated)
+    {
+        if (isTruncated)
+        {
+            Donnees.IncludeTruncatedDistributions = b;
+        }
+        else
+        {
+            Donnees.IsDiscreteDistribution = b;
+        }
+        if (isInit)
+        {
+            distributions = Donnees?.GetAllDistributions();
+            ChangeSelectionMethod(Donnees.MethodeCalibration, false);
+            UpdateChart();
+            SaveData();
+
+        }
+    }
+
+    protected void ChangeSelectionMethod(MethodeCalibrationRetenue m, bool update)
+    {
+        Donnees?.ChangeSelectionMethod(m);
+        if (update)
+        {
+            UpdateChart();
+            SaveData();
+        }
+    }
+    protected void ChangeSelectionMethodComparaisonML(MethodeCalibrationRetenue m, bool update)
+    {
+        valeurMethodeAlternative = m;
+        double[][] val = null;
+        if(m == MethodeCalibrationRetenue.Vraisemblance)
+        {
+            val = Donnees.ConfusionMatrixMaximumVraissemblance;
+        }
+        else if(m == MethodeCalibrationRetenue.AIC)
+        {
+            val = Donnees.ConfusionMatrixMaximumVraissemblanceAIC;
+        }
+        else
+        {
+            val = Donnees.ConfusionMatrixMaximumVraissemblanceBIC;
+        }
+        ChartMatrixMaximumVraissemblance.UpdateData(val, Donnees.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixEcart.UpdateData(Donnees.ConfusionMatrixML.Moins(val), Donnees.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixMaximumVraissemblance.ChartJsConfig.ReinitializeChart();
+        ChartMatrixEcart.ChartJsConfig.ReinitializeChart();
+
+    }
+    public async void UpdateChart()
+    {
+        if (Donnees.ConfusionMatrixML != null && ChartMatrixMachineLearning == null)
+        {
+            GraphiqueMachineLearning();
+        }
+        if (QQPlot == null)
+        {
+            QQPlot = new ChartViewModelLine(
+            Donnees?.GetQQPlot());
+            PPPlot = new ChartViewModelLine(
+            Donnees?.GetPPPlot());
+            PDFCDF = new ChartViewModelLine(
+                Donnees?.GetCDFPDF(), true
+            );
+            QuantileBeta = new ChartViewModelLine().InitialiseQuantile(Donnees?.GetQuantileBetaPlot());
+            if (Donnees?.CurrentDistribution?.EELQuantileTest != null)
+            {
+                QuantileEEL = new ChartViewModelLine().InitialiseQuantile(Donnees?.GetQuantilePlot());
+            }
+
+        }
+        else
+        {
+            QQPlot.Update(
+            Donnees?.GetQQPlot(),
+            new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PPPlot.Update(
+            Donnees?.GetPPPlot(),
+            new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+            new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+            PDFCDF.Update(
+                Donnees?.GetCDFPDF(),
+                new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue, 5), new SolidColorPaint(SKColors.IndianRed, 5) },
+                new List<SolidColorPaint>() { null, null },
+            new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null }, true
+            );
+            QuantileBeta.UpdateQuantile(Donnees?.GetQuantileBetaPlot());
+            if (Donnees?.CurrentDistribution?.EELQuantileTest != null)
+            {
+                if (QuantileEEL == null)
+                {
+                    QuantileEEL = new ChartViewModelLine().InitialiseQuantile(Donnees?.GetQuantilePlot());
+                }
+                else
+                {
+                    QuantileEEL.UpdateQuantile(Donnees?.GetQuantilePlot());
+                }
+            }
+        }
+        QQPlot.ChartJsConfig.ReinitializeChart();
+        PPPlot.ChartJsConfig.ReinitializeChart();
+        PDFCDF.ChartJsConfig.ReinitializeChart();
+        QuantileBeta.ChartJsConfig.ReinitializeChart();
+        QuantileEEL?.ChartJsConfig.ReinitializeChart();
+        StateHasChanged();
+    }
+    public void IncludeTruncatedDistribution()
+    {
+        Donnees.IncludeTruncatedDistributions = true;
+        UpdateCalibration(true, true);
+    }
+    public async void ExportSample()
+    {
+        Random r = MersenneTwister.MTRandom.Create(1234533);
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < NbRow; i++)
+        {
+            var sample = Donnees?.CalibratedDistribution.Simulate(r, NbCol);
+            sb.AppendLine(string.Join(";", sample.Select(a => a.ToString())));
+        }
+        await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+    }
+    public async void AddMonteCarlo()
+    {
+        Donnees?.AddMonteCarloTest();
+        UpdateChart();
+        SaveData();
+    }
+    public async void CalibrateMLI()
+    {
+        Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{""}");
+        StateHasChanged();
+        var service = new MLService();
+        await service.Train(Donnees, () =>
+        {
+            AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
+            Notifications.Add($"La calibration est terminée");
+            StateHasChanged();
+        });
+        GraphiqueMachineLearning();
+
+    }
+
+    private void GraphiqueMachineLearning()
+    {
+        ChartMatrixMachineLearning = new ChartMatrixViewModel(Donnees.ConfusionMatrixML, Donnees.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixMaximumVraissemblance = new ChartMatrixViewModel(Donnees.ConfusionMatrixMaximumVraissemblance, Donnees.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+        ChartMatrixEcart = new ChartMatrixViewModel(Donnees.ConfusionMatrixML.Moins(Donnees.ConfusionMatrixMaximumVraissemblance), Donnees.Distributions.Select(a => a.Distribution.Type.ToString()).ToList());
+
+    }
+
+    public void SuppressionNotification(string notif)
+    {
+        Notifications.Remove(notif);
+    }
+
+    public async void ExporterErreurModele()
+    {
+        var distribs = Donnees.GetDistributionAvecErreurDeModele();
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (int i = 0; i < distribs.Count; i++)
+        {
+            stringBuilder.Append(distribs[i].dist.Type + ";");
+            foreach (var v in distribs[i].dist.AllParameters())
+            {
+                if (v.Name == ParametreName.valeurMin)
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";" + "Quantile Down" + ";" + (distribs[i].dist as TruncatedDistribution).QuantileDown + ";");
+                }
+                else if (v.Name == ParametreName.ValeurMax)
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";" + "Quantile Up" + ";" + (distribs[i].dist as TruncatedDistribution).QuantileUp + ";");
+                }
+                else
+                {
+                    stringBuilder.Append(v.Name + ";" + v.Value + ";");
+                }
+
+            }
+            stringBuilder.Append( distribs[i].proba+ ";");
+            stringBuilder.Append(Environment.NewLine);
+        }
+        await FileUtil.SaveAs(js, "distributionAvecErreur.csv", System.Text.Encoding.UTF8.GetBytes(stringBuilder.ToString()));
+        Random random = new Random(41365454);
+        stringBuilder = new StringBuilder();
+        for (int i = 0; i < distribs.Count; i++)
+        {
+            for (int j = 0; j < 50; j++)
+            {
+                stringBuilder.Append(distribs[i].dist.Simulate(random));
+                stringBuilder.Append(Environment.NewLine);
+            }
+        }
+        await FileUtil.SaveAs(js, "sampleAvecErreur.csv", System.Text.Encoding.UTF8.GetBytes(stringBuilder.ToString()));
+
+    }
+
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartComponent c2;
+    private ChartComponent c3;
+    private ChartComponent c4;
+    private ChartComponent c5;
+    private ChartComponent c6;
+    private ChartComponent c7;
+    private ChartComponent c8;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (c1 != null)
+        {
+            if (c3 != null)
+            {
+                c3.Modal = modal;
+            }
+            c1.Modal = modal;
+            c2.Modal = modal;
+
+            c4.Modal = modal;
+            c5.Modal = modal;
+            if (c6 != null)
+            {
+                c6.Modal = modal;
+                c7.Modal = modal;
+                c8.Modal = modal;
+            }
+        }
+    }
+}
