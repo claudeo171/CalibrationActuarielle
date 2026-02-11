@@ -7,6 +7,7 @@
     <Platforms>AnyCPU;x86;x64</Platforms>
     <CompressionEnabled>true</CompressionEnabled>
     <RunAOTCompilation>true</RunAOTCompilation>
+    <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
   </PropertyGroup>
 
   <ItemGroup>

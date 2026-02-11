@@ -1,5 +1,4 @@
 ﻿using Accord.Statistics.Testing;
-using MessagePack;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class ShapiroTest : TestStatistique, IMessagePackSerializationCallbackReceiver
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ShapiroTest : TestStatistique
     {
+        [MemoryPack.MemoryPackConstructor]
         public ShapiroTest()
         { }
         public ShapiroTest(double[] values):this()
@@ -23,17 +23,8 @@ namespace OnlineCalibrator.Shared
             var test = new ShapiroWilkTest(values);
             PValue = test.PValue;
         }
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public double Statistic { get; set; }
 
-        public void OnAfterDeserialize()
-        {
-            //Test = new ShapiroWilkTest(Values);
-        }
-
-        public void OnBeforeSerialize()
-        {
-
-        }
     }
 }

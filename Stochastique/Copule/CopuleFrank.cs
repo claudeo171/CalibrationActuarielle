@@ -5,12 +5,12 @@ using Stochastique.SpecialFunction;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class CopuleFrank : CopuleArchimedienne
     {
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Theta => GetParameter(CopuleParameterName.thetaFrank).Value;
-
+        [MemoryPack.MemoryPackConstructor]
         public CopuleFrank() : base(2)
         {
             Type = TypeCopule.Frank;

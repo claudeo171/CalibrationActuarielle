@@ -5,10 +5,10 @@ using Stochastique.Enums;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class CopuleGumbel : CopuleArchimedienne
     {
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Theta => GetParameter(CopuleParameterName.thetaGumbel).Value;
         public CopuleGumbel() : base(2)
         {

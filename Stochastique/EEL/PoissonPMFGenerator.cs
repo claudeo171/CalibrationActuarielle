@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
-    [MessagePack.MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class PoissonPMFGenerator
     {
+        [MemoryPack.MemoryPackConstructor]
+        public PoissonPMFGenerator() { }
         public PoissonPMFGenerator(int max_k)
         {
             MaxK = max_k;
@@ -54,11 +56,11 @@ namespace Stochastique.EEL
             }
         }
 
-        [MessagePack.Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         private int MaxK;
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         private double[] log_gamma_LUT;
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double[] pmf_array_ptr;
     }
 }

@@ -6,12 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MessagePack;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
-    public class LogarithmiqueDistribution : DiscreteDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class LogarithmiqueDistribution : DiscreteDistribution
     {
         public override void Initialize(IEnumerable<double> value, TypeCalibration typeCalibration)
         {
@@ -20,14 +19,14 @@ namespace Stochastique.Distributions.Discrete
             base.Initialize(value, typeCalibration);
             IntervaleForDisplay = new Intervale(0, 10 * Math.Sqrt(Variance()));
         }
+        [MemoryPack.MemoryPackConstructor]
         public LogarithmiqueDistribution() { }
         public LogarithmiqueDistribution(double p)
         {
             AddParameter(new Parameter(ParametreName.p, p));
         }
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Logarithmique;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double P => GetParameter(ParametreName.p).Value;
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)

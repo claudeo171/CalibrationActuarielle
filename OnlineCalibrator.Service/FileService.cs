@@ -166,7 +166,7 @@ namespace OnlineCalibrator.Service
                         {
                             body.AddPuceParagraphe($"La variable {v.Name} est continue.");
                         }
-                        if (v.IncludeTrunkatedDistributions)
+                        if (v.IncludeTruncatedDistributions)
                         {
                             body.AddPuceParagraphe($"Les distributions tronquées ont été utilisés pour la calibration.");
                         }

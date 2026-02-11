@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics.Distributions;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,23 +9,24 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class CauchyDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class CauchyDistribution : Distribution
     {
         public CauchyDistribution(double a, double b)
         {
             AddParameter(new Parameter(ParametreName.aCauchy, a));
             AddParameter(new Parameter(ParametreName.bCauchy, b));
         }
+        [MemoryPack.MemoryPackConstructor]
         public CauchyDistribution() { }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double A => GetParameter(ParametreName.aCauchy).Value;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double B => GetParameter(ParametreName.bCauchy).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public override TypeDistribution Type => TypeDistribution.Cauchy;
 
         public override double CDF(double x)

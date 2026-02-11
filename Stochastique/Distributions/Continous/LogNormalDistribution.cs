@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class LogNormalDistribution : NormalDistribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class LogNormalDistribution : NormalDistribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public LogNormalDistribution()
         {
 
@@ -21,16 +21,15 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.mu, mu));
             AddParameter(new Parameter(ParametreName.sigma, sigma));
         }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override TypeDistribution Type => TypeDistribution.LogNormal;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double mu => GetParameter(ParametreName.mu).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public double sigma => GetParameter(ParametreName.sigma).Value;
 
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)

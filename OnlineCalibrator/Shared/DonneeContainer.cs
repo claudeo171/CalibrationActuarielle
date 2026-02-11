@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class DonneeContainer
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DonneeContainer
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public DonneesImportes Value { get; set; }
         public event Action OnStateChange;
         public void SetValue(DonneesImportes value)

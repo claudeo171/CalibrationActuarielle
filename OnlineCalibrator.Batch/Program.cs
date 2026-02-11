@@ -8,6 +8,14 @@ using Stochastique.Distributions;
 using Stochastique.Distributions.Continous;
 using System.Text;
 
+
+
+ErreurModeleRetraitement retraitement = new ErreurModeleRetraitement();
+retraitement.Import();
+retraitement.Calculer(1000);
+retraitement.CalibrateLoiNombre();
+retraitement.CalibrateLoiCout();
+retraitement.Export();
 if (args.Length == 3)
 {
     if (args.Length < 3)
@@ -30,7 +38,7 @@ if (args.Length == 3)
         d.ValeurMinTrukated = elts.Min();
         d.ValeurMinTrukated = elts.Max();
         d.IsDiscreteDistribution = data.ActualData.IsDiscreteDistribution;
-        d.IncludeTrunkatedDistributions = data.ActualData.IncludeTrunkatedDistributions;
+        d.IncludeTruncatedDistributions = data.ActualData.IncludeTruncatedDistributions;
         d.GetAllDistributions();
         d.ChangeSelectionMethod(data.ActualData.MethodeCalibration);
         distributions[i] = d.CalibratedDistribution;

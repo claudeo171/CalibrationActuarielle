@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MemoryPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,14 +7,15 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Autre
 {
-    [MessagePack.MessagePackObject]
-    public class ValIndice
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class ValIndice
     {
-        [MessagePack.Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public int indice = 0;
-        [MessagePack.Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double valeur = 0;
-
+        [MemoryPackConstructor]
+        public ValIndice() { }
         public ValIndice(int ind, double val)
         {
             indice = ind;

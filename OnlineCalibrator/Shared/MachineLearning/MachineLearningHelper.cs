@@ -11,28 +11,28 @@ namespace OnlineCalibrator.Shared.MachineLearning
 {
     public static class MachineLearningHelper
     {
-
+        //Méthode permettant de générer et d'entrainer le modèle de machine learning.
         public static ITransformer GenerateModel(MLContext mlContext, string tag, string imagesFolder)
         {
+            //Récupération des donnés d'entrainements avec le fichier de tag qui précise quel image correspond à quel loi/copule
             string _trainTagsTsv = Path.Combine(imagesFolder, tag);
 
-            // <SnippetImageTransforms>
+            //Création du modèle de machine learning ->récupération des images
             IEstimator<ITransformer> pipeline = mlContext.Transforms.LoadImages(outputColumnName: "input", imageFolder: imagesFolder, inputColumnName: nameof(ImageData.ImagePath))
-                            .Append(mlContext.Transforms.ResizeImages(outputColumnName: "input", imageWidth: InceptionSettings.ImageWidth, imageHeight: InceptionSettings.ImageHeight, inputColumnName: "input"))
-                            .Append(mlContext.Transforms.ExtractPixels(outputColumnName: "input", interleavePixelColors: InceptionSettings.ChannelsLast, offsetImage: InceptionSettings.Mean))
-                            .Append(mlContext.Model.LoadTensorFlowModel("./tensorflow_inception_graph.pb").
-                                ScoreTensorFlowModel(outputColumnNames: new[] { "softmax2_pre_activation" }, inputColumnNames: new[] { "input" }, addBatchDimensionInput: true))
-                            .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "LabelKey", inputColumnName: "Label"))
-                            .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(labelColumnName: "LabelKey", featureColumnName: "softmax2_pre_activation"))
-                            .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabelValue", "PredictedLabel"))
-                            .AppendCacheCheckpoint(mlContext);
-
+                //Redimention des images pour réduire le temps de calcul            
+                .Append(mlContext.Transforms.ResizeImages(outputColumnName: "input", imageWidth: InceptionSettings.ImageWidth, imageHeight: InceptionSettings.ImageHeight, inputColumnName: "input"))
+                //Méthode de récupération des pixels            
+                .Append(mlContext.Transforms.ExtractPixels(outputColumnName: "input", interleavePixelColors: InceptionSettings.ChannelsLast, offsetImage: InceptionSettings.Mean))
+                //Paramétrage du modèle tensorflow à partir d'un modèle pré-entrainé           
+                .Append(mlContext.Model.LoadTensorFlowModel("./tensorflow_inception_graph.pb").ScoreTensorFlowModel(outputColumnNames: new[] { "softmax2_pre_activation" }, inputColumnNames: new[] { "input" }, addBatchDimensionInput: true))
+                .Append(mlContext.Transforms.Conversion.MapValueToKey(outputColumnName: "LabelKey", inputColumnName: "Label"))
+                .Append(mlContext.MulticlassClassification.Trainers.LbfgsMaximumEntropy(labelColumnName: "LabelKey", featureColumnName: "softmax2_pre_activation"))
+                .Append(mlContext.Transforms.Conversion.MapKeyToValue("PredictedLabelValue", "PredictedLabel"))
+                .AppendCacheCheckpoint(mlContext);
+            //Alimentation du modèle avec le fichier tsv contenant le chemin des images.
             IDataView trainingData = mlContext.Data.LoadFromTextFile<ImageData>(path: _trainTagsTsv, hasHeader: false);
-
-            // Create and train the model
+            //Création et entrainement du modèle
             ITransformer model = pipeline.Fit(trainingData);
-
-
 
             return model;
         }

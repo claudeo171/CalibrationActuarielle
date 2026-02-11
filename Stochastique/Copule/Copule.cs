@@ -9,29 +9,27 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Copule
 {
-    [MessagePack.Union(0, typeof(CopuleAMH))]
-    [MessagePack.Union(1, typeof(CopuleClayton))]
-    [MessagePack.Union(2, typeof(CopuleFrank))]
-    [MessagePack.Union(3, typeof(CopuleGaussienne))]
-    [MessagePack.Union(4, typeof(CopuleGumbel))]
-    [MessagePack.Union(5, typeof(CopuleJoe))]
-    [MessagePack.MessagePackObject]
-    public abstract class Copule
+    [MemoryPack.MemoryPackUnion(0, typeof(CopuleAMH))]
+    [MemoryPack.MemoryPackUnion(1, typeof(CopuleClayton))]
+    [MemoryPack.MemoryPackUnion(2, typeof(CopuleFrank))]
+    [MemoryPack.MemoryPackUnion(3, typeof(CopuleGaussienne))]
+    [MemoryPack.MemoryPackUnion(4, typeof(CopuleGumbel))]
+    [MemoryPack.MemoryPackUnion(5, typeof(CopuleJoe))]
+    [MemoryPack.MemoryPackable(MemoryPack.SerializeLayout.Explicit)]
+    public abstract partial class Copule
     {
 
         /// <summary>
         /// List of all parameter of the distribution in dictionary by parameter name
         /// </summary>
-        [MessagePack.IgnoreMember]
+        [MemoryPack.MemoryPackOrder(1)]
         protected Dictionary<CopuleParameterName, CopuleParameter> ParametresParNom { get; set; } = new Dictionary<CopuleParameterName, CopuleParameter>();
         /// <summary>
         /// Storing the list of parameter for serialization purpose. (MessagePack doesn't serialize dictionnary properly. Maybe because of me^^)
         /// </summary>
-        [MessagePack.Key(1)]
-        public List<CopuleParameter> ParametersList { get; set; }
-        [MessagePack.Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public int Dimension { get; set; }
-        [MessagePack.Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public TypeCopule Type { get; set; }
         public abstract List<List<double>> SimulerCopule(Random r,int nbSim);
 

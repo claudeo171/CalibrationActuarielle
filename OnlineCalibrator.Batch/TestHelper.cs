@@ -213,8 +213,8 @@ namespace OnlineCalibrator.Batch
                 new GumbelDistribution(1,2),
                 new LogNormalDistribution(0,1),
                 new WeibullDistribution(0.5,1),new WeibullDistribution(1,2),new WeibullDistribution(2,3.4),new WeibullDistribution(3,4),
-                new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-1),normal.CDF(1)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-2),normal.CDF(2)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(3)),
-                new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-2),normal.CDF(1)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(1)),new TrunkatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(2))
+                new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-1),normal.CDF(1)),new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-2),normal.CDF(2)),new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(3)),
+                new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-2),normal.CDF(1)),new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(1)),new TruncatedDistribution(new NormalDistribution(0,1),normal.CDF(-3),normal.CDF(2))
             };
             var rst = new List<ResultPuissance>[distributions.Count];
             Parallel.For(0, distributions.Count, new ParallelOptions { MaxDegreeOfParallelism = 1 }, (int i) =>

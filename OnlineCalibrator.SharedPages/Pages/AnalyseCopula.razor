@@ -5,6 +5,8 @@
 @using System.IO
 @using System.Text.RegularExpressions
 @using Microsoft.Extensions.Logging
+@using OnlineCalibrator.Shared.MachineLearning
+@using OnlineCalibrator.SharedPages.ViewModel
 @using SkiaSharp;
 @using Stochastique.Enums;
 @using Stochastique;
@@ -61,10 +63,7 @@
                                 <li>@item.Name : @item.Value</li>
                             }
                         </ul>
-                        @if (EnvironementCalibration.EstMAUI)
-                        {
-                            <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
-                        }
+ 
                     }
                 </div>
             </div>
@@ -97,7 +96,40 @@
                     }
                 </div>
             </div>
+            @if (EnvironementCalibration.EstMAUI)
+            {
+                <div class="card">
+                    <div class="card-header">
+                        Machine Learning
+                    </div>
+                    <div class="card-body">
+                        @if (DonneesImportes.ActualData.ConfusionMatrixML == null)
+                        {
+                            <button class="btn btn-primary" @onclick="CalibrateMLI">Faire une calibration par reconnaissance d'image</button>
+                        }
+                        @if (ChartMatrixMachineLearning != null)
+                        {
+                            <div> Matrice de confusion Machine Learning </div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c6" ChartJsConfig="ChartMatrixMachineLearning.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <div> Matrice de confusion Maximum Vraissemblance</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c7" ChartJsConfig="ChartMatrixMaximumVraissemblance.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                            <div> Matrice de confusion Ecart</div>
+                            <div class="chart-container300">
+                                <ChartComponent @ref="c8" ChartJsConfig="ChartMatrixEcart.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
+
     }
 
     @if (copules != null)
@@ -170,12 +202,18 @@
 
 
 @code {
+    private ChartMatrixViewModel? ChartMatrixMachineLearning;
+    private ChartMatrixViewModel? ChartMatrixMaximumVraissemblance;
+    private ChartMatrixViewModel? ChartMatrixEcart;
     private bool isInit;
     private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.Manuelle };
     private List<CopuleWithData>? copules;
     private DonneesImportes? DonneesImportes;
     private ChartViewModelScatter? QQPlot;
     private List<string> Notifications = new List<string>();
+    private ChartComponent c6;
+    private ChartComponent c7;
+    private ChartComponent c8;
     private int NbRow = 1000;
     protected override async void OnInitialized()
     {
@@ -252,21 +290,41 @@
 
     private ModalChart modal;
     private ChartComponent c1;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        c1.Modal = modal;
-    }
+
 
     public async void CalibrateMLI()
     {
         Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{""}");
         StateHasChanged();
         var service = new MLService();
-        await service.Train(DonneesImportes.ActualData, () =>
+        await service.Train(DonneesImportes.ActualDonneesPourAnalyseConjointe, () =>
         {
             AviableMethod.Add(MethodeCalibrationRetenue.MachineLearningImage);
             Notifications.Add($"La calibration est terminée");
             StateHasChanged();
         });
+        GraphiqueMachineLearning();
+
+    }
+
+    private void GraphiqueMachineLearning()
+    {
+        ChartMatrixMachineLearning = new ChartMatrixViewModel(DonneesImportes.ActualDonneesPourAnalyseConjointe.ConfusionMatrixML, DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.Select(a => a.Copule.Type.ToString()).ToList());
+        ChartMatrixMaximumVraissemblance = new ChartMatrixViewModel(DonneesImportes.ActualDonneesPourAnalyseConjointe.ConfusionMatrixMaximumVraissemblance, DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.Select(a => a.Copule.Type.ToString()).ToList());
+        ChartMatrixEcart = new ChartMatrixViewModel(DonneesImportes.ActualDonneesPourAnalyseConjointe.ConfusionMatrixML.Moins(DonneesImportes.ActualDonneesPourAnalyseConjointe.ConfusionMatrixMaximumVraissemblance), DonneesImportes.ActualDonneesPourAnalyseConjointe.Copules.Select(a => a.Copule.Type.ToString()).ToList());
+
+    }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (c1 != null)
+        {
+            c1.Modal = modal;
+            if (c6 != null)
+            {
+                c6.Modal = modal;
+                c7.Modal = modal;
+                c8.Modal = modal;
+            }
+        }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,21 +9,20 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class LoiBeta : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class LoiBeta : Distribution
     {
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override TypeDistribution Type => TypeDistribution.Beta;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double A => GetParameter(ParametreName.aBeta).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public double B => GetParameter(ParametreName.bBeta).Value;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
-        [IgnoreMember]
         public override double InconditionnalMaximumPossibleValue => 1;
+        [MemoryPack.MemoryPackConstructor]
         public LoiBeta()
         {
             

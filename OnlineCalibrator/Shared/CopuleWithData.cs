@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Copule;
+﻿using Stochastique.Copule;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class CopuleWithData
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class CopuleWithData
     {
+        [MemoryPack.MemoryPackConstructor]
         public CopuleWithData()
         {
         }
@@ -24,26 +24,26 @@ namespace OnlineCalibrator.Shared
             N = data.First().Count();
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double N { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public double LogLikelihood { get; set; }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public double AIC => 2 * Copule.AllParameters().Count() - 2 * LogLikelihood;
 
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double BIC => Math.Log(N) * Copule.AllParameters().Count() - 2 * LogLikelihood;
 
 
-        [Key(5)]
+        [MemoryPack.MemoryPackOrder(5)]
         public Copule Copule { get; set; }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public TypeCalibration Calibration { get; set; }
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public string? Comment { get; set; }
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public float ProbabiliteMachineLearningImage { get; internal set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Enums;
+﻿using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Discrete
 {
-    [MessagePackObject]
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
     public partial class JoeDistribution : DiscreteDistribution
     {
         public override void OnAfterDeserialize()
@@ -16,10 +15,10 @@ namespace Stochastique.Distributions.Discrete
             base.OnAfterDeserialize();
             SimulateurRejet = new SimulateurRejet(this, new PartieEntierePuissanceUniformeDistribution(Theta), 1.44269509130226 + 0.52882337976858 / Theta);
         }
-        [IgnoreMember]
         public override TypeDistribution Type => TypeDistribution.Joe;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Theta => GetParameter(ParametreName.theta).Value;
+        [MemoryPack.MemoryPackConstructor]
         public JoeDistribution()
         {
 
@@ -30,7 +29,7 @@ namespace Stochastique.Distributions.Discrete
             SimulateurRejet = new SimulateurRejet(this, new PartieEntierePuissanceUniformeDistribution(theta), 1.44269509130226 + 0.52882337976858 / theta);
             //Voir en cas d'évolution du paramètre pour la gestion 
         }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         private SimulateurRejet SimulateurRejet { get; set; }
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)
         {

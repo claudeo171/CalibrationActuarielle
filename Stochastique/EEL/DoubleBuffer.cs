@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,23 +6,24 @@ using System.Threading.Tasks;
 
 namespace Stochastique.EEL
 {
-    [MessagePackObject]
-    public class DoubleBuffer<T>
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class DoubleBuffer<T>
     {
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public T[] Buff0 { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public T[] Buff1 { get; set; }
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public bool IsBuff0SRC { get; set; }
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public T[] get_src => IsBuff0SRC ? Buff0 : Buff1;
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public T[] get_dest => IsBuff0SRC ? Buff1 : Buff0;
         public void flip()
         {
             IsBuff0SRC = !IsBuff0SRC;
         }
+        [MemoryPack.MemoryPackConstructor]
         public DoubleBuffer()
         {
 

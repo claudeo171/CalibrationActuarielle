@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class LaplaceDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class LaplaceDistribution : Distribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public LaplaceDistribution()
         {
 
@@ -22,13 +22,12 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.beta, beta));
         }
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Mu => GetParameter(ParametreName.mu).Value;
 
-        [IgnoreMember]
+        [MemoryPack.MemoryPackIgnore]
         public double Beta => GetParameter(ParametreName.beta).Value;
 
-        [IgnoreMember]
         public override TypeDistribution Type =>TypeDistribution.Laplace;
 
         public override IEnumerable<Parameter> CalibrateWithMoment(IEnumerable<double> values)

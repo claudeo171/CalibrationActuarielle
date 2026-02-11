@@ -1,7 +1,6 @@
 ﻿using Accord.Math;
 using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -11,18 +10,19 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class StudentDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class StudentDistribution : Distribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public StudentDistribution() { }
         public StudentDistribution(int n)
         {
             AddParameter(new Parameter(ParametreName.nStudent, n));
         }
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public override TypeDistribution Type => TypeDistribution.Student;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double n => GetParameter(ParametreName.nStudent).Value;
 
 

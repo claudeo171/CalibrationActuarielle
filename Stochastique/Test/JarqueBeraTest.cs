@@ -1,5 +1,4 @@
 ﻿using MathNet.Numerics.Statistics;
-using MessagePack;
 using Newtonsoft.Json.Linq;
 using Stochastique;
 using Stochastique.Distributions;
@@ -12,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace OnlineCalibrator.Shared
 {
-    [MessagePackObject]
-    public class JarqueBeraTest : TestStatistique
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class JarqueBeraTest : TestStatistique
     {
-        
+        [MemoryPack.MemoryPackConstructor]
         public JarqueBeraTest() {
             TypeTestStatistique = TypeTestStatistique.JarqueBera;
         }

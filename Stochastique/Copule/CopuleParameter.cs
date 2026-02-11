@@ -1,5 +1,4 @@
-﻿using MessagePack;
-using Stochastique.Distributions;
+﻿using Stochastique.Distributions;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -13,9 +12,10 @@ namespace Stochastique.Copule
     {
         thetaClayton,thetaAMH,thetaFrank,thetaGumbel, thetaJoe, rho
     }
-    [MessagePackObject]
-    public class CopuleParameter
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class CopuleParameter
     {
+        [MemoryPack.MemoryPackConstructor]
         public CopuleParameter() { }
         public CopuleParameter(CopuleParameterName nom, double valeur)
         {
@@ -34,15 +34,15 @@ namespace Stochastique.Copule
             return Name + " : " + Value.ToString("F5");
         }
 
-        [Key(0)]
+        [MemoryPack.MemoryPackOrder(0)]
         public double Value { get; set; }
-        [Key(1)]
+        [MemoryPack.MemoryPackOrder(1)]
         public Copule? Estimateur { get; set; }
 
-        [Key(2)]
+        [MemoryPack.MemoryPackOrder(2)]
         public CopuleParameterName Name { get; set; }
 
-        [Key(3)]
+        [MemoryPack.MemoryPackOrder(3)]
         public double MinValue
         {
             get
@@ -67,7 +67,7 @@ namespace Stochastique.Copule
             }
         }
 
-        [Key(4)]
+        [MemoryPack.MemoryPackOrder(4)]
         public double MaxValue
         {
             get

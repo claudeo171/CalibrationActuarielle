@@ -1,6 +1,5 @@
 ﻿using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-using MessagePack;
 using Stochastique.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace Stochastique.Distributions.Continous
 {
-    [MessagePackObject]
-    public class GammaDistribution : Distribution
+    [MemoryPack.MemoryPackable(MemoryPack.GenerateType.VersionTolerant, MemoryPack.SerializeLayout.Explicit)]
+    public partial class GammaDistribution : Distribution
     {
+        [MemoryPack.MemoryPackConstructor]
         public GammaDistribution()
         {
 
@@ -24,15 +24,14 @@ namespace Stochastique.Distributions.Continous
             AddParameter(new Parameter(ParametreName.theta, theta));
         }
 
-        [Key(6)]
+        [MemoryPack.MemoryPackOrder(6)]
         public double K => GetParameter(ParametreName.k).Value;
 
-        [Key(7)]
+        [MemoryPack.MemoryPackOrder(7)]
         public double Theta => GetParameter(ParametreName.theta).Value;
 
-        [Key(8)]
+        [MemoryPack.MemoryPackOrder(8)]
         public override TypeDistribution Type => TypeDistribution.Gamma;
-        [IgnoreMember]
         public override double InconditionnalMinimumPossibleValue => 0;
 
         public override double CDF(double x)
