@@ -145,6 +145,43 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="card">
+                            <div class="card-header">
+                                Calibration fréquence coût
+                            </div>
+                            <div class="card-body">
+                                <div class="row m-1">
+                                    <label>Selectionnez les colonnes pour la calibration fréquence cout. (classification puis coût)</label>
+                                    <select class="mt-1" @onchange="(ChangeEventArgs a) => ChangeDataCategorie(a)">
+                                        @foreach (var donnee in DonneesImportes.Donnees)
+                                        {
+                                            @if (DonneesImportes.NomDataCategorie != "" && donnee.Name == DonneesImportes.NomDataCategorie)
+                                            {
+                                                <option selected value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                    <select class="mt-1" @onchange="(ChangeEventArgs a) => ChangeDataCout(a)">
+                                        @foreach (var donnee in DonneesImportes.Donnees)
+                                        {
+                                            @if (DonneesImportes.NomDataCout != "" && donnee.Name == DonneesImportes.NomDataCout || DonneesImportes.NomDataCout == "" && donnee == DonneesImportes.Donnees[1])
+                                            {
+                                                <option selected value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@donnee.Name">@donnee.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                    <button class="btn btn-primary mt-1" @onclick="@CalibrerDonneFrequenceCout">Calibrer les données de fréquence coût</button>
+                                </div>
+                            </div>
+                        </div>
                     }
                 </div>
                 <div class="row">
@@ -226,6 +263,8 @@
             DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
             DonneesImportes.NomDataConjointe1 = DonneesImportes.Donnees.FirstOrDefault()?.Name;
             DonneesImportes.NomDataConjointe2 = DonneesImportes.Donnees.Skip(1).FirstOrDefault()?.Name;
+            DonneesImportes.NomDataCategorie = DonneesImportes.Donnees.FirstOrDefault()?.Name;
+            DonneesImportes.NomDataCout = DonneesImportes.Donnees.Skip(1).FirstOrDefault()?.Name;
             SaveData();
             StateHasChanged();
         }
@@ -249,7 +288,14 @@
     {
         DonneesImportes.NomDataConjointe2 = e.Value.ToString();
     }
-
+    public void ChangeDataCout(ChangeEventArgs e)
+    {
+        DonneesImportes.NomDataCout = e.Value.ToString();
+    }
+    public void ChangeDataCategorie(ChangeEventArgs e)
+    {
+        DonneesImportes.NomDataCategorie = e.Value.ToString();
+    }
     protected override async void OnInitialized()
     {
         if (donneeContainer.Value != null)
@@ -285,6 +331,11 @@
     {
         SaveData();
         NavManager.NavigateTo("/CalibrateDistributionConjointe");
+    }
+    private void CalibrerDonneFrequenceCout()
+    {
+        SaveData();
+        NavManager.NavigateTo("/CalibrateDistributionFrequenceCout");
     }
 
     private void ShowAcordion()

@@ -1,0 +1,178 @@
+﻿@using OnlineCalibrator.Service
+@using OnlineCalibrator.Shared;
+@using System
+@using System.Text
+@using System.IO
+@using System.Text.RegularExpressions
+@using Microsoft.Extensions.Logging
+@using OnlineCalibrator.Shared.MachineLearning
+@using OnlineCalibrator.SharedPages.ViewModel
+@using SkiaSharp;
+@using SpawnDev.BlazorJS.WebWorkers
+@using Stochastique.Enums;
+@using Stochastique;
+@using LiveChartsCore.SkiaSharpView.Painting;
+@using pax.BlazorChartJs
+@inherits BasePage
+@inject NavigationManager NavManager
+@inject IJSRuntime js
+@inject DonneeContainer donneeContainer
+@page "/AnalyseFrequenceCout"
+<ModalChart @ref="modal" />
+@if (DonneesImportes != null)
+{
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mynavbar" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Import">Import des données</a></li>
+            <li class="breadcrumb-item"><a href="/CalibrateDistributionConjointe">Calibration des données frequence cout (@DonneesImportes.NomDataCategorie - @DonneesImportes.NomDataCout)</a></li>
+            <li class="breadcrumb-item active">Indentification de la copule</li>
+        </ol>
+    </nav>
+
+
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <button class="nav-link" @onclick="ClickNombre" >Nombre</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" @onclick="@ClickCout">Cout</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link"@onclick="ClickCopule">Copule</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link"  @onclick="ClickSynthese">Synthèse</button>
+        </li>
+    </ul>
+     <ComposantAnalyseDistribution Donnees="@DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre" DonneesImportes="@DonneesImportes" IsVisible="@ShowNombre" />
+    <ComposantAnalyseDistribution Donnees="@DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout" DonneesImportes="@DonneesImportes" IsVisible="@ShoCout" />
+    <ComposantAnalyseCopule Donnees="@DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.DonnneesCopules" DonneesImportes="@DonneesImportes" IsVisible="@ShowCopule" />
+
+    @if (ShowSynthese)
+    {
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    Résultats de la calibration
+                </div>
+                <div class="card-body">
+                    <div>La loi de nombre calibrée est la suivante: @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Nombre.CalibratedDistribution.ToString()</div>
+                    <div>La loi de cout calibrée est la suivante: @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Cout.CalibratedDistribution.ToString()</div>
+                    <div>La copule calibrée est la suivante: @DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.DonnneesCopules.CalibratedCopule.ToString()</div>
+                </div>
+            </div>
+            @if (ChartCout != null)
+            {
+                
+                <div class="card ">
+                    <div class="card-header">
+                        FDR + CDF Coût Total
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container500">
+                            <ChartComponent @ref="c1" ChartJsConfig="ChartCout.ChartJsConfig">
+                            </ChartComponent>
+                        </div>
+                    </div>
+                </div>
+
+            }
+
+            <div class="card">
+                <div class="card-header">
+                    Simuler des réalisation
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-check-label">Nombre de ligne</label>
+                        <InputNumber @bind-Value="@NbRow" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-check-label">Utiliser la copule paramétrée?</label>
+                        <InputCheckbox @bind-Value="@DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.UtiliserCopule" />
+                    </div>
+                    <button class="btn btn-primary" @onclick="ExportSample">Simuler les valeurs</button>
+                </div>
+            </div>
+        </div>
+    }
+}
+@code {
+    private DonneesImportes? DonneesImportes;
+    private bool ShowCopule;
+    private bool ShowNombre = true;
+    private bool ShoCout;
+    private bool ShowSynthese;
+    private int NbRow=10000;
+    private ModalChart modal;
+    private ChartComponent c1;
+    private ChartViewModelLine ChartCout;
+    protected override async void OnInitialized()
+    {
+
+        if (donneeContainer.Value != null)
+        {
+            DonneesImportes = donneeContainer.Value;
+        }
+        else
+        {
+            var data = await GetData("donneesImportes");
+            DonneesImportes = DonneesImportes.FromMsgPack(data);
+
+        }
+
+    }
+    private void ClickSynthese()
+    {
+        ShoCout = false;
+        ShowNombre = false;
+        ShowCopule = false;
+        ShowSynthese = true;
+        if (DonneesImportes != null && DonneesImportes.ActualDonneesPourAnalyseFrequenceCout != null)
+        {
+            ChartCout = new ChartViewModelLine(new List<Point[]?> { DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.PointsKDE, DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.PointsCDF }, true);
+        }
+        StateHasChanged();
+        
+
+    }
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(c1!=null)
+        {
+            c1.Modal = modal;
+        }
+    }
+    private void ClickNombre()
+    {
+        ShoCout = false;
+        ShowNombre = true;
+        ShowCopule = false;
+        ShowSynthese = false;
+    }
+    private void ClickCout()
+    {
+        ShoCout = true;
+        ShowNombre = false;
+        ShowCopule = false;
+        ShowSynthese = false;
+    }
+    private void ClickCopule()
+    {
+        ShoCout = false;
+        ShowNombre = false;
+        ShowCopule = true;
+        ShowSynthese = false;
+    }
+    private async void ExportSample()
+    {
+        StringBuilder sb = new StringBuilder();
+        var sample = DonneesImportes.ActualDonneesPourAnalyseFrequenceCout.Sample(NbRow);
+        for (int i = 0; i < NbRow; i++)
+        {
+            sb.AppendLine(string.Join(";", sample[i].Select(a => a.ToString())));
+        }
+        await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
+    }
+
+}

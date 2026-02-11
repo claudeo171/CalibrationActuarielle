@@ -152,10 +152,7 @@
     public async void UpdateCalibration(TypeCalibration? typeCalibration)
     {
         distribution = DonneesImportes.ActualData?.GetDistribution(TypeDistribution.Normal, typeCalibration);
-        QQPlot = new ChartViewModelLine(
-    DonneesImportes.ActualData?.GetQQPlot(TypeDistribution.Normal),
-    new List<SolidColorPaint>() { new SolidColorPaint(SKColors.CornflowerBlue), new SolidColorPaint(SKColors.IndianRed) },
-    new List<SolidColorPaint>() { null, null }, new List<double>() { 0, 0 }, new List<SolidColorPaint>() { null, null });
+        QQPlot = new ChartViewModelLine(DonneesImportes.ActualData?.GetQQPlot(TypeDistribution.Normal));
     }
     private ModalChart modal;
     private ChartComponent c1;
