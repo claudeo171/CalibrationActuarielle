@@ -6,8 +6,6 @@ using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
 using OnlineCalibrator.SharedPages;
 using pax.BlazorChartJs;
-using SpawnDev.BlazorJS;
-using SpawnDev.BlazorJS.WebWorkers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -24,6 +22,4 @@ builder.Services.AddChartJs(options =>
     options.ChartJsPluginDatalabelsLocation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
 });
 //for multithreading
-builder.Services.AddBlazorJSRuntime();
-builder.Services.AddWebWorkerService();
 await builder.Build().RunAsync();
