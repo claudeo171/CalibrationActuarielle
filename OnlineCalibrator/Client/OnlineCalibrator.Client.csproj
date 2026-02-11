@@ -1,37 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Platforms>AnyCPU;x86;x64</Platforms>
-    <CompressionEnabled>true</CompressionEnabled>
-    <RunAOTCompilation>true</RunAOTCompilation>
-    <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Platforms>AnyCPU;x86;x64</Platforms>
+		<CompressionEnabled>true</CompressionEnabled>
+		<RunAOTCompilation>true</RunAOTCompilation>
+		<WasmStripILAfterAOT>true</WasmStripILAfterAOT>
+		<WasmApplicationEnvironmentName>Staging</WasmApplicationEnvironmentName>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\script\common.js" />
-    <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc4.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="9.0.1" />
-    <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.9" />
-    <PackageReference Include="System.Formats.Nrbf" Version="9.0.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<_ContentIncludedByDefault Remove="wwwroot\script\common.js" />
+		<PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc4.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.3" />
+		<PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.9" />
+		<PackageReference Include="System.Formats.Nrbf" Version="10.0.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\OnlineCalibrator.SharedPages\OnlineCalibrator.SharedPages.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<TrimmerRootAssembly Include="NumSharp.Lite" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\OnlineCalibrator.SharedPages\OnlineCalibrator.SharedPages.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Update="wwwroot\Content\Image\FormatImport.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Update="wwwroot\script\common.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Update="wwwroot\Content\Image\FormatImport.png">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Update="wwwroot\script\common.js">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 
 </Project>

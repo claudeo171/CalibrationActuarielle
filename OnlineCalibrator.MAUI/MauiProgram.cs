@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
-using SpawnDev.BlazorJS.WebWorkers;
-using SpawnDev.BlazorJS;
 using pax.BlazorChartJs;
 using OnlineCalibrator.SharedPages;
 
@@ -26,8 +24,6 @@ namespace OnlineCalibrator.MAUI
             builder.Services.AddSingleton<DonneeContainer>();
             builder.Services.AddSingleton<IMLService, MLService>();
             //for multithreading
-            builder.Services.AddBlazorJSRuntime();
-            builder.Services.AddWebWorkerService();
             builder.Services.AddChartJs(options =>
             {
                 // default
