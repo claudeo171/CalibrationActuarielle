@@ -2,8 +2,6 @@
 using Microsoft.Extensions.Logging;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
-using SpawnDev.BlazorJS.WebWorkers;
-using SpawnDev.BlazorJS;
 using pax.BlazorChartJs;
 using OnlineCalibrator.SharedPages;
 
