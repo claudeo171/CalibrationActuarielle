@@ -10,14 +10,16 @@
         while(data!="Fin")
         {
             bytes.AddRange(Convert.FromBase64String(data));
+            i++;
             data = await sessionStorage.GetItemAsStringAsync(name + $"_{i}");
         }
         return bytes.ToArray();
     }
-    public async void SaveData(string name, byte[] values)
+    public async Task SaveData(string name, byte[] values)
     {
         int indice = 0;
         int i = 0;
+        await RemoveData(name);
         while(values.Length-indice>0)
         {
             await sessionStorage.SetItemAsStringAsync(name + $"_{i}", Convert.ToBase64String(values.Skip(indice).Take(Math.Min(500000, values.Length - indice)).ToArray()));
@@ -26,7 +28,7 @@
         }
         await sessionStorage.SetItemAsStringAsync(name + $"_{i}", "Fin");
     }
-    public async void RemoveData(string name)
+    public async Task RemoveData(string name)
     {
         int i = 0;
         while (await sessionStorage.ContainKeyAsync(name + $"_{i}"))

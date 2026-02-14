@@ -260,7 +260,7 @@
         stream.Close();
         try
         {
-            DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name);
+            DonneesImportes = FileService.GetDataFromFile(ms, e.File.Name,EnvironementCalibration.EstMAUI);
             DonneesImportes.NomDataConjointe1 = DonneesImportes.Donnees.FirstOrDefault()?.Name;
             DonneesImportes.NomDataConjointe2 = DonneesImportes.Donnees.Skip(1).FirstOrDefault()?.Name;
             DonneesImportes.NomDataCategorie = DonneesImportes.Donnees.FirstOrDefault()?.Name;
@@ -309,7 +309,7 @@
             if (hasData)
             {
                 var data = await GetData("donneesImportes");
-                DonneesImportes = DonneesImportes.FromMsgPack(data);
+                DonneesImportes = DonneesImportes.FromMsgPack(data, EnvironementCalibration.EstMAUI);
             }
         }
         StateHasChanged();
@@ -318,7 +318,7 @@
     private async void SaveData()
     {
         donneeContainer.SetValue(DonneesImportes);
-        SaveData("donneesImportes", DonneesImportes.ToMsgPack());
+        SaveData("donneesImportes", DonneesImportes.ToMsgPack(EnvironementCalibration.EstMAUI));
     }
 
     private void CalibrerDonne()
@@ -356,7 +356,7 @@
     private async void SauvegarderDonnee()
     {
 
-        var fileStream = new MemoryStream(DonneesImportes.ToMsgPack());
+        var fileStream = new MemoryStream(DonneesImportes.ToMsgPack(EnvironementCalibration.EstMAUI));
         var fileName = "test.data";
         using var streamRef = new DotNetStreamReference(stream: fileStream);
         await js.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);

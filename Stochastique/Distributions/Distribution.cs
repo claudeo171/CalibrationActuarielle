@@ -613,7 +613,7 @@ namespace Stochastique.Distributions
 
         public override string ToString()
         {
-            return Type + "(" + string.Concat(AllParameters().Select(a => a.Name + ":" + a.Value)) + ")";
+            return Type + "(" + string.Concat(AllParameters().Select(a => a.Name + ":" + a.Value+";")) + ")";
         }
 
         public double DistributionFunction(double x)

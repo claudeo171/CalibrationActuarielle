@@ -20,9 +20,6 @@ namespace Stochastique.Copule
         //Loi dont la tranformée de Laplace est égale à la fonction "inverseGenerateur"
         [MemoryPack.MemoryPackOrder(4)]
         protected Distribution Distribution { get; set; }
-
-        [MemoryPack.MemoryPackOrder(5)]
-        public int Dimension { get; set; }
         
         public CopuleArchimedienne(int dimention)
         {

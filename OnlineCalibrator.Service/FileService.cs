@@ -23,7 +23,7 @@ namespace OnlineCalibrator.Service
         {
             return input.Split(';');
         }
-        public static DonneesImportes GetDataFromFile(Stream singleFile, string name)
+        public static DonneesImportes GetDataFromFile(Stream singleFile, string name,bool estCompresse)
         {
             var donneesImportes = new DonneesImportes();
             Regex regex = new Regex(".+\\.csv", RegexOptions.Compiled);
@@ -33,7 +33,7 @@ namespace OnlineCalibrator.Service
                 if (regex.IsMatch(name))
                 {
 
-                    donneesImportes = DonneesImportes.FromMsgPack(UseStreamDotReadMethod(singleFile));
+                    donneesImportes = DonneesImportes.FromMsgPack(UseStreamDotReadMethod(singleFile),estCompresse);
 
                     donneesImportes.NomData = donneesImportes.Donnees.FirstOrDefault()?.Name;
                 }

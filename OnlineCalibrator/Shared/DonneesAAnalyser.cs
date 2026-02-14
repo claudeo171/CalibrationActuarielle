@@ -59,6 +59,8 @@ namespace OnlineCalibrator.Shared
         /// </summary>
         [MemoryPack.MemoryPackOrder(3)]
         public List<DistributionWithDatas> Distributions { get; set; } = new List<DistributionWithDatas>();
+        [MemoryPack.MemoryPackIgnore]
+        public DistributionWithDatas? CalibratedDistributionsWithData => Distributions?.FirstOrDefault(a => a.Distribution.Type == CalibratedTypeDistribution);
 
         [MemoryPack.MemoryPackOrder(4)]
         public bool IsDiscreteDistribution { get; set; }

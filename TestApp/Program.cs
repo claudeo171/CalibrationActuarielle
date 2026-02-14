@@ -13,32 +13,11 @@ using Stochastique.Distributions.Continous;
 using Stochastique.SpecialFunction;
 using System.Text;
 using TestApp;
-WeibullDistribution fd = new WeibullDistribution(2, 4);
-GammaDistribution GD = new GammaDistribution(100, 12);
-Khi2Distribution k2 = new Khi2Distribution(100);
-var mmmmm= fd.Simulate(new Random(13465), 100000).Mean();
-var vvvvvv = fd.Simulate(new Random(134665), 100000).Variance();
-var SSSSS = fd.Simulate(new Random(134665), 100000).Skewness();
-var KKKK = fd.Simulate(new Random(13465), 100000).Kurtosis();
-var loiNormale = new NormalDistribution(0, 1);
-List<List<double[][]>> rstConfusionMatrix = new List<List<double[][]>>();
-foreach (var taille in new List<int> { 20,50,100})
-{
-    var rzzzd = new Random(13465);
-    var sample = loiNormale.Simulate(rzzzd, taille);
-    DonneesImportes data = new DonneesImportes();
-    data.Donnees = new List<DonneesAAnalyser> { new DonneesAAnalyser { Values = sample, Name="a" }};
-    data.NomData = "a";
-    data.ActualData.GetAllDistributions();
-    data.ActualData.CalibrerMLI();
-    rstConfusionMatrix.Add(new List<double[][]> { data.ActualData.ConfusionMatrixML, data.ActualData.ConfusionMatrixMaximumVraissemblance });
-
-}
 
 
 
 #region Test Confusion Matrix MLD
-var testMatrice = FileService.GetDataFromFile(new FileStream("./test.csv", FileMode.Open, FileAccess.Read), "tes.csv");
+var testMatrice = FileService.GetDataFromFile(new FileStream("./test.csv", FileMode.Open, FileAccess.Read), "tes.csv", false);
 
 
 testMatrice.NomData = testMatrice.Donnees.First().Name;
@@ -51,7 +30,7 @@ testMatrice.ActualData.ComputeMLEConfusionMatrix();
 #endregion
 
 #region test copule
-var testCopule = FileService.GetDataFromFile(new FileStream("C:\\users\\parent.claude\\Documents\\Classeur1.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv");
+var testCopule = FileService.GetDataFromFile(new FileStream("C:\\users\\parent.claude\\Documents\\Classeur1.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv", false);
 
 
 testCopule.NomData = testCopule.Donnees.First().Name;   
@@ -64,42 +43,16 @@ var resultatTestCopule = testCopule.ActualDonneesPourAnalyseConjointe.GetAllCopu
 testCopule.ActualDonneesPourAnalyseConjointe?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
 testCopule.ActualDonneesPourAnalyseConjointe?.GetCopuleCopulePlot(new Random(123));
 //testCopule.DonneesPourAnalyseConjointes = null;
-var trololo4864=testCopule.ToMsgPack();
+var trololo4864=testCopule.ToMsgPack(false);
 //var totogggg= MessagePack.MessagePackSerializer.Serialize(testCopule.ActualDonneesPourAnalyseConjointe.Copules[2]);
-DonneesImportes.FromMsgPack(trololo4864);
+var ttgjoigj=DonneesImportes.FromMsgPack(trololo4864,false);
 #endregion
 
-#region Graphique Puissance test
 
-loiNormale = new NormalDistribution(0, 1);
-var loiBeta = new LoiBeta(0.5, 0.5);
-var loiBeta2 = new GammaDistribution(5, 5);
-int nbSim = 1000;
-double[] statNormale = new double[nbSim];
-double[] statBeta = new double[nbSim];
-double[] statBeta2 = new double[nbSim];
-Random randdd= new Random(154365458);
-for(int i = 0; i < nbSim; i++)
-{
-    statNormale[i] = new ShapiroTest(loiNormale.Simulate(randdd, 50)).Statistic;
-    statBeta[i] = new ShapiroTest(loiBeta.Simulate(randdd, 50)).Statistic;
-    statBeta2[i] = new ShapiroTest(loiBeta2.Simulate(randdd, 50)).Statistic;
-}
-
-GenerationGraphique.SaveChartImage(new List<Point[]> { GenerationGraphique.GetDensity(statNormale, 100), GenerationGraphique.GetDensity(statBeta, 100), GenerationGraphique.GetDensity(statBeta2, 100) },
-
-    new List<SolidColorPaint> { new SolidColorPaint(SKColors.Blue.WithAlpha(0)), new SolidColorPaint(SKColors.DarkRed.WithAlpha(0)), new SolidColorPaint(SKColors.Indigo.WithAlpha(0)) },
-    new List<SolidColorPaint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.DarkRed) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.Indigo) { StrokeThickness = 0 } },
-     new List<SolidColorPaint> { new SolidColorPaint(SKColors.Blue) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.DarkRed) { StrokeThickness = 0 }, new SolidColorPaint(SKColors.Indigo) { StrokeThickness = 0 } },
-    new List<int> { 0,0,0 },
-
-    "distributionTestShapiro",800, 400, true);
-
-#endregion
 
 
 #region Test Tronqué
-var testTronque = FileService.GetDataFromFile(new FileStream("./TestTronque.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv");
+var testTronque = FileService.GetDataFromFile(new FileStream("./TestTronque.csv", FileMode.Open, FileAccess.Read), "NormaleCorrelle.csv", false);
 
 
 testTronque.NomData = testTronque.Donnees.First().Name;
@@ -211,7 +164,7 @@ var d = Double.MinValue;
 
 Console.WriteLine(d.ToBeautifulString());
 //DonneesImportes.FromMsgPack(File.ReadAllBytes("C:\\Users\\Claude\\Downloads\\log (3).data"));
-var elt=FileService.GetDataFromFile(new FileStream("C:\\users\\claude\\Documents\\NormaleCorrelle.csv", FileMode.Open,FileAccess.Read), "NormaleCorrelle.csv");
+var elt=FileService.GetDataFromFile(new FileStream("C:\\users\\claude\\Documents\\NormaleCorrelle.csv", FileMode.Open,FileAccess.Read), "NormaleCorrelle.csv", false);
 
 
 elt.NomData= elt.Donnees.First().Name;
@@ -227,7 +180,7 @@ elt.ActualData.GetQQPlot();
 
 elt.ActualData.Distributions.First().ToMsgPack().FromMsgPack<DistributionWithDatas>();
 
-var toto33 = DonneesImportes.FromMsgPack(elt.ToMsgPack());
+var toto33 = DonneesImportes.FromMsgPack(elt.ToMsgPack(false), false);
 elt.ActualData.CalibratedDistribution=toto.First(a=>a.Distribution.Type==Stochastique.Enums.TypeDistribution.Beta).Distribution;
 elt.ActualData.GetQQPlot();
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
@@ -243,7 +196,7 @@ foreach (var v in toto)
     v.Distribution.Skewness();
 }
 elt.ActualData?.ChangeSelectionMethod(Stochastique.Enums.MethodeCalibrationRetenue.Vraisemblance);
-DonneesImportes.FromMsgPack(elt.ToMsgPack());
+DonneesImportes.FromMsgPack(elt.ToMsgPack(false), false);
 elt.ActualData.CalibrerMLI();
 FileService fs = new FileService();
 File.WriteAllBytes("test.docx", fs.ExportFileDocx(elt));

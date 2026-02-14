@@ -17,7 +17,7 @@ namespace Stochastique.Copule
         [MemoryPack.MemoryPackIgnore]
         private DenseMatrix matriceCorrelations;
         [MemoryPack.MemoryPackOrder(5)]
-        private double[][] matrice;
+        public double[][] Matrice { get; set; }
         [MemoryPack.MemoryPackConstructor]
         public CopuleGaussienne()
         {
@@ -109,15 +109,18 @@ namespace Stochastique.Copule
         [MemoryPack.MemoryPackOnSerializing]
         public void OnBeforeSerialize()
         {
-            matrice = matriceCorrelations?.ToColumnArrays();
+            Matrice = matriceCorrelations?.ToColumnArrays();
         }
         [MemoryPack.MemoryPackOnDeserialized]
         public void OnAfterDeserialize()
         {
-            matriceCorrelations = new DenseMatrix( matrice.Length, matrice[0].Length);
-            for(int i=0;i< matrice.Length;i++)
-                for (int j = 0; j < matrice[i].Length; j++)
-                    matriceCorrelations.At(i, j, matrice[i][j]);
+            if (Matrice != null)
+            {
+                matriceCorrelations = new DenseMatrix(Matrice.Length, Matrice[0].Length);
+                for (int i = 0; i < Matrice.Length; i++)
+                    for (int j = 0; j < Matrice[i].Length; j++)
+                        matriceCorrelations.At(i, j, Matrice[i][j]);
+            }
         }
     }
 }

@@ -1,11 +1,12 @@
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using OnlineCalibrator.Client;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
 using OnlineCalibrator.SharedPages;
 using pax.BlazorChartJs;
+using SpawnDev.BlazorJS;
+using SpawnDev.BlazorJS.WebWorkers;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -15,6 +16,16 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddSingleton<DonneeContainer>();
 builder.Services.AddSingleton<IMLService, MLService>();
+/*BlazorWebWorker*/
+builder.Services.AddBlazorJSRuntime();
+builder.Services.AddWebWorkerService(WebWorkerService =>
+{
+    WebWorkerService.TaskPool.MaxPoolSize = WebWorkerService.MaxWorkerCount;
+});
+
+// Other misc. services
+builder.Services.AddSingleton<IGrosCalculService, GrosCalculService>();
+//SUite
 builder.Services.AddChartJs(options =>
 {
     // default
@@ -22,4 +33,4 @@ builder.Services.AddChartJs(options =>
     options.ChartJsPluginDatalabelsLocation = "https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2";
 });
 //for multithreading
-await builder.Build().RunAsync();
+await builder.Build().BlazorJSRunAsync();

@@ -16,6 +16,8 @@
 @using Stochastique.Test
 @using pax.BlazorChartJs
 @using OnlineCalibrator.Shared.MachineLearning
+@inject WebWorkerService webWorkerService
+@inject IGrosCalculService mathsService
 @inject NavigationManager NavManager
 @inject DonneeContainer donneeContainer
 @inject IJSRuntime js
@@ -23,7 +25,14 @@
 @if(IsVisible)
 {
 <ModalChart @ref="modal" />
-
+    @if (ShowSpiner)
+    {
+        <div class="spinnerFS d-flex align-items-center text-center">
+            <div class="spinner-border spinner-centrer"  role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
 
 <div class="row">
     @if (Donnees != null)
@@ -124,7 +133,7 @@
                         else
                         {
 
-                            <h5>Probabilité des quantiles au niveau gloabl (EEL)</h5>
+                            <h5>Probabilité des quantiles au niveau gloable (EEL)</h5>
                             <div class="chart-container300">
                                 <ChartComponent @ref="c3" ChartJsConfig="QuantileEEL.ChartJsConfig">
                                 </ChartComponent>
@@ -322,7 +331,7 @@
 
 
 @code {
-
+    private bool ShowSpiner;
     private bool isInit;
     private List<MethodeCalibrationRetenue> AviableMethod = new List<MethodeCalibrationRetenue> { MethodeCalibrationRetenue.Vraisemblance, MethodeCalibrationRetenue.AIC, MethodeCalibrationRetenue.BIC, MethodeCalibrationRetenue.KSTest, MethodeCalibrationRetenue.Manuelle };
     private List<DistributionWithDatas>? distributions;
@@ -348,6 +357,7 @@
     private List<string> Notifications = new List<string>();
     private int NbRow = 1000;
     private int NbCol = 10;
+    private WebWorker? webWorker;
     protected override async void OnInitialized()
     {
         if (Donnees != null)
@@ -367,11 +377,11 @@
     private async void SaveData()
     {
         donneeContainer.SetValue(DonneesImportes);
-        var data = DonneesImportes.ToMsgPack();
+        var data = DonneesImportes.ToMsgPack(EnvironementCalibration.EstMAUI);
         SaveData("donneesImportes", data);
     }
 
-    protected void UpdateCalibration(bool b, bool isTruncated)
+    protected async void UpdateCalibration(bool b, bool isTruncated)
     {
         if (isTruncated)
         {
@@ -422,7 +432,7 @@
         ChartMatrixEcart.ChartJsConfig.ReinitializeChart();
 
     }
-    public async void UpdateChart()
+    public async Task UpdateChart()
     {
         if (Donnees.ConfusionMatrixML != null && ChartMatrixMachineLearning == null)
         {
@@ -487,7 +497,7 @@
         Donnees.IncludeTruncatedDistributions = true;
         UpdateCalibration(true, true);
     }
-    public async void ExportSample()
+    public async Task ExportSample()
     {
         Random r = MersenneTwister.MTRandom.Create(1234533);
         StringBuilder sb = new StringBuilder();
@@ -499,13 +509,30 @@
         }
         await FileUtil.SaveAs(js, "sample.csv", System.Text.Encoding.UTF8.GetBytes(sb.ToString()));
     }
-    public async void AddMonteCarlo()
+    public async Task AddMonteCarlo()
     {
-        Donnees?.AddMonteCarloTest();
+        ShowSpiner = true;
+        StateHasChanged();
+        //Donnees?.AddMonteCarloTest();
+        var s1 = string.Concat(Donnees.Values.Select(a => a.ToString() + ";"));
+        var s2 = Donnees.CalibratedDistribution.ToString();
+        if (EnvironementCalibration.EstMAUI)
+        {
+            var result = await mathsService.CalculELL(s1, s2);
+            Donnees.CalibratedDistributionsWithData.TestStatistiques.Add(new EELQuantileTest(result.Split(';').SkipLast(1).Select(a => Convert.ToDouble(a)).ToList(), 0.05));
+        }
+        else
+        {
+            if (webWorker == null) webWorker = await webWorkerService.GetWebWorker();
+            var mathsServiceWorker = webWorker.GetService<IGrosCalculService>();
+            var result = await mathsServiceWorker.CalculELL(s1, s2);
+            Donnees.CalibratedDistributionsWithData.TestStatistiques.Add(new EELQuantileTest(result.Split(';').SkipLast(1).Select(a => Convert.ToDouble(a)).ToList(), 0.05));
+        }
         UpdateChart();
         SaveData();
+        ShowSpiner = false;
     }
-    public async void CalibrateMLI()
+    public async Task CalibrateMLI()
     {
         Notifications.Add($"La calibration par reconnaissance d'image est en cours, le calcul est long, vous receverez une notification lors de la fin du calcul.{""}");
         StateHasChanged();
@@ -533,7 +560,7 @@
         Notifications.Remove(notif);
     }
 
-    public async void ExporterErreurModele()
+    public async Task ExporterErreurModele()
     {
         var distribs = Donnees.GetDistributionAvecErreurDeModele();
         StringBuilder stringBuilder = new StringBuilder();

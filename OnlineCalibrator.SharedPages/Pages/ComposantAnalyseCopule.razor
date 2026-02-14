@@ -8,7 +8,6 @@
 @using OnlineCalibrator.Shared.MachineLearning
 @using OnlineCalibrator.SharedPages.ViewModel
 @using SkiaSharp;
-@using SpawnDev.BlazorJS.WebWorkers
 @using Stochastique.Enums;
 @using Stochastique;
 @using LiveChartsCore.SkiaSharpView.Painting;
@@ -241,7 +240,7 @@
     private async void SaveData()
     {
         donneeContainer.SetValue(DonneesImportes);
-        SaveData("donneesImportes", DonneesImportes.ToMsgPack());
+        SaveData("donneesImportes", DonneesImportes.ToMsgPack(EnvironementCalibration.EstMAUI));
     }
     public async void UpdateChart()
     {

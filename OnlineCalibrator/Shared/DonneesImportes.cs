@@ -89,24 +89,38 @@ namespace OnlineCalibrator.Shared
 
 
 
-        public byte[] ToMsgPack()
+        public byte[] ToMsgPack(bool estCompresse)
         {
-            using var compressor = new MemoryPack.Compression.BrotliCompressor();
-            MemoryPack.MemoryPackSerializer.Serialize(compressor,this);
-            return compressor.ToArray();
+            if (estCompresse)
+            {
+                using var compressor = new MemoryPack.Compression.BrotliCompressor();
+                MemoryPack.MemoryPackSerializer.Serialize(compressor, this);
+                return compressor.ToArray();
+            }
+            else
+            {
+                return MemoryPack.MemoryPackSerializer.Serialize(this);
+            }
         }
 
-        public static DonneesImportes? FromMsgPack(byte[] json)
+        public static DonneesImportes? FromMsgPack(byte[] json, bool estCompresse)
         {
-            try
+            if (estCompresse)
             {
-                using var decompressor = new MemoryPack.Compression.BrotliDecompressor();
-                var decompressedBuffer = decompressor.Decompress(json);
-                return MemoryPack.MemoryPackSerializer.Deserialize<DonneesImportes?>(decompressedBuffer);
+                try
+                {
+                    using var decompressor = new MemoryPack.Compression.BrotliDecompressor();
+                    var decompressedBuffer = decompressor.Decompress(json);
+                    return MemoryPack.MemoryPackSerializer.Deserialize<DonneesImportes?>(decompressedBuffer);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
             }
-            catch (Exception e)
+            else
             {
-                return null;
+                return MemoryPack.MemoryPackSerializer.Deserialize<DonneesImportes?>(json);
             }
         }
     }

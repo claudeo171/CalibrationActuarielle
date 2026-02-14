@@ -25,7 +25,7 @@ if (args.Length == 3)
     var path = args[0];
     var variable = args[1];
     int nombreSimulation = Convert.ToInt32(args[2]);
-    var data = FileService.GetDataFromFile(new FileStream(path, FileMode.Open, FileAccess.Read), Path.GetFileName(path));
+    var data = FileService.GetDataFromFile(new FileStream(path, FileMode.Open, FileAccess.Read), Path.GetFileName(path),false);
     data.NomData = variable;
     var calibratedDistribution = data.ActualData.CalibratedDistribution;
     var random = new Random();
