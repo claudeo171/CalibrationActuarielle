@@ -4,6 +4,9 @@ using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
 using pax.BlazorChartJs;
 using OnlineCalibrator.SharedPages;
+using SpawnDev.BlazorJS.WebWorkers;
+using SpawnDev.BlazorJS;
+using SpawnDev;
 
 namespace OnlineCalibrator.MAUI
 {
@@ -28,16 +31,16 @@ namespace OnlineCalibrator.MAUI
             builder.Services.AddBlazorJSRuntime();
             builder.Services.AddWebWorkerService(webWorkerService =>
             {
-                /*
+                
                 // Optionally configure the WebWorkerService service before it is used
                 // Default WebWorkerService.TaskPool settings: PoolSize = 0, MaxPoolSize = 1, AutoGrow = true
                 // Below sets TaskPool max size to 2. By default the TaskPool size will grow as needed up to the max pool size.
                 // Setting max pool size to -1 will set it to the value of navigator.hardwareConcurrency
-                webWorkerService.TaskPool.MaxPoolSize = 2;
+                //webWorkerService.TaskPool.MaxPoolSize = 2;
                 // Below is telling the WebWorkerService TaskPool to set the initial size to 2 if running in a Window scope and 0 otherwise
                 // This starts up 2 WebWorkers to handle TaskPool tasks as needed
-                webWorkerService.TaskPool.PoolSize = webWorkerService.GlobalScope == GlobalScope.Window ? 2 : 0;
-                */
+                //webWorkerService.TaskPool.PoolSize = webWorkerService.GlobalScope == GlobalScope.Window ? 2 : 0;
+                
             });
 
             // Other misc. services

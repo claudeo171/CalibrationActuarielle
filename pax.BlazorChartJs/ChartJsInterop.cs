@@ -336,6 +336,10 @@ public class ChartJsInterop : IAsyncDisposable
         {
             // catch disposed exception for statically rendered components (e.g. RenderMode.Auto)
         }
+        catch( Exception )
+        {
+
+        }
     }
 
     private JsonObject? SerializeConfig(ChartJsConfig config)

@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x86;x64</Platforms>
-    <CompressionEnabled>false</CompressionEnabled>
+    <CompressionEnabled>true</CompressionEnabled>
     <RunAOTCompilation>true</RunAOTCompilation>
     <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
     <PublishTrimmed>true</PublishTrimmed>

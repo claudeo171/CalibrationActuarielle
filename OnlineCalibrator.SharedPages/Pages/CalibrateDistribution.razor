@@ -20,78 +20,79 @@
             <li class="breadcrumb-item active">Calibration des données (@DonneesImportes.NomData)</li>
         </ol>
     </nav>
-}
 
-<div class="card">
-    <div class="card-header main-card-header">
-        Calibrer la distribution d'une Variable Aléatoire
-    </div>
-    <div class="card-body row">
-        @if (ChartCDF != null)
-        {
-            <div class="col-xl-6">
-                <div class="card ">
-                    <div class="card-header">
-                        Fonction de répartition empirique
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container500">
-                            <ChartComponent  @ref="c2" ChartJsConfig="ChartCDF.ChartJsConfig">
-                            </ChartComponent>
+
+    <div class="card">
+        <div class="card-header main-card-header">
+            Calibrer la distribution d'une Variable Aléatoire
+        </div>
+        <div class="card-body row">
+            @if (ChartCDF != null)
+            {
+                <div class="col-xl-6">
+                    <div class="card ">
+                        <div class="card-header">
+                            Fonction de répartition empirique
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container500">
+                                <ChartComponent @ref="c2" ChartJsConfig="ChartCDF.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        }
-        @if (ChartKDE != null)
-        {
-            <div class="col-xl-6">
-                <div class="card">
-                    <div class="card-header">
-                        Estimateur à noyau de la Densité
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container500">
-                            <ChartComponent  @ref="c1" ChartJsConfig="ChartKDE.ChartJsConfig">
-                            </ChartComponent>
+            }
+            @if (ChartKDE != null)
+            {
+                <div class="col-xl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            Estimateur à noyau de la Densité
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container500">
+                                <ChartComponent @ref="c1" ChartJsConfig="ChartKDE.ChartJsConfig">
+                                </ChartComponent>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-        }
-        @if (DonneesImportes.ActualData != null)
-        {
+            }
+            @if (DonneesImportes.ActualData != null)
+            {
+                <div class="col-xl-6 col-sm-12">
+                    <div class="card">
+                        <div class="card-header">
+                            Caracteristiques Empiriques
+                        </div>
+                        <div class="card-body">
+                            <ul>
+                                <li> Moyenne : @DonneesImportes.ActualData.Moyenne.ToBeautifulString() </li>
+                                <li> Variance : @DonneesImportes.ActualData.Variance.ToBeautifulString() </li>
+                                <li> Skewness : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
+                                <li> Kurtosis : @DonneesImportes.ActualData.Kurtosis.ToBeautifulString() </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
             <div class="col-xl-6 col-sm-12">
                 <div class="card">
                     <div class="card-header">
-                        Caracteristiques Empiriques
+                        Etudes
                     </div>
                     <div class="card-body">
-                        <ul>
-                            <li> Moyenne : @DonneesImportes.ActualData.Moyenne.ToBeautifulString() </li>
-                            <li> Variance : @DonneesImportes.ActualData.Variance.ToBeautifulString() </li>
-                            <li> Skewness : @DonneesImportes.ActualData.Skewness.ToBeautifulString() </li>
-                            <li> Kurtosis : @DonneesImportes.ActualData.Kurtosis.ToBeautifulString() </li>
-                        </ul>
+                        <a class="btn btn-primary" href="/TestNormalite"> Etude de la normalité </a>
+                        <a class="btn btn-primary" href="/AnalyseDistribution"> Etude de la distribution </a>
                     </div>
                 </div>
-            </div>
-        }
-        <div class="col-xl-6 col-sm-12">
-            <div class="card">
-                <div class="card-header">
-                    Etudes
-                </div>
-                <div class="card-body">
-                    <a class="btn btn-primary" href="/TestNormalite"> Etude de la normalité </a>
-                    <a class="btn btn-primary" href="/AnalyseDistribution"> Etude de la distribution </a>
-                </div>
-            </div>
 
+            </div>
         </div>
     </div>
-</div>
+}
 @code {
     private ModalChart modal;
     private ChartComponent c1;
@@ -127,8 +128,11 @@
     }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        c1.Modal = modal;
-        c2.Modal = modal;
+        if (c1 != null && c2 != null)
+        {
+            c1.Modal = modal;
+            c2.Modal = modal;
+        }
     }
 }
 
