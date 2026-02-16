@@ -31,6 +31,7 @@ html, body {
     z-index:1000;
 }
 .spinner-centrer {
+    position:absolute;
     left:50%;
     width: 15vh;
     height: 15vh;
