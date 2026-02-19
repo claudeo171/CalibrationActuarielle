@@ -154,7 +154,7 @@ namespace Stochastique.Distributions
         }
         public override double ExpextedValue()
         {
-            if (QuantileUp - QuantileDown < 1)
+            if (QuantileUp - QuantileDown < 1 || double.IsNaN(QuantileUp) || double.IsNaN(QuantileDown))
             {
                 return double.NaN;
             }
@@ -184,7 +184,7 @@ namespace Stochastique.Distributions
 
         public override double Variance()
         {
-            if (QuantileUp - QuantileDown < 1)
+            if (QuantileUp - QuantileDown < 1 || double.IsNaN(QuantileUp) || double.IsNaN(QuantileDown))
             {
                 return double.NaN;
             }
@@ -196,7 +196,7 @@ namespace Stochastique.Distributions
         }
         public override double Skewness()
         {
-            if (QuantileUp - QuantileDown < 1)
+            if (QuantileUp - QuantileDown < 1 || double.IsNaN(QuantileUp) || double.IsNaN(QuantileDown))
             {
                 return double.NaN;
             }
@@ -208,7 +208,7 @@ namespace Stochastique.Distributions
         }
         public override double Kurtosis()
         {
-            if (QuantileUp - QuantileDown < 1)
+            if (QuantileUp - QuantileDown < 1 || double.IsNaN(QuantileUp) || double.IsNaN(QuantileDown))
             {
                 return double.NaN;
             }

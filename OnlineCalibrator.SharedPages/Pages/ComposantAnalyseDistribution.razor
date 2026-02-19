@@ -365,7 +365,7 @@
             distributions =Donnees?.GetAllDistributions();
             isInit = true;
             ChangeSelectionMethod(Donnees.MethodeCalibration, true);
-            SaveData();
+            //SaveData();
             StateHasChanged();
             if (Donnees.ConfusionMatrixML != null)
             {
@@ -492,8 +492,38 @@
         QuantileEEL?.ChartJsConfig.ReinitializeChart();
         StateHasChanged();
     }
-    public void IncludeTruncatedDistribution()
+    public async void IncludeTruncatedDistribution()
     {
+        if (!Donnees.Distributions.Any(a => (int)a.Distribution.Type >= 1000))
+        {
+            ShowSpiner = true;
+            StateHasChanged();
+            //Donnees?.AddMonteCarloTest();
+            var s1 = string.Concat(Donnees.Values.Select(a => a.ToString() + ";"));
+            var s2 = Donnees.CalibratedDistribution.ToString();
+            var min = Donnees.ValeurMinTrukated;
+            var max = Donnees.ValeurMaxTrukated;
+            var discreet = Donnees.IsDiscreteDistribution;
+            string result;
+            if (EnvironementCalibration.EstMAUI)
+            {
+                result = await mathsService.CalculDistributionTronques(s1, discreet, min, max);
+
+            }
+            else
+            {
+                if (webWorker == null) webWorker = await webWorkerService.GetWebWorker();
+                var mathsServiceWorker = webWorker.GetService<IGrosCalculService>();
+                result = await mathsServiceWorker.CalculDistributionTronques(s1, discreet, min, max);
+
+            }
+            var distrib = GrosCalculService.GetDistrib(result).Where(a=>(int)a.Type>=1000);
+            Donnees.Distributions.AddRange(distrib.Select(a => new DistributionWithDatas (a,Donnees.Values)));
+        }
+        UpdateChart();
+        //SaveData();
+        ShowSpiner = false;
+        //TODO
         Donnees.IncludeTruncatedDistributions = true;
         UpdateCalibration(true, true);
     }

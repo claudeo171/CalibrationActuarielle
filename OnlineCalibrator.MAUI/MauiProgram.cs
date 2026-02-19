@@ -1,12 +1,16 @@
-﻿using Blazored.SessionStorage;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using OnlineCalibrator.Service;
 using OnlineCalibrator.Shared;
-using pax.BlazorChartJs;
 using OnlineCalibrator.SharedPages;
-using SpawnDev.BlazorJS.WebWorkers;
-using SpawnDev.BlazorJS;
+using OnlineCalibrator.SharedPages.Component;
+using pax.BlazorChartJs;
 using SpawnDev;
+using SpawnDev.BlazorJS;
+using SpawnDev.BlazorJS.WebWorkers;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using Tavenem.DataStorage;
 
 namespace OnlineCalibrator.MAUI
 {
@@ -23,7 +27,6 @@ namespace OnlineCalibrator.MAUI
                 });
             EnvironementCalibration.EstMAUI = true;
             builder.Services.AddMauiBlazorWebView();
-            builder.Services.AddBlazoredSessionStorage();
             builder.Services.AddSingleton<DonneeContainer>();
             builder.Services.AddSingleton<IMLService, MLService>();
             //for multithreading
@@ -42,8 +45,25 @@ namespace OnlineCalibrator.MAUI
                 //webWorkerService.TaskPool.PoolSize = webWorkerService.GlobalScope == GlobalScope.Window ? 2 : 0;
                 
             });
-
-            // Other misc. services
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            options.TypeInfoResolverChain.Add(ItemContext.Default.WithAddedModifier(static typeInfo =>
+            {
+                if (typeInfo.Type == typeof(IIdItem))
+                {
+                    typeInfo.PolymorphismOptions ??= new JsonPolymorphismOptions
+                    {
+                        IgnoreUnrecognizedTypeDiscriminators = true,
+                        UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor,
+                    };
+                    typeInfo.PolymorphismOptions.DerivedTypes.Add(new JsonDerivedType(typeof(SavedData)));
+                }
+            }));
+            builder.Services.AddIndexedDbService();
+            builder.Services.AddIndexedDb(
+                "saveData",
+                ["valueStore"],
+                2,
+                options, key: "id");
             builder.Services.AddSingleton<IGrosCalculService, GrosCalculService>();
             builder.Services.AddChartJs(options =>
             {

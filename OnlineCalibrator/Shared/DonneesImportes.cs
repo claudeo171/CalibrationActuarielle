@@ -91,6 +91,7 @@ namespace OnlineCalibrator.Shared
 
         public byte[] ToMsgPack(bool estCompresse)
         {
+            estCompresse = false;
             if (estCompresse)
             {
                 using var compressor = new MemoryPack.Compression.BrotliCompressor();
@@ -105,6 +106,7 @@ namespace OnlineCalibrator.Shared
 
         public static DonneesImportes? FromMsgPack(byte[] json, bool estCompresse)
         {
+            estCompresse = false;
             if (estCompresse)
             {
                 try

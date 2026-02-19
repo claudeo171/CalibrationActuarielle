@@ -14,7 +14,7 @@ namespace OnlineCalibrator.Shared
     {
         public async Task<string> CalculDistributionTronques(string values, bool isDiscrete, double min, double max)
         {
-            double[] valeurs = values.Split(";").Select(x => Convert.ToDouble(x)).ToArray();
+            double[] valeurs = values.Split(";").SkipLast(1).Select(x => Convert.ToDouble(x)).ToArray();
             DonneesAAnalyser daa = new DonneesAAnalyser { Values = valeurs, ValeurMinTrukated = min, ValeurMaxTrukated = max, IsDiscreteDistribution = isDiscrete, IncludeTruncatedDistributions = true };
             return string.Concat(daa.GetAllDistributions().Select(a => a.Distribution.ToString() + Environment.NewLine));
         }
@@ -27,40 +27,48 @@ namespace OnlineCalibrator.Shared
 
         public static List<Distribution> GetDistrib(string value)
         {
+            
             var distribs = value.Split(Environment.NewLine);
             var rst= new List<Distribution>();
             for (int i = 0; i < distribs.Length; i++) 
             {
-                var premiersplit= distribs[i].Split('(');
-                TypeDistribution dt = Enum.Parse<TypeDistribution>(premiersplit[0]);
-                Distribution distrib;
-                if ((int)dt > 1000)
+                if (!string.IsNullOrEmpty(distribs[i]))
                 {
-                    distrib = new TruncatedDistribution { BaseDistribution = Distribution.CreateDistribution(dt - 1000) };
-                }
-                else
-                {
-                    distrib = Distribution.CreateDistribution(dt);
-                }
-                var splitparam = premiersplit[1].Replace(")","").Split(';').SkipLast(1);
-                foreach (var split in splitparam)
-                {
-                    var splitValeur = split.Split(':');
-                    distrib.AddParameter(new Parameter
+                    var premiersplit = distribs[i].Split('(');
+                    TypeDistribution dt = Enum.Parse<TypeDistribution>(premiersplit[0]);
+                    Distribution distrib;
+                    if ((int)dt > 1000)
                     {
-                        Name = Enum.Parse<ParametreName>(splitValeur[0]),
-                        Value = Convert.ToDouble(splitValeur[1])
-                    });
-                    if(distrib is TruncatedDistribution trunk && splitValeur[0]!=ParametreName.valeurMin.ToString() && splitValeur[0] != ParametreName.ValeurMax.ToString())
-                    {
-                        trunk.AddParameter(new Parameter
-                        {
-                            Name = Enum.Parse<ParametreName>(splitValeur[0]),
-                            Value = Convert.ToDouble(splitValeur[1])
-                        });
+                        distrib = new TruncatedDistribution { BaseDistribution = Distribution.CreateDistribution(dt - 1000) };
                     }
+                    else
+                    {
+                        distrib = Distribution.CreateDistribution(dt);
+                    }
+                    var splitparam = premiersplit[1].Replace(")", "").Split(';').SkipLast(1);
+                    foreach (var split in splitparam)
+                    {
+                        var splitValeur = split.Split(':');
+                        if (distrib is TruncatedDistribution trunk && splitValeur[0] != ParametreName.valeurMin.ToString() && splitValeur[0] != ParametreName.ValeurMax.ToString())
+                        {
+                            trunk.BaseDistribution.AddParameter(new Parameter
+                            {
+                                Name = Enum.Parse<ParametreName>(splitValeur[0]),
+                                Value = Convert.ToDouble(splitValeur[1])
+                            });
+                        }
+                        else
+                        {
+                            distrib.AddParameter(new Parameter
+                            {
+                                Name = Enum.Parse<ParametreName>(splitValeur[0]),
+                                Value = Convert.ToDouble(splitValeur[1])
+                            });
+                        }
+                       
+                    }
+                    rst.Add(distrib);
                 }
-                rst.Add(distrib);
             }
             return rst;
             

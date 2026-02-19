@@ -15,13 +15,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
     <PackageReference Include="LiveChartsCore" Version="2.0.0-rc4.5" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-rc4.5" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
     <PackageReference Include="SkiaSharp.HarfBuzz" Version="2.88.9" />
     <PackageReference Include="SpawnDev.BlazorJS.WebWorkers" Version="3.0.0" />
+    <PackageReference Include="Tavenem.Blazor.IndexedDB" Version="6.4.1" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,44 +1,44 @@
-﻿@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+﻿@using OnlineCalibrator.SharedPages.Component
+@using Tavenem.Blazor.IndexedDB
+
 
 @code {
+    [Inject(Key = "saveData")] private IndexedDb MyDatabase { get; set; } = default!;
     public async Task<byte[]> GetData(string name)
     {
-
-        List<byte> bytes = new List<byte>();
-        int i = 0;
-        var data = await sessionStorage.GetItemAsStringAsync(name + $"_{i}");
-        while(data!="Fin")
+        var store = MyDatabase["valueStore"];
+        var data = await store.GetItemAsync<SavedData>(name);
+        if (data?.Value != null)
         {
-            bytes.AddRange(Convert.FromBase64String(data));
-            i++;
-            data = await sessionStorage.GetItemAsStringAsync(name + $"_{i}");
+            return Convert.FromBase64String(data?.Value);
         }
-        return bytes.ToArray();
+        return null;
     }
     public async Task SaveData(string name, byte[] values)
     {
-        int indice = 0;
-        int i = 0;
-        await RemoveData(name);
-        while(values.Length-indice>0)
+        var store = MyDatabase["valueStore"];
+        try
         {
-            await sessionStorage.SetItemAsStringAsync(name + $"_{i}", Convert.ToBase64String(values.Skip(indice).Take(Math.Min(500000, values.Length - indice)).ToArray()));
-            i++;
-            indice += 500000;
+            bool rst = await store.RemoveItemAsync(name);
+            var item = new SavedData { Id = name, Value = Convert.ToBase64String(values) };
+            await store.StoreItemAsync(item);
         }
-        await sessionStorage.SetItemAsStringAsync(name + $"_{i}", "Fin");
+        catch(Exception e)
+        {
+
+        }
     }
     public async Task RemoveData(string name)
     {
-        int i = 0;
-        while (await sessionStorage.ContainKeyAsync(name + $"_{i}"))
+        var store = MyDatabase["valueStore"];
+        try
         {
-            await sessionStorage.RemoveItemAsync(name + $"_{i}");
-            i++;
+            bool rst = await store.RemoveItemAsync(name);
+        }
+        catch (Exception e)
+        {
+
         }
     }
-    public async Task<bool> HasData(string name)
-    {
-        return await sessionStorage.ContainKeyAsync(name + "_0");
-    }
+
 }

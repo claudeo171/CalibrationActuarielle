@@ -305,10 +305,10 @@
         else
         {
 
-            bool hasData = await HasData("donneesImportes");
-            if (hasData)
+            var data = await GetData("donneesImportes");
+            if (data!=null)
             {
-                var data = await GetData("donneesImportes");
+                
                 DonneesImportes = DonneesImportes.FromMsgPack(data, EnvironementCalibration.EstMAUI);
             }
         }

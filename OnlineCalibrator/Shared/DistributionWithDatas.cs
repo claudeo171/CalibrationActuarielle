@@ -61,8 +61,11 @@ namespace OnlineCalibrator.Shared
             {
                 try
                 {
-                    SeuilAlpha = value.Contains('.') ? Convert.ToDouble(value, new CultureInfo("en-US")) : Convert.ToDouble(value, new CultureInfo("fr-FR"));
-                    UpdateTest();
+                    if (value != null)
+                    {
+                        SeuilAlpha = value.Contains('.') ? Convert.ToDouble(value, new CultureInfo("en-US")) : Convert.ToDouble(value, new CultureInfo("fr-FR"));
+                        UpdateTest();
+                    }
                 }
                 catch
                 {
